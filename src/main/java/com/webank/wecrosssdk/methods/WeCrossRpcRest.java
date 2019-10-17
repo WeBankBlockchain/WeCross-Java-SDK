@@ -41,6 +41,7 @@ public class WeCrossRpcRest implements WeCrossRpc {
 
         Map<String, Object> data = new HashMap<>();
         List<Object> listArgs = Arrays.<Object>asList(args);
+        data.put("to", "");
         data.put("method", method);
         data.put("args", listArgs);
 
