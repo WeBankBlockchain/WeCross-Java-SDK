@@ -30,16 +30,22 @@ verifyGoogleJavaFormat {
     exclude '**/temp/*.java'
 }
 
+configurations.all {
+    //exclude module: 'slf4j-log4j12'
+    //exclude module: "spring-boot-starter-logging"
+    exclude module: "log4j-to-slf4j"
+}
+
 dependencies {
+    compile 'org.apache.logging.log4j:log4j-web:2.7'
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'com.google.guava:guava:23.0'
-    compile 'org.springframework.boot:spring-boot-starter-actuator:2.1.4.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.4.RELEASE'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
+    //annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.4.RELEASE'
+    // testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.4.RELEASE'
 }
 
 jar {
@@ -48,13 +54,6 @@ jar {
     exclude '**/*.xml'
     exclude '**/*.properties'
     exclude '**/*.yml'
-
-    manifest {
-        attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'com.webank.wecross.Application'
-        )
-    }
 
     doLast {
         copy {
@@ -67,10 +66,6 @@ jar {
         }
         copy {
             from file('.').listFiles().findAll { File f -> (f.name.endsWith('.sh') || f.name.endsWith('.env')) }
-            into 'dist'
-        }
-        copy {
-            from file('scripts/')
             into 'dist'
         }
     }
