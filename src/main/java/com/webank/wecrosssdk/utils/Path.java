@@ -7,6 +7,6 @@ public class Path {
     }
 
     public static String pathToUrl(String prefix, String path) {
-        return "http://" + prefix + path.replace('.', '/');
+        return "http://" + prefix + "/" + path.replace('.', '/');
     }
 }
