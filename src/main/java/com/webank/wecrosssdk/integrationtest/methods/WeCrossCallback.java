@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.methods;
+package com.webank.wecrosssdk.integrationtest.methods;
 
 import org.springframework.core.ParameterizedTypeReference;
 

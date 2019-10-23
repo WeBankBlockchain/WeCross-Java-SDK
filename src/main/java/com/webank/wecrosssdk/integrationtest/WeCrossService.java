@@ -1,10 +1,10 @@
-package com.webank.wecrosssdk.rpc;
+package com.webank.wecrosssdk.integrationtest;
 
-import com.webank.wecrosssdk.methods.Request;
-import com.webank.wecrosssdk.methods.Response;
+import com.webank.wecrosssdk.integrationtest.methods.Request;
+import com.webank.wecrosssdk.integrationtest.methods.Response;
 import java.util.concurrent.CompletableFuture;
 
-public interface WeCrossRpcService {
+public interface WeCrossService {
 
     String getWeCrossServer();
 
