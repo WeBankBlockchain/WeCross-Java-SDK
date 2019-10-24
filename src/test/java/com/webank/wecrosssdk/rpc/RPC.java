@@ -1,14 +1,10 @@
-package com.webank.wecrosssdk.integrationtest;
+package com.webank.wecrosssdk.rpc;
 
-import com.webank.wecrosssdk.integrationtest.methods.ResourcesResponse;
-import com.webank.wecrosssdk.integrationtest.methods.Response;
-import com.webank.wecrosssdk.integrationtest.methods.TransactionResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.webank.wecrosssdk.rpc.methods.ResourcesResponse;
+import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
 
 public class RPC {
-
-    static Logger logger = LoggerFactory.getLogger(RPC.class);
 
     public static WeCrossRPC weCrossRPC;
 

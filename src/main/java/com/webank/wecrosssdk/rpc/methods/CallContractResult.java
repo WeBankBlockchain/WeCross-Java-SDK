@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.integrationtest.methods;
+package com.webank.wecrosssdk.rpc.methods;
 
 import java.util.Arrays;
 import java.util.Objects;

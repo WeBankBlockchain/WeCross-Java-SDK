@@ -1,8 +1,8 @@
-package com.webank.wecrosssdk.integrationtest;
+package com.webank.wecrosssdk.rpc;
 
-import com.webank.wecrosssdk.integrationtest.methods.ResourcesResponse;
-import com.webank.wecrosssdk.integrationtest.methods.Response;
-import com.webank.wecrosssdk.integrationtest.methods.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.ResourcesResponse;
+import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
 
 public interface WeCrossRPC {
 
