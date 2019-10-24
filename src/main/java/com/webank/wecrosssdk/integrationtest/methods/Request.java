@@ -1,20 +1,20 @@
-package com.webank.wecrosssdk.methods;
+package com.webank.wecrosssdk.integrationtest.methods;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Request<T> {
     private String version = "0.1";
     private String path;
     private String method;
-    private String sig;
     private T data;
 
-    private WeCrossCallback callback;
+    @JsonIgnore private WeCrossCallback callback;
 
     public Request() {}
 
-    public Request(String path, String method, String sig, T data) {
+    public Request(String path, String method, T data) {
         this.path = path;
         this.method = method;
-        this.sig = sig;
         this.data = data;
     }
 
@@ -40,14 +40,6 @@ public class Request<T> {
 
     public void setMethod(String method) {
         this.method = method;
-    }
-
-    public String getSig() {
-        return sig;
-    }
-
-    public void setSig(String sig) {
-        this.sig = sig;
     }
 
     public T getData() {

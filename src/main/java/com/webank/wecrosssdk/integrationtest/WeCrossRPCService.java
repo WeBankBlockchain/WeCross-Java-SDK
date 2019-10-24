@@ -1,7 +1,7 @@
-package com.webank.wecrosssdk.rpc;
+package com.webank.wecrosssdk.integrationtest;
 
-import com.webank.wecrosssdk.methods.Request;
-import com.webank.wecrosssdk.methods.Response;
+import com.webank.wecrosssdk.integrationtest.methods.Request;
+import com.webank.wecrosssdk.integrationtest.methods.Response;
 import com.webank.wecrosssdk.utils.Path;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
@@ -14,22 +14,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-public class Service implements WeCrossRpcService {
-    private Logger logger = LoggerFactory.getLogger(WeCrossRpcService.class);
+public class WeCrossRPCService implements WeCrossService {
+    private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
 
     // specify wecross node ip and port
     private String server;
 
-    public Service(String server) {
+    public WeCrossRPCService(String server) {
         this.server = server;
     }
 
     private void checkRequest(Request<?> request) throws Exception {
         if (request.getVersion().isEmpty()) {
             throw new Exception("request version is empty");
-        }
-        if (request.getPath().isEmpty()) {
-            throw new Exception("request path is empty");
         }
         if (request.getMethod().isEmpty()) {
             throw new Exception("request method is empty");
@@ -38,7 +35,7 @@ public class Service implements WeCrossRpcService {
 
     private <T extends Response> void checkResponse(ResponseEntity<T> response) throws Exception {
         if (response.getStatusCode() != HttpStatus.OK) {
-            throw new Exception("Method not exists: " + response.toString());
+            throw new Exception("method not exists: " + response.toString());
         }
     }
 
@@ -63,9 +60,9 @@ public class Service implements WeCrossRpcService {
                     restTemplate.exchange(url, HttpMethod.POST, httpRequest, responseType);
 
             checkResponse(httpResponse);
-            Response<T> response = httpResponse.getBody();
+            T response = httpResponse.getBody();
             logger.info(
-                    "Receive status:{} message:{} data:{}",
+                    "receive status:{} message:{} data:{}",
                     response.getResult(),
                     response.getMessage(),
                     response.getData());
@@ -74,7 +71,7 @@ public class Service implements WeCrossRpcService {
                 logger.info("response data: {}", response.getData());
 
                 // handle return values
-                return (T) response;
+                return response;
             }
 
         } catch (Exception e) {

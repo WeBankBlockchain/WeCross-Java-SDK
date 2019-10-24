@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.methods;
+package com.webank.wecrosssdk.integrationtest.methods;
 
 import java.util.Objects;
 
@@ -66,5 +66,21 @@ public class Response<T> {
     @Override
     public int hashCode() {
         return Objects.hash(getVersion(), getResult(), getMessage(), getData());
+    }
+
+    @Override
+    public String toString() {
+        return "Response{"
+                + "version='"
+                + version
+                + '\''
+                + ", result="
+                + result
+                + ", message='"
+                + message
+                + '\''
+                + ", data="
+                + data
+                + '}';
     }
 }
