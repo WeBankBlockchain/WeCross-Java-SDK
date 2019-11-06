@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Response<T> {
     private String version = "0.1";
-    private Integer result = 0;
+    private Integer result = -1;
     private String message;
     private T data;
 

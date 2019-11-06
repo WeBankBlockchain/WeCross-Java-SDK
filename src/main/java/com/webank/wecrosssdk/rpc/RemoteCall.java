@@ -18,7 +18,7 @@ public class RemoteCall<T extends Response> {
         this.request = request;
     }
 
-    public T send() {
+    public T send() throws Exception {
         return weCrossService.send(request, responseType);
     }
 

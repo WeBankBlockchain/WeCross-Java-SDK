@@ -2,7 +2,7 @@ package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.utils.Path;
+import com.webank.wecrosssdk.utils.RPCUtils;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,46 +40,33 @@ public class WeCrossRPCService implements WeCrossService {
     }
 
     @Override
-    public String getWeCrossServer() {
-        return server;
-    }
-
-    @Override
-    public <T extends Response> T send(Request request, Class<T> responseType) {
-        String url = Path.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
+    public <T extends Response> T send(Request request, Class<T> responseType) throws Exception {
+        String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
         logger.info("method: {}; url: {}", request.getMethod(), url);
-        try {
-            checkRequest(request);
 
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+        checkRequest(request);
 
-            HttpEntity<Request> httpRequest = new HttpEntity<>(request, headers);
-            ResponseEntity<T> httpResponse =
-                    restTemplate.exchange(url, HttpMethod.POST, httpRequest, responseType);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-            checkResponse(httpResponse);
-            T response = httpResponse.getBody();
-            logger.info(
-                    "receive status:{} message:{} data:{}",
-                    response.getResult(),
-                    response.getMessage(),
-                    response.getData());
+        HttpEntity<Request> httpRequest = new HttpEntity<>(request, headers);
+        ResponseEntity<T> httpResponse =
+                restTemplate.exchange(url, HttpMethod.POST, httpRequest, responseType);
 
-            if (response.getData() != null) {
-                logger.info("response data: {}", response.getData());
+        checkResponse(httpResponse);
+        T response = httpResponse.getBody();
+        logger.info(
+                "receive status:{} message:{} data:{}",
+                response.getResult(),
+                response.getMessage(),
+                response.getData());
 
-                // handle return values
-                return response;
-            }
-
-        } catch (Exception e) {
-            logger.error("send rpc request error", e);
-            Response response = new Response(1, e.getMessage(), null);
-            return (T) response;
+        if (response.getData() != null) {
+            logger.info("response data: {}", response.getData());
         }
-        return null;
+
+        return response;
     }
 
     @Override
