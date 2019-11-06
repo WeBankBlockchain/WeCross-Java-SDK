@@ -12,7 +12,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.jline.utils.AttributedString;
 
-class IgnoreCaseCompleter implements Completer {
+public class IgnoreCaseCompleter implements Completer {
 
     protected final Collection<Candidate> candidates = new ArrayList<>();
 
@@ -35,6 +35,11 @@ class IgnoreCaseCompleter implements Completer {
                             null,
                             true));
         }
+    }
+
+    public IgnoreCaseCompleter(Candidate... candidates) {
+        assert candidates != null;
+        this.candidates.addAll(Arrays.asList(candidates));
     }
 
     public void complete(
