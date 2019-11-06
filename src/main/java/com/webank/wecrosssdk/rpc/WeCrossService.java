@@ -6,9 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface WeCrossService {
 
-    String getWeCrossServer();
-
-    <T extends Response> T send(Request request, Class<T> responseType);
+    <T extends Response> T send(Request request, Class<T> responseType) throws Exception;
 
     void sendOnly(Request request);
 
