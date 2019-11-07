@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
@@ -19,7 +20,11 @@ import org.jline.terminal.TerminalBuilder;
 public class JlineUtils {
 
     public static LineReader getLineReader(
-            List<String> paths, Set<String> resourceVars, Set<String> pathVars) throws IOException {
+            List<String> paths,
+            Set<String> resourceVars,
+            Set<String> pathVars,
+            Map<String, String> serverMaps)
+            throws IOException {
 
         List<Completer> completers = new ArrayList<Completer>();
 
@@ -31,7 +36,8 @@ public class JlineUtils {
                         "currentServer",
                         "listServers",
                         "switch",
-                        "list",
+                        "listLocalResources",
+                        "listResources",
                         "exists",
                         "call",
                         "sendTransaction");
@@ -40,6 +46,14 @@ public class JlineUtils {
             completers.add(
                     new ArgumentCompleter(
                             new IgnoreCaseCompleter(command), new StringsCompleter()));
+        }
+
+        for (String server : serverMaps.keySet()) {
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter("switch"),
+                            new StringsCompleter(server),
+                            new StringsCompleter()));
         }
 
         // resourceVars
@@ -55,24 +69,32 @@ public class JlineUtils {
         }
 
         // pathVars
-        for (String var : pathVars) {
-            completers.add(new ArgumentCompleter(new StringsCompleter(var)));
-            completers.add(
-                    new ArgumentCompleter(
-                            new GroovyCompleter("WeCross.getResource"),
-                            new StringsCompleter(var),
-                            new StringsCompleter()));
-        }
+        //        for (String var : pathVars) {
+        //            completers.add(new ArgumentCompleter(new GroovyCompleter(),new
+        // StringsCompleter(var),new StringsCompleter(var)));
+        //            completers.add(
+        //                    new ArgumentCompleter(
+        //                            new GroovyCompleter("WeCross.getResource"),
+        //                            new StringsCompleter(var),
+        //                            new StringsCompleter()));
+        //        }
 
-        for (String path : paths) {
-            completers.add(
-                    new ArgumentCompleter(new GroovyCompleter(path), new StringsCompleter()));
-            completers.add(
-                    new ArgumentCompleter(
-                            new GroovyCompleter("WeCross.getResource"),
-                            new StringsCompleter("\"" + path + "\""),
-                            new StringsCompleter()));
-        }
+        //    for (String path : paths) {
+        //            Map<String, Completer> comp = new HashMap<>();
+        //            comp.put("C1", new StringsCompleter("="));
+        //            comp.put("C2", new StringsCompleter("\"" + path + "\""));
+        //            completers.add(new Completers.RegexCompleter("C1 C2", comp::get));
+        //      completers.add(
+        //          new ArgumentCompleter(
+        //              new StringsCompleter("="),
+        //              new StringsCompleter("\"" + path + "\""),
+        //              new StringsCompleter()));
+        //            completers.add(
+        //                    new ArgumentCompleter(
+        //                            new GroovyCompleter("WeCross.getResource"),
+        //                            new StringsCompleter("\"" + path + "\""),
+        //                            new StringsCompleter()));
+        //    }
 
         commands = Arrays.asList("exists", "call", "sendTransaction");
         for (String command : commands) {

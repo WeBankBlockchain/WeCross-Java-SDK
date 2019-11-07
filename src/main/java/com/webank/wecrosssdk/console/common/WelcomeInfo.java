@@ -25,7 +25,9 @@ public class WelcomeInfo {
         sb.append("listServers                        List all configured WeCross servers.\n");
         sb.append("switch                             Switch to a specific WeCross server.\n");
         sb.append(
-                "list                               List all resources configured by WeCross server.\n");
+                "listLocalResources                 List local resources configured by WeCross server.\n");
+        sb.append(
+                "listResources                      List all resources including remote resources.\n");
         sb.append("exists                             Check if the resource exists.\n");
         sb.append("call                               Call constant method of smart contract.\n");
         sb.append(

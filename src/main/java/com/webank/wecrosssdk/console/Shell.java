@@ -32,11 +32,13 @@ public class Shell {
         Set<String> resourceVars = new HashSet<>();
         Set<String> pathVars = new HashSet<>();
         Map<String, String> pathMaps = new HashMap<>();
+        Map<String, String> serverMaps = new HashMap<>();
         ConsoleInitializer consoleInitializer = new ConsoleInitializer();
 
         try {
             consoleInitializer.init("");
             rpcFace = consoleInitializer.getRpcFace();
+            serverMaps = consoleInitializer.getWeCrossServers().getServers();
         } catch (ConsoleException e) {
             System.out.println(e.getMessage());
             return;
@@ -50,7 +52,9 @@ public class Shell {
             mockWeCross = new MockWeCross(consoleInitializer.getWeCrossRPC());
             groovyShell.setProperty("WeCross", mockWeCross);
 
-            lineReader = JlineUtils.getLineReader(rpcFace.getPaths(), resourceVars, pathVars);
+            lineReader =
+                    JlineUtils.getLineReader(
+                            rpcFace.getPaths(), resourceVars, pathVars, serverMaps);
             KeyMap<org.jline.reader.Binding> keymap = lineReader.getKeyMaps().get(LineReader.MAIN);
             keymap.bind(new Reference("beginning-of-line"), "\033[1~");
             keymap.bind(new Reference("end-of-line"), "\033[4~");
@@ -120,9 +124,6 @@ public class Shell {
                         {
                             if (HelpInfo.promptNoParams(params, "listServers")) {
                                 continue;
-                            } else if (params.length > 2) {
-                                HelpInfo.promptHelp("listServers");
-                                continue;
                             }
                             System.out.println(consoleInitializer.getWeCrossServers().getServers());
                             break;
@@ -132,7 +133,10 @@ public class Shell {
                             if (rpcFace.switchServer(params)) {
                                 lineReader =
                                         JlineUtils.getLineReader(
-                                                rpcFace.getPaths(), resourceVars, pathVars);
+                                                rpcFace.getPaths(),
+                                                resourceVars,
+                                                pathVars,
+                                                serverMaps);
                                 KeyMap<org.jline.reader.Binding> keymap =
                                         lineReader.getKeyMaps().get(LineReader.MAIN);
                                 keymap.bind(new Reference("beginning-of-line"), "\033[1~");
@@ -144,9 +148,22 @@ public class Shell {
                             }
                             break;
                         }
-                    case "list":
+                    case "listLocalResources":
                         {
-                            rpcFace.listResources(params);
+                            if (HelpInfo.promptNoParams(params, "listLocalResources")) {
+                                continue;
+                            }
+                            String listParams[] = {"list", "1"};
+                            rpcFace.listResources(listParams);
+                            break;
+                        }
+                    case "listResources":
+                        {
+                            if (HelpInfo.promptNoParams(params, "listResources")) {
+                                continue;
+                            }
+                            String listParams[] = {"list", "0"};
+                            rpcFace.listResources(listParams);
                             break;
                         }
                     case "exists":
@@ -172,7 +189,10 @@ public class Shell {
                                         params, resourceVars, pathVars, pathMaps)) {
                                     lineReader =
                                             JlineUtils.getLineReader(
-                                                    rpcFace.getPaths(), resourceVars, pathVars);
+                                                    rpcFace.getPaths(),
+                                                    resourceVars,
+                                                    pathVars,
+                                                    serverMaps);
                                     KeyMap<org.jline.reader.Binding> keymap =
                                             lineReader.getKeyMaps().get(LineReader.MAIN);
                                     keymap.bind(new Reference("beginning-of-line"), "\033[1~");
@@ -182,9 +202,11 @@ public class Shell {
                                 if (result != null) {
                                     System.out.println(
                                             "Result ==> " + mapper.writeValueAsString(result));
+                                } else {
+                                    System.out.println();
                                 }
                             } catch (Exception e) {
-                                System.out.println("Error: " + e.getMessage());
+                                System.out.println("Error: unsupported command.");
                             }
                             break;
                         }
