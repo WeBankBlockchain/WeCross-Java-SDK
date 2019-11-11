@@ -249,6 +249,8 @@ public class ConsoleUtils {
 
                 if (param.endsWith(".call") || param.endsWith(".sendTransaction")) {
                     isArgs = true;
+
+                    params[1] = "\"" + parseString(params[1]) + "\"";
                 }
             }
         }
