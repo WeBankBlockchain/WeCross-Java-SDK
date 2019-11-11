@@ -235,12 +235,21 @@ public class ConsoleUtils {
 
     public static String parseRequest(String[] params) {
         String result = "";
+        Boolean isArgs = false;
         for (String param : params) {
             String temp = parseString(param);
             if (RPCUtils.isValidPath(temp)) {
                 result += ("\"" + temp + "\"" + " ");
             } else {
-                result += (param + " ");
+                if (isArgs) {
+                    result += (param + ",");
+                } else {
+                    result += (param + " ");
+                }
+
+                if (param.endsWith(".call") || param.endsWith(".sendTransaction")) {
+                    isArgs = true;
+                }
             }
         }
         return result.substring(0, result.length() - 1);
