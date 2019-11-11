@@ -20,57 +20,73 @@ public class MockResource implements Serializable {
             Response response = weCrossRPC.exists(path).send();
             if (response.getResult() != 0) {
                 System.out.println(response.toString());
+                System.out.println();
                 return;
             }
             System.out.println(path + " : " + response.getData());
+            System.out.println();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 
-    public void call(String method, Object args[]) {
+    public void call(String method, Object... args) {
         try {
             if (args.length == 0) {
-                TransactionResponse callTransactionResponse = weCrossRPC.call(path, method).send();
-                System.out.println(callTransactionResponse.getCallContractResult().toString());
-                return;
+                TransactionResponse transactionResponse = weCrossRPC.call(path, method).send();
+
+                if (transactionResponse.getResult() != 0) {
+                    System.out.println(transactionResponse.toString());
+                    return;
+                }
+                String result = transactionResponse.getCallContractResult().toString();
+                ConsoleUtils.printJson(result);
+            } else {
+                TransactionResponse transactionResponse =
+                        weCrossRPC.call(path, method, args).send();
+
+                if (transactionResponse.getResult() != 0) {
+                    System.out.println(transactionResponse.toString());
+                    System.out.println();
+                    return;
+                }
+                String result = transactionResponse.getCallContractResult().toString();
+                ConsoleUtils.printJson(result);
             }
-
-            TransactionResponse transactionResponse = weCrossRPC.call(path, method, args).send();
-
-            if (transactionResponse.getResult() != 0) {
-                System.out.println(transactionResponse.toString());
-                return;
-            }
-
-            String result = transactionResponse.getCallContractResult().toString();
-            ConsoleUtils.printJson(result);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 
-    public void sendTransaction(String method, Object args[]) {
+    public void sendTransaction(String method, Object... args) {
         try {
             if (args.length == 0) {
-                TransactionResponse callTransactionResponse =
+                TransactionResponse transactionResponse =
                         weCrossRPC.sendTransaction(path, method).send();
-                System.out.println(callTransactionResponse.getCallContractResult().toString());
-                return;
+
+                if (transactionResponse.getResult() != 0) {
+                    System.out.println(transactionResponse.toString());
+                    return;
+                }
+                String result = transactionResponse.getCallContractResult().toString();
+                ConsoleUtils.printJson(result);
+            } else {
+                TransactionResponse transactionResponse =
+                        weCrossRPC.sendTransaction(path, method, args).send();
+
+                if (transactionResponse.getResult() != 0) {
+                    System.out.println(transactionResponse.toString());
+                    System.out.println();
+                    return;
+                }
+                String result = transactionResponse.getCallContractResult().toString();
+                ConsoleUtils.printJson(result);
             }
-
-            TransactionResponse transactionResponse =
-                    weCrossRPC.sendTransaction(path, method, args).send();
-
-            if (transactionResponse.getResult() != 0) {
-                System.out.println(transactionResponse.toString());
-                return;
-            }
-
-            String result = transactionResponse.getCallContractResult().toString();
-            ConsoleUtils.printJson(result);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println();
         }
     }
 

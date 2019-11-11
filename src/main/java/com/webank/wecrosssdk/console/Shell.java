@@ -97,12 +97,6 @@ public class Shell {
                     break;
                 }
                 switch (params[0]) {
-                    case "test":
-                        {
-                            System.out.println(ConsoleUtils.parseString(params[1]));
-                            System.out.println(params[2]);
-                            break;
-                        }
                     case "h":
                     case "help":
                         {
@@ -118,6 +112,7 @@ public class Shell {
                                 continue;
                             }
                             System.out.println(consoleInitializer.getCurrentServer());
+                            System.out.println();
                             break;
                         }
                     case "listServers":
@@ -126,6 +121,7 @@ public class Shell {
                                 continue;
                             }
                             System.out.println(consoleInitializer.getWeCrossServers().getServers());
+                            System.out.println();
                             break;
                         }
                     case "switch":
@@ -141,7 +137,6 @@ public class Shell {
                                         lineReader.getKeyMaps().get(LineReader.MAIN);
                                 keymap.bind(new Reference("beginning-of-line"), "\033[1~");
                                 keymap.bind(new Reference("end-of-line"), "\033[4~");
-
                                 consoleInitializer.init(params[1]);
                                 mockWeCross = new MockWeCross(consoleInitializer.getWeCrossRPC());
                                 groovyShell.setProperty("WeCross", mockWeCross);
@@ -198,15 +193,21 @@ public class Shell {
                                     keymap.bind(new Reference("beginning-of-line"), "\033[1~");
                                     keymap.bind(new Reference("end-of-line"), "\033[4~");
                                 }
-                                Object result = groovyShell.evaluate(request);
+
+                                Object result =
+                                        groovyShell.evaluate(ConsoleUtils.parseRequest(params));
+
+                                // Object result = groovyShell.evaluate(request);
                                 if (result != null) {
                                     System.out.println(
                                             "Result ==> " + mapper.writeValueAsString(result));
+                                    System.out.println();
                                 } else {
                                     System.out.println();
                                 }
                             } catch (Exception e) {
                                 System.out.println("Error: unsupported command.");
+                                System.out.println();
                             }
                             break;
                         }

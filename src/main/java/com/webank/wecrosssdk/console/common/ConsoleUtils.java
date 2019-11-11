@@ -35,7 +35,9 @@ public class ConsoleUtils {
         if (params[1].equals("=")) {
             if (params[2].equals("WeCross.getResource")) {
                 if (length != 4) {
-                    return false;
+                    if (length > 5 || !params[4].equals(" ")) {
+                        return false;
+                    }
                 }
                 if (pathVars.contains(params[3])) {
                     resourceVars.add(params[0]);
@@ -43,20 +45,17 @@ public class ConsoleUtils {
                 }
 
                 String out = parseString(params[3]);
-                if (out.length() == params[3].length()) {
-                    return false;
-                }
                 if (RPCUtils.isValidPath(out)) {
                     resourceVars.add(params[0]);
+                    return true;
                 }
             } else {
                 if (length != 3) {
-                    return false;
+                    if (length > 4 || !params[3].equals(" ")) {
+                        return false;
+                    }
                 }
                 String out = parseString(params[2]);
-                if (out.length() == params[2].length()) {
-                    return false;
-                }
                 if (RPCUtils.isValidPath(out)) {
                     pathVars.add(params[0]);
                     pathMaps.put(params[0], out);
@@ -232,6 +231,28 @@ public class ConsoleUtils {
         return tokens1.size() <= tokens2.size()
                 ? tokens1.toArray(new String[tokens1.size()])
                 : tokens2.toArray(new String[tokens2.size()]);
+    }
+
+    public static String parseRequest(String[] params) {
+        String result = "";
+        Boolean isArgs = false;
+        for (String param : params) {
+            String temp = parseString(param);
+            if (RPCUtils.isValidPath(temp)) {
+                result += ("\"" + temp + "\"" + " ");
+            } else {
+                if (isArgs) {
+                    result += (param + ",");
+                } else {
+                    result += (param + " ");
+                }
+
+                if (param.endsWith(".call") || param.endsWith(".sendTransaction")) {
+                    isArgs = true;
+                }
+            }
+        }
+        return result.substring(0, result.length() - 1);
     }
 
     public static void singleLine() {
