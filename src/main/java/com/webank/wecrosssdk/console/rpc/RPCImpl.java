@@ -123,6 +123,7 @@ public class RPCImpl implements RPCFace {
             return;
         }
         System.out.println("Result ==> " + response.getData());
+        System.out.println();
     }
 
     @Override
@@ -161,6 +162,7 @@ public class RPCImpl implements RPCFace {
 
         if (transactionResponse.getResult() != 0) {
             System.out.println(transactionResponse.toString());
+            System.out.println();
             return;
         }
 
@@ -204,6 +206,7 @@ public class RPCImpl implements RPCFace {
 
         if (transactionResponse.getResult() != 0) {
             System.out.println(transactionResponse.toString());
+            System.out.println();
             return;
         }
 

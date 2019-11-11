@@ -69,32 +69,38 @@ public class JlineUtils {
         }
 
         // pathVars
-        //        for (String var : pathVars) {
-        //            completers.add(new ArgumentCompleter(new GroovyCompleter(),new
-        // StringsCompleter(var),new StringsCompleter(var)));
-        //            completers.add(
-        //                    new ArgumentCompleter(
-        //                            new GroovyCompleter("WeCross.getResource"),
-        //                            new StringsCompleter(var),
-        //                            new StringsCompleter()));
-        //        }
+        for (String var : pathVars) {
+            ArgumentCompleter argumentCompleter =
+                    new ArgumentCompleter(
+                            new StringsCompleter(""),
+                            new StringsCompleter("="),
+                            new StringsCompleter("WeCross.getResource"),
+                            new StringsCompleter(var),
+                            new StringsCompleter());
+            argumentCompleter.setStrict(false);
+            completers.add(argumentCompleter);
+        }
 
-        //    for (String path : paths) {
-        //            Map<String, Completer> comp = new HashMap<>();
-        //            comp.put("C1", new StringsCompleter("="));
-        //            comp.put("C2", new StringsCompleter("\"" + path + "\""));
-        //            completers.add(new Completers.RegexCompleter("C1 C2", comp::get));
-        //      completers.add(
-        //          new ArgumentCompleter(
-        //              new StringsCompleter("="),
-        //              new StringsCompleter("\"" + path + "\""),
-        //              new StringsCompleter()));
-        //            completers.add(
-        //                    new ArgumentCompleter(
-        //                            new GroovyCompleter("WeCross.getResource"),
-        //                            new StringsCompleter("\"" + path + "\""),
-        //                            new StringsCompleter()));
-        //    }
+        for (String path : paths) {
+            ArgumentCompleter argumentCompleter1 =
+                    new ArgumentCompleter(
+                            new StringsCompleter(""),
+                            new StringsCompleter("="),
+                            new StringsCompleter(path),
+                            new StringsCompleter());
+            argumentCompleter1.setStrict(false);
+            completers.add(argumentCompleter1);
+
+            ArgumentCompleter argumentCompleter2 =
+                    new ArgumentCompleter(
+                            new StringsCompleter(""),
+                            new StringsCompleter("="),
+                            new StringsCompleter("WeCross.getResource"),
+                            new StringsCompleter(path),
+                            new StringsCompleter());
+            argumentCompleter2.setStrict(false);
+            completers.add(argumentCompleter2);
+        }
 
         commands = Arrays.asList("exists", "call", "sendTransaction");
         for (String command : commands) {
@@ -122,10 +128,8 @@ public class JlineUtils {
                         .signalHandler(Terminal.SignalHandler.SIG_IGN)
                         .build();
         Attributes termAttribs = terminal.getAttributes();
-        // enable CTRL+D shortcut to exit
         // disable CTRL+C shortcut
-        termAttribs.setControlChar(ControlChar.VEOF, 4);
-        termAttribs.setControlChar(ControlChar.VINTR, -1);
+        termAttribs.setControlChar(ControlChar.VINTR, 4);
         terminal.setAttributes(termAttribs);
 
         return LineReaderBuilder.builder()
