@@ -39,7 +39,7 @@ public class ConsoleUtils {
                         return false;
                     }
                 }
-                if (pathVars.contains(params[3])) {
+                if (pathMaps.keySet().contains(params[3])) {
                     resourceVars.add(params[0]);
                     return true;
                 }
@@ -95,8 +95,11 @@ public class ConsoleUtils {
                 try {
                     ret[i++] = Integer.parseInt(params[j]);
                 } catch (Exception e) {
-                    String errorMessage = "Cannot convert " + params[j] + " to int";
-                    throw new ConsoleException(Status.INTERNAL_ERROR, errorMessage);
+                    String errorMessage =
+                            "Cannot convert "
+                                    + params[j]
+                                    + " to int\nAllowed: -2147483648 to 2147483647\n";
+                    throw new ConsoleException(Status.ILLEGAL_PARAM, errorMessage);
                 }
             }
         }
@@ -233,28 +236,58 @@ public class ConsoleUtils {
                 : tokens2.toArray(new String[tokens2.size()]);
     }
 
-    public static String parseRequest(String[] params) {
+    public static String parseRequest(String[] params) throws ConsoleException {
         String result = "";
         Boolean isArgs = false;
-        for (String param : params) {
-            String temp = parseString(param);
-            if (RPCUtils.isValidPath(temp)) {
-                result += ("\"" + temp + "\"" + " ");
-            } else {
-                if (isArgs) {
-                    result += (param + ",");
-                } else {
-                    result += (param + " ");
+        Integer length = params.length;
+        Integer start = 0;
+        if (length != 0) {
+            if ((params[0].endsWith(".call") || params[0].endsWith(".sendTransaction"))) {
+                isArgs = true;
+                if (length < 2) {
+                    throw new ConsoleException(Status.METHOD_MISSING, "Method is missing");
                 }
 
-                if (param.endsWith(".call") || param.endsWith(".sendTransaction")) {
-                    isArgs = true;
+                params[1] = "\"" + parseString(params[1]) + "\"";
+                start = 1;
+                result = params[0];
+            } else if (params[0].endsWith(".exists")) {
+                if (length != 1) {
+                    throw new ConsoleException(Status.INTERNAL_ERROR, "Redundant parameters");
+                }
+                result = params[0] + "() ";
+                start = 1;
+            }
 
-                    params[1] = "\"" + parseString(params[1]) + "\"";
+            for (; start < length; ++start) {
+                String temp = parseString(params[start]);
+                if (!isArgs && RPCUtils.isValidPath(temp)) {
+                    result += ("\"" + temp + "\"" + " ");
+                } else if (isArgs) {
+                    if (start > 1) {
+                        // args1 args2 ...
+                        if (temp.equals(params[start])) {
+                            // as int
+                            try {
+                                Integer.parseInt(temp);
+                            } catch (Exception e) {
+                                String errorMessage =
+                                        "Cannot convert "
+                                                + temp
+                                                + " to int\nAllowed: -2147483648 to 2147483647\n";
+                                throw new ConsoleException(Status.ILLEGAL_PARAM, errorMessage);
+                            }
+                        }
+                    }
+                    result += (params[start] + ",");
+                } else {
+                    result += (params[start] + " ");
                 }
             }
+
+            result = result.substring(0, result.length() - 1);
         }
-        return result.substring(0, result.length() - 1);
+        return result;
     }
 
     public static void singleLine() {

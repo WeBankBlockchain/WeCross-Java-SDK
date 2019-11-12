@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.webank.wecrosssdk.console.common.ConsoleUtils;
 import com.webank.wecrosssdk.console.common.HelpInfo;
+import com.webank.wecrosssdk.console.common.IgnoreCaseCompleter;
 import com.webank.wecrosssdk.console.common.JlineUtils;
 import com.webank.wecrosssdk.console.common.WelcomeInfo;
 import com.webank.wecrosssdk.console.mock.MockWeCross;
@@ -11,13 +12,18 @@ import com.webank.wecrosssdk.console.rpc.RPCFace;
 import com.webank.wecrosssdk.exception.ConsoleException;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jline.keymap.KeyMap;
+import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.Reference;
+import org.jline.reader.impl.completer.ArgumentCompleter;
+import org.jline.reader.impl.completer.StringsCompleter;
 
 public class Shell {
 
@@ -34,6 +40,8 @@ public class Shell {
         Map<String, String> pathMaps = new HashMap<>();
         Map<String, String> serverMaps = new HashMap<>();
         ConsoleInitializer consoleInitializer = new ConsoleInitializer();
+
+        List<Completer> completers = new ArrayList<Completer>();
 
         try {
             consoleInitializer.init("");
@@ -52,9 +60,11 @@ public class Shell {
             mockWeCross = new MockWeCross(consoleInitializer.getWeCrossRPC());
             groovyShell.setProperty("WeCross", mockWeCross);
 
-            lineReader =
-                    JlineUtils.getLineReader(
+            completers =
+                    JlineUtils.getCompleters(
                             rpcFace.getPaths(), resourceVars, pathVars, serverMaps);
+            lineReader = JlineUtils.getLineReader(completers);
+
             KeyMap<org.jline.reader.Binding> keymap = lineReader.getKeyMaps().get(LineReader.MAIN);
             keymap.bind(new Reference("beginning-of-line"), "\033[1~");
             keymap.bind(new Reference("end-of-line"), "\033[4~");
@@ -127,16 +137,13 @@ public class Shell {
                     case "switch":
                         {
                             if (rpcFace.switchServer(params)) {
-                                lineReader =
-                                        JlineUtils.getLineReader(
-                                                rpcFace.getPaths(),
-                                                resourceVars,
-                                                pathVars,
-                                                serverMaps);
-                                KeyMap<org.jline.reader.Binding> keymap =
-                                        lineReader.getKeyMaps().get(LineReader.MAIN);
-                                keymap.bind(new Reference("beginning-of-line"), "\033[1~");
-                                keymap.bind(new Reference("end-of-line"), "\033[4~");
+
+                                JlineUtils.updateCompleters(
+                                        completers,
+                                        rpcFace.getPaths(),
+                                        resourceVars,
+                                        pathVars,
+                                        serverMaps);
                                 consoleInitializer.init(params[1]);
                                 mockWeCross = new MockWeCross(consoleInitializer.getWeCrossRPC());
                                 groovyShell.setProperty("WeCross", mockWeCross);
@@ -163,6 +170,10 @@ public class Shell {
                         }
                     case "exists":
                         {
+                            completers.add(
+                                    new ArgumentCompleter(
+                                            new IgnoreCaseCompleter("command"),
+                                            new StringsCompleter()));
                             rpcFace.existsResource(params, pathMaps);
                             break;
                         }
@@ -180,22 +191,18 @@ public class Shell {
                     default:
                         {
                             try {
+                                Set<String> thisResourceVars = new HashSet<>();
+                                Set<String> thisPathVars = new HashSet<>();
                                 if (ConsoleUtils.parseVars(
-                                        params, resourceVars, pathVars, pathMaps)) {
-                                    lineReader =
-                                            JlineUtils.getLineReader(
-                                                    rpcFace.getPaths(),
-                                                    resourceVars,
-                                                    pathVars,
-                                                    serverMaps);
-                                    KeyMap<org.jline.reader.Binding> keymap =
-                                            lineReader.getKeyMaps().get(LineReader.MAIN);
-                                    keymap.bind(new Reference("beginning-of-line"), "\033[1~");
-                                    keymap.bind(new Reference("end-of-line"), "\033[4~");
+                                        params, thisResourceVars, thisPathVars, pathMaps)) {
+                                    JlineUtils.addVarCompleters(
+                                            completers, thisResourceVars, thisPathVars);
                                 }
-
-                                Object result =
-                                        groovyShell.evaluate(ConsoleUtils.parseRequest(params));
+                                // System.out.println(thisPathVars);
+                                // System.out.println(thisResourceVars);
+                                String thisRequest = ConsoleUtils.parseRequest(params);
+                                // System.out.println(thisRequest);
+                                Object result = groovyShell.evaluate(thisRequest);
 
                                 // Object result = groovyShell.evaluate(request);
                                 if (result != null) {
@@ -205,6 +212,9 @@ public class Shell {
                                 } else {
                                     System.out.println();
                                 }
+                            } catch (ConsoleException e) {
+                                System.out.println(e.getMessage());
+                                System.out.println();
                             } catch (Exception e) {
                                 System.out.println("Error: unsupported command.");
                                 System.out.println();

@@ -26,8 +26,13 @@ public class ConsoleInitializer {
         WeCrossServers weCrossServers = context.getBean(WeCrossServers.class);
 
         if (weCrossServers == null || weCrossServers.getServers().size() == 0) {
-            String errorMessage = "Error in WeCrossServers config";
+            String errorMessage = "Error in WeCrossServers configuration";
             throw new ConsoleException(Status.NO_CONFIG_FOUND, errorMessage);
+        }
+
+        if (!weCrossServers.areValidServers()) {
+            String errorMessage = "Illegal key found in configuration";
+            throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
         }
 
         this.weCrossServers = weCrossServers;
@@ -36,7 +41,7 @@ public class ConsoleInitializer {
             // default server
             String defaultServer = weCrossServers.getDefaultServer();
             if (!weCrossServers.getServers().keySet().contains(defaultServer)) {
-                String errorMessage = "Error in defaultServer config";
+                String errorMessage = "Error in defaultServer configuration";
                 throw new ConsoleException(Status.UNEXPECTED_SERVER, errorMessage);
             }
 

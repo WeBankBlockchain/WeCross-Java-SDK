@@ -11,41 +11,41 @@ public class RPCUtils {
 
         String ipUnits[] = server.split("\\.");
         if (ipUnits.length != 4) {
-            throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+            throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
         }
 
         for (Integer i = 0; i < 3; ++i) {
             try {
                 Integer ipUnit = Integer.parseInt(ipUnits[i]);
                 if (ipUnit < 0 || ipUnit > 255) {
-                    throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+                    throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
                 }
             } catch (NumberFormatException e) {
-                throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+                throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
             }
         }
 
         String ipAndPort[] = ipUnits[3].split(":");
         if (ipAndPort.length != 2) {
-            throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+            throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
         }
 
         try {
             Integer ipUnit = Integer.parseInt(ipAndPort[0]);
             if (ipUnit < 0 || ipUnit > 255) {
-                throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+                throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
             }
         } catch (NumberFormatException e) {
-            throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+            throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
         }
 
         try {
             Integer port = Integer.parseInt(ipAndPort[1]);
             if (port < 1 || port > 65535) {
-                throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+                throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
             }
         } catch (NumberFormatException e) {
-            throw new ConsoleException(Status.ILLEGAL_Server, errorMessage);
+            throw new ConsoleException(Status.ILLEGAL_SERVER, errorMessage);
         }
     }
 
