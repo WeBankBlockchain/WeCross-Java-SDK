@@ -3,9 +3,18 @@ package com.webank.wecrosssdk.rpc.methods;
 import java.util.Objects;
 
 public class WeCrossResource {
-    public String type;
-    public Integer distance;
-    public String path;
+    private String checksum;
+    private String type;
+    private Integer distance;
+    private String path;
+
+    public String getChecksum() {
+        return checksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.checksum = checksum;
+    }
 
     public String getType() {
         return type;
@@ -40,20 +49,24 @@ public class WeCrossResource {
             return false;
         }
         WeCrossResource that = (WeCrossResource) o;
-        return Objects.equals(getType(), that.getType())
+        return Objects.equals(getChecksum(), that.getChecksum())
+                && Objects.equals(getType(), that.getType())
                 && Objects.equals(getDistance(), that.getDistance())
                 && Objects.equals(getPath(), that.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getType(), getDistance(), getPath());
+        return Objects.hash(getChecksum(), getType(), getDistance(), getPath());
     }
 
     @Override
     public String toString() {
         return "WeCrossResource{"
-                + "type='"
+                + "checksum='"
+                + checksum
+                + '\''
+                + ", type='"
                 + type
                 + '\''
                 + ", distance="

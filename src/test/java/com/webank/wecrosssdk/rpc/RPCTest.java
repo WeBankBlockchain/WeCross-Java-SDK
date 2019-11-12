@@ -4,7 +4,7 @@ import com.webank.wecrosssdk.rpc.methods.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
 
-public class RPC {
+public class RPCTest {
 
     public static WeCrossRPC weCrossRPC;
 
