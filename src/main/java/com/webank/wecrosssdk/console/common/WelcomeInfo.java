@@ -34,7 +34,7 @@ public class WelcomeInfo {
                 "sendTransaction                    Call non-constant method of smart contract.\n");
         sb.append(
                 "WeCross.getResource                Init resource by path, and assign it to a custom variable.\n");
-        sb.append("[resource].exists()                Equal to command: exists [path].\n");
+        sb.append("[resource].exists                  Equal to command: exists [path].\n");
         sb.append("[resource].call                    Equal to command: call [path].\n");
         sb.append("[resource].sendTransaction         Equal to command: sendTransaction [path].\n");
 

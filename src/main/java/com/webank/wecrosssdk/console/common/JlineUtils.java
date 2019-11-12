@@ -19,15 +19,50 @@ import org.jline.terminal.TerminalBuilder;
 
 public class JlineUtils {
 
-    public static LineReader getLineReader(
+    public static List<Completer> getCompleters(
             List<String> paths,
             Set<String> resourceVars,
             Set<String> pathVars,
-            Map<String, String> serverMaps)
-            throws IOException {
+            Map<String, String> serverMaps) {
 
-        List<Completer> completers = new ArrayList<Completer>();
+        List<Completer> completers = new ArrayList<>();
 
+        addCommandCompleters(completers);
+        addServerCompleters(completers, serverMaps);
+        addPathCompleters(completers, paths);
+        addVarCompleters(completers, resourceVars, pathVars);
+
+        return completers;
+    }
+
+    public static void updateCompleters(
+            List<Completer> completers,
+            List<String> paths,
+            Set<String> resourceVars,
+            Set<String> pathVars,
+            Map<String, String> serverMaps) {
+        if (!completers.isEmpty()) {
+            completers.clear();
+        }
+
+        addCommandCompleters(completers);
+        addServerCompleters(completers, serverMaps);
+        addPathCompleters(completers, paths);
+        addVarCompleters(completers, resourceVars, pathVars);
+    }
+
+    public static void addServerCompleters(
+            List<Completer> completers, Map<String, String> serverMaps) {
+        for (String server : serverMaps.keySet()) {
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter("switch"),
+                            new StringsCompleter(server),
+                            new StringsCompleter()));
+        }
+    }
+
+    public static void addCommandCompleters(List<Completer> completers) {
         // commands
         List<String> commands =
                 Arrays.asList(
@@ -47,39 +82,9 @@ public class JlineUtils {
                     new ArgumentCompleter(
                             new IgnoreCaseCompleter(command), new StringsCompleter()));
         }
+    }
 
-        for (String server : serverMaps.keySet()) {
-            completers.add(
-                    new ArgumentCompleter(
-                            new StringsCompleter("switch"),
-                            new StringsCompleter(server),
-                            new StringsCompleter()));
-        }
-
-        // resourceVars
-        for (String var : resourceVars) {
-            completers.add(new ArgumentCompleter(new StringsCompleter(var + ".exists()")));
-            completers.add(
-                    new ArgumentCompleter(
-                            new StringsCompleter(var + ".call"), new StringsCompleter()));
-            completers.add(
-                    new ArgumentCompleter(
-                            new StringsCompleter(var + ".sendTransaction"),
-                            new StringsCompleter()));
-        }
-
-        // pathVars
-        for (String var : pathVars) {
-            ArgumentCompleter argumentCompleter =
-                    new ArgumentCompleter(
-                            new StringsCompleter(""),
-                            new StringsCompleter("="),
-                            new StringsCompleter("WeCross.getResource"),
-                            new StringsCompleter(var),
-                            new StringsCompleter());
-            argumentCompleter.setStrict(false);
-            completers.add(argumentCompleter);
-        }
+    public static void addPathCompleters(List<Completer> completers, List<String> paths) {
 
         for (String path : paths) {
             ArgumentCompleter argumentCompleter1 =
@@ -102,7 +107,7 @@ public class JlineUtils {
             completers.add(argumentCompleter2);
         }
 
-        commands = Arrays.asList("exists", "call", "sendTransaction");
+        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
         for (String command : commands) {
             for (String path : paths) {
                 completers.add(
@@ -112,15 +117,84 @@ public class JlineUtils {
                                 new StringsCompleter()));
             }
         }
+    }
+
+    public static void addVarCompleters(
+            List<Completer> completers, Set<String> resourceVars, Set<String> pathVars) {
+        // resourceVars
+        for (String var : resourceVars) {
+            completers.add(new ArgumentCompleter(new StringsCompleter(var + ".exists")));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(var + ".call"), new StringsCompleter()));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(var + ".sendTransaction"),
+                            new StringsCompleter()));
+        }
+
+        // pathVars
+        for (String var : pathVars) {
+            ArgumentCompleter argumentCompleter =
+                    new ArgumentCompleter(
+                            new StringsCompleter(""),
+                            new StringsCompleter("="),
+                            new StringsCompleter("WeCross.getResource"),
+                            new StringsCompleter(var),
+                            new StringsCompleter());
+            argumentCompleter.setStrict(false);
+            completers.add(argumentCompleter);
+        }
+
+        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
         for (String command : commands) {
-            for (String path : pathVars) {
+            for (String var : pathVars) {
                 completers.add(
                         new ArgumentCompleter(
                                 new StringsCompleter(command),
-                                new StringsCompleter(path),
+                                new StringsCompleter(var),
                                 new StringsCompleter()));
             }
         }
+    }
+
+    public static void addSingleVarCompleters(
+            List<Completer> completers, String resourceVar, String pathVar) {
+
+        if (!resourceVar.equals("")) {
+            completers.add(new ArgumentCompleter(new StringsCompleter(resourceVar + ".exists")));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(resourceVar + ".call"), new StringsCompleter()));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(resourceVar + ".sendTransaction"),
+                            new StringsCompleter()));
+        }
+
+        if (!pathVar.equals("")) {
+            ArgumentCompleter argumentCompleter =
+                    new ArgumentCompleter(
+                            new StringsCompleter(""),
+                            new StringsCompleter("="),
+                            new StringsCompleter("WeCross.getResource"),
+                            new StringsCompleter(pathVar),
+                            new StringsCompleter());
+            argumentCompleter.setStrict(false);
+            completers.add(argumentCompleter);
+        }
+
+        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
+        for (String command : commands) {
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(command),
+                            new StringsCompleter(pathVar),
+                            new StringsCompleter()));
+        }
+    }
+
+    public static LineReader getLineReader(List<Completer> completers) throws IOException {
 
         Terminal terminal =
                 TerminalBuilder.builder()
@@ -128,6 +202,7 @@ public class JlineUtils {
                         .signalHandler(Terminal.SignalHandler.SIG_IGN)
                         .build();
         Attributes termAttribs = terminal.getAttributes();
+
         // disable CTRL+C shortcut
         termAttribs.setControlChar(ControlChar.VINTR, 4);
         terminal.setAttributes(termAttribs);
