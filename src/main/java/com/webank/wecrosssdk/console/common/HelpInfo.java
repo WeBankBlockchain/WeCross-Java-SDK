@@ -112,6 +112,25 @@ public class HelpInfo {
         ConsoleUtils.singleLine();
     }
 
+    public static void getDataHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Get data from contract.");
+        System.out.println("Usage:  getData [path] [key]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("key:    the key of an entry");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void setDataHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Set data for contract.");
+        System.out.println("Usage:  setData [path] [key] [value]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("key:    the key of an entry");
+        System.out.println("value:  the value of an entry");
+        ConsoleUtils.singleLine();
+    }
+
     public static void callHelp() {
         ConsoleUtils.singleLine();
         System.out.println("Call constant method of smart contract.");

@@ -2,7 +2,6 @@ package com.webank.wecrosssdk.console.common;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class WeCrossServers {
     private Map<String, String> servers = new HashMap<>();
@@ -14,13 +13,11 @@ public class WeCrossServers {
     }
 
     public Boolean areValidServers() {
-        Pattern pattern = Pattern.compile("\\p{Lower}\\w*");
+        String regex = "^[a-z0-9A-Z]+$";
         for (String server : servers.keySet()) {
-            if (!pattern.matcher(server).matches()) {
-                return false;
-            }
+            return server.matches(regex);
         }
-        return true;
+        return false;
     }
 
     public void setServers(Map<String, String> servers) {

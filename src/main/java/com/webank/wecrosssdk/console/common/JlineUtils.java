@@ -74,6 +74,8 @@ public class JlineUtils {
                         "listLocalResources",
                         "listResources",
                         "exists",
+                        "getData",
+                        "setData",
                         "call",
                         "sendTransaction");
 
@@ -107,7 +109,8 @@ public class JlineUtils {
             completers.add(argumentCompleter2);
         }
 
-        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
+        List<String> commands =
+                Arrays.asList("exists", "getData", "setData", "call", "sendTransaction");
         for (String command : commands) {
             for (String path : paths) {
                 completers.add(
@@ -124,6 +127,12 @@ public class JlineUtils {
         // resourceVars
         for (String var : resourceVars) {
             completers.add(new ArgumentCompleter(new StringsCompleter(var + ".exists")));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(var + ".getData"), new StringsCompleter()));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(var + ".setData"), new StringsCompleter()));
             completers.add(
                     new ArgumentCompleter(
                             new StringsCompleter(var + ".call"), new StringsCompleter()));
@@ -146,7 +155,8 @@ public class JlineUtils {
             completers.add(argumentCompleter);
         }
 
-        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
+        List<String> commands =
+                Arrays.asList("exists", "getData", "setData", "call", "sendTransaction");
         for (String command : commands) {
             for (String var : pathVars) {
                 completers.add(
@@ -163,6 +173,14 @@ public class JlineUtils {
 
         if (!resourceVar.equals("")) {
             completers.add(new ArgumentCompleter(new StringsCompleter(resourceVar + ".exists")));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(resourceVar + ".getData"),
+                            new StringsCompleter()));
+            completers.add(
+                    new ArgumentCompleter(
+                            new StringsCompleter(resourceVar + ".setData"),
+                            new StringsCompleter()));
             completers.add(
                     new ArgumentCompleter(
                             new StringsCompleter(resourceVar + ".call"), new StringsCompleter()));
@@ -184,7 +202,8 @@ public class JlineUtils {
             completers.add(argumentCompleter);
         }
 
-        List<String> commands = Arrays.asList("exists", "call", "sendTransaction");
+        List<String> commands =
+                Arrays.asList("exists", "getData", "setData", "call", "sendTransaction");
         for (String command : commands) {
             completers.add(
                     new ArgumentCompleter(

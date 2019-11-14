@@ -2,7 +2,9 @@ package com.webank.wecrosssdk.console.mock;
 
 import com.webank.wecrosssdk.console.common.ConsoleUtils;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
+import com.webank.wecrosssdk.rpc.methods.GetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.SetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
 import java.io.Serializable;
 
@@ -25,6 +27,38 @@ public class MockResource implements Serializable {
             }
             System.out.println(path + " : " + response.getData());
             System.out.println();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println();
+        }
+    }
+
+    public void getData(String key) {
+        try {
+            GetDataResponse getDataResponse = weCrossRPC.getData(path, key).send();
+            if (getDataResponse.getResult() != 0) {
+                System.out.println(getDataResponse.toString());
+                System.out.println();
+                return;
+            }
+            String result = getDataResponse.getStatusAndValue().toString();
+            ConsoleUtils.printJson(result);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println();
+        }
+    }
+
+    public void setData(String key, String value) {
+        try {
+            SetDataResponse setDataResponse = weCrossRPC.setData(path, key, value).send();
+            if (setDataResponse.getResult() != 0) {
+                System.out.println(setDataResponse.toString());
+                System.out.println();
+                return;
+            }
+            String result = setDataResponse.getStatus().toString();
+            ConsoleUtils.printJson(result);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println();

@@ -2,6 +2,7 @@ package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.concurrent.CompletableFuture;
 
 public class RemoteCall<T extends Response> {
