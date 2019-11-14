@@ -242,7 +242,9 @@ public class ConsoleUtils {
         Integer length = params.length;
         Integer start = 0;
         if (length != 0) {
-            if ((params[0].endsWith(".call") || params[0].endsWith(".sendTransaction"))) {
+            if ((params[0].endsWith(".call")
+                    || params[0].endsWith(".sendTransaction")
+                    || params[0].endsWith(".setData"))) {
                 isArgs = true;
                 if (length < 2) {
                     throw new ConsoleException(Status.METHOD_MISSING, "Method is missing");

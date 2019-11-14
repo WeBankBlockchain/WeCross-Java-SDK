@@ -107,6 +107,13 @@ public class Shell {
                     break;
                 }
                 switch (params[0]) {
+                    case "t":
+                        {
+                            System.out.println(params[1]);
+                            System.out.println(params[2]);
+                            System.out.println(request);
+                            break;
+                        }
                     case "h":
                     case "help":
                         {
@@ -175,6 +182,16 @@ public class Shell {
                                             new IgnoreCaseCompleter("command"),
                                             new StringsCompleter()));
                             rpcFace.existsResource(params, pathMaps);
+                            break;
+                        }
+                    case "getData":
+                        {
+                            rpcFace.getData(params, pathMaps);
+                            break;
+                        }
+                    case "setData":
+                        {
+                            rpcFace.setData(params, pathMaps);
                             break;
                         }
                     case "call":

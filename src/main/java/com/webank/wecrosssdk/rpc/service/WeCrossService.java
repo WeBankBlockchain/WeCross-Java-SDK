@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.rpc;
+package com.webank.wecrosssdk.rpc.service;
 
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
