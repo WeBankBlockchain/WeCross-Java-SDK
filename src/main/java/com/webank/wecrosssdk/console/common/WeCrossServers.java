@@ -15,9 +15,11 @@ public class WeCrossServers {
     public Boolean areValidServers() {
         String regex = "^[a-z0-9A-Z]+$";
         for (String server : servers.keySet()) {
-            return server.matches(regex);
+            if (!server.matches(regex)) {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     public void setServers(Map<String, String> servers) {
