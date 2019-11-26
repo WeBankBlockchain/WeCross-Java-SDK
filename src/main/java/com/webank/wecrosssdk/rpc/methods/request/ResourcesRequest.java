@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.rpc.methods;
+package com.webank.wecrosssdk.rpc.methods.request;
 
 public class ResourcesRequest {
 

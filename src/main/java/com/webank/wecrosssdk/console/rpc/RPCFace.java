@@ -25,7 +25,23 @@ public interface RPCFace {
 
     void call(String[] params, Map<String, String> pathMaps) throws Exception;
 
+    void callInt(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void callIntArray(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void callString(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void callStringArray(String[] params, Map<String, String> pathMaps) throws Exception;
+
     void sendTransaction(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void sendTransactionInt(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void sendTransactionIntArray(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void sendTransactionString(String[] params, Map<String, String> pathMaps) throws Exception;
+
+    void sendTransactionStringArray(String[] params, Map<String, String> pathMaps) throws Exception;
 
     List<String> getPaths();
 }

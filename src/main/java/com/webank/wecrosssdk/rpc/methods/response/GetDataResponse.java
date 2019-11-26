@@ -1,6 +1,7 @@
-package com.webank.wecrosssdk.rpc.methods;
+package com.webank.wecrosssdk.rpc.methods.response;
 
-import com.webank.wecrosssdk.rpc.methods.GetDataResponse.StatusAndValue;
+import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse.StatusAndValue;
 import java.util.Objects;
 
 public class GetDataResponse extends Response<StatusAndValue> {

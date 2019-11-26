@@ -1,4 +1,7 @@
-package com.webank.wecrosssdk.rpc.methods;
+package com.webank.wecrosssdk.rpc.methods.response;
+
+import com.webank.wecrosssdk.rpc.data.CallContractResult;
+import com.webank.wecrosssdk.rpc.methods.Response;
 
 public class TransactionResponse extends Response<CallContractResult> {
 

@@ -1,10 +1,10 @@
 package com.webank.wecrosssdk.rpc;
 
-import com.webank.wecrosssdk.rpc.methods.GetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.SetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
+import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
@@ -81,5 +81,33 @@ public class RPCTest {
         SetDataResponse setDataResponse =
                 weCrossRPC.setData("payment.bcos2.HelloWorldContract", "set", "data").send();
         System.out.println("Correct: " + setDataResponse.toString());
+
+        // decode test
+        System.out.println("*************** decode ***************");
+        TransactionResponse decodeCallTransactionResponse =
+                weCrossRPC
+                        .call(
+                                "payment.bcos2.HelloWorldContract",
+                                new String[] {"Int", "IntArray", "String", "StringArray"},
+                                "getAll",
+                                10086,
+                                new int[] {1, 2, 3},
+                                "hello",
+                                new String[] {"Int", "IntArray", "String", "StringArray"})
+                        .send();
+        System.out.println("Correct: " + decodeCallTransactionResponse.toString());
+
+        TransactionResponse decodesendTransactionResponse =
+                weCrossRPC
+                        .sendTransaction(
+                                "payment.bcos2.HelloWorldContract",
+                                new String[] {"Int", "IntArray", "String", "StringArray"},
+                                "getAll",
+                                10086,
+                                new int[] {1, 2, 3},
+                                "hello",
+                                new String[] {"Int", "IntArray", "String", "StringArray"})
+                        .send();
+        System.out.println("Correct: " + decodesendTransactionResponse.toString());
     }
 }
