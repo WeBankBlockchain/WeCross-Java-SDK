@@ -1,8 +1,10 @@
-package com.webank.wecrosssdk.rpc.methods;
+package com.webank.wecrosssdk.rpc.methods.response;
 
+import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse.Status;
 import java.util.Objects;
 
-public class SetDataResponse extends Response<SetDataResponse.Status> {
+public class SetDataResponse extends Response<Status> {
 
     public SetDataResponse() {
         super();

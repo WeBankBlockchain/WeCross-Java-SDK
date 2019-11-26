@@ -33,12 +33,26 @@ public class WelcomeInfo {
         sb.append("setData                            Set data for contract.\n");
         sb.append("call                               Call constant method of smart contract.\n");
         sb.append(
+                "callInt                            Call constant method of smart contract with int returned.\n");
+        sb.append(
+                "callIntArray                       Call constant method of smart contract with int array returned.\n");
+        sb.append(
+                "callString                         Call constant method of smart contract with string returned.\n");
+        sb.append(
+                "callStringArray                    Call constant method of smart contract with string array returned.\n");
+        sb.append(
                 "sendTransaction                    Call non-constant method of smart contract.\n");
         sb.append(
+                "sendTransactionInt                 Call non-constant method of smart contract with int returned.\n");
+        sb.append(
+                "sendTransactionIntArray            Call non-constant method of smart contract with int array returned.\n");
+        sb.append(
+                "sendTransactionString              Call non-constant method of smart contract with string returned.\n");
+        sb.append(
+                "sendTransactionStringArray         Call non-constant method of smart contract with string array returned.\n");
+        sb.append(
                 "WeCross.getResource                Init resource by path, and assign it to a custom variable.\n");
-        sb.append("[resource].exists                  Equal to command: exists [path].\n");
-        sb.append("[resource].call                    Equal to command: call [path].\n");
-        sb.append("[resource].sendTransaction         Equal to command: sendTransaction [path].\n");
+        sb.append("[resource].[command]               Equal to command: command [path].\n");
 
         System.out.println(sb.toString());
         ConsoleUtils.singleLine();

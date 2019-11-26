@@ -1,11 +1,13 @@
 package com.webank.wecrosssdk.console.mock;
 
+import com.webank.wecrosssdk.console.common.CallResult;
 import com.webank.wecrosssdk.console.common.ConsoleUtils;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.methods.GetDataResponse;
+import com.webank.wecrosssdk.rpc.data.CallContractResult;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.SetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import java.io.Serializable;
 
 public class MockResource implements Serializable {
@@ -65,10 +67,15 @@ public class MockResource implements Serializable {
         }
     }
 
-    public void call(String method, Object... args) {
+    public void call(String retTypes, String method, Object... args) {
         try {
+            String types[] = retTypes.split(",");
+            if (types[0].equals("Void")) {
+                types = null;
+            }
             if (args.length == 0) {
-                TransactionResponse transactionResponse = weCrossRPC.call(path, method).send();
+                TransactionResponse transactionResponse =
+                        weCrossRPC.call(path, types, method).send();
 
                 if (transactionResponse.getResult() != 0) {
                     System.out.println(transactionResponse.toString());
@@ -78,15 +85,28 @@ public class MockResource implements Serializable {
                 ConsoleUtils.printJson(result);
             } else {
                 TransactionResponse transactionResponse =
-                        weCrossRPC.call(path, method, args).send();
+                        weCrossRPC.call(path, types, method, args).send();
 
                 if (transactionResponse.getResult() != 0) {
                     System.out.println(transactionResponse.toString());
                     System.out.println();
                     return;
                 }
-                String result = transactionResponse.getCallContractResult().toString();
-                ConsoleUtils.printJson(result);
+                if (types.length == 1) {
+                    CallContractResult callContractResult =
+                            transactionResponse.getCallContractResult();
+                    CallResult callResult =
+                            new CallResult(
+                                    callContractResult.getErrorCode(),
+                                    callContractResult.getErrorMessage());
+                    if (callContractResult.getErrorCode() == 0) {
+                        callResult.setResult(callContractResult.getResult()[0]);
+                    }
+                    ConsoleUtils.printJson(callResult.toString());
+                } else {
+                    String result = transactionResponse.getCallContractResult().toString();
+                    ConsoleUtils.printJson(result);
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -94,11 +114,31 @@ public class MockResource implements Serializable {
         }
     }
 
-    public void sendTransaction(String method, Object... args) {
+    public void callInt(String method, Object... args) {
+        call("Int", method, args);
+    }
+
+    public void callIntArray(String method, Object... args) {
+        call("IntArray", method, args);
+    }
+
+    public void callString(String method, Object... args) {
+        call("String", method, args);
+    }
+
+    public void callStringArray(String method, Object... args) {
+        call("StringArray", method, args);
+    }
+
+    public void sendTransaction(String retTypes, String method, Object... args) {
         try {
+            String types[] = retTypes.split(",");
+            if (types[0].equals("Void")) {
+                types = null;
+            }
             if (args.length == 0) {
                 TransactionResponse transactionResponse =
-                        weCrossRPC.sendTransaction(path, method).send();
+                        weCrossRPC.sendTransaction(path, types, method).send();
 
                 if (transactionResponse.getResult() != 0) {
                     System.out.println(transactionResponse.toString());
@@ -108,20 +148,49 @@ public class MockResource implements Serializable {
                 ConsoleUtils.printJson(result);
             } else {
                 TransactionResponse transactionResponse =
-                        weCrossRPC.sendTransaction(path, method, args).send();
+                        weCrossRPC.sendTransaction(path, types, method, args).send();
 
                 if (transactionResponse.getResult() != 0) {
                     System.out.println(transactionResponse.toString());
                     System.out.println();
                     return;
                 }
-                String result = transactionResponse.getCallContractResult().toString();
-                ConsoleUtils.printJson(result);
+                if (types.length == 1) {
+                    CallContractResult callContractResult =
+                            transactionResponse.getCallContractResult();
+                    CallResult callResult =
+                            new CallResult(
+                                    callContractResult.getErrorCode(),
+                                    callContractResult.getErrorMessage());
+                    if (callContractResult.getErrorCode() == 0) {
+                        callResult.setResult(callContractResult.getResult()[0]);
+                    }
+                    ConsoleUtils.printJson(callResult.toString());
+                } else {
+                    String result = transactionResponse.getCallContractResult().toString();
+                    ConsoleUtils.printJson(result);
+                }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println();
         }
+    }
+
+    public void sendTransactionInt(String method, Object... args) {
+        sendTransaction("Int", method, args);
+    }
+
+    public void sendTransactionIntArray(String method, Object... args) {
+        sendTransaction("IntArray", method, args);
+    }
+
+    public void sendTransactionString(String method, Object... args) {
+        sendTransaction("String", method, args);
+    }
+
+    public void sendTransactionStringArray(String method, Object... args) {
+        sendTransaction("StringArray", method, args);
     }
 
     public String getPath() {

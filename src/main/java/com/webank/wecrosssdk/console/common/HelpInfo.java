@@ -136,6 +136,48 @@ public class HelpInfo {
         System.out.println("Call constant method of smart contract.");
         System.out.println("Usage:  call [path] [method] [...args]");
         System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println(
+                "types:  the types of return values, support: Void, Int, IntArray, String, StringArray.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void callIntHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call constant method of smart contract with int returned.");
+        System.out.println("Usage:  call [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void callIntArrayHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call constant method of smart contract with int array returned.");
+        System.out.println("Usage:  call [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void callStringHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call constant method of smart contract with string returned.");
+        System.out.println("Usage:  call [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void callStringArrayHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call constant method of smart contract with string array returned.");
+        System.out.println("Usage:  call [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
         System.out.println("method: the method in contract.");
         System.out.println("args:   variable parameter list.");
         ConsoleUtils.singleLine();
@@ -144,6 +186,49 @@ public class HelpInfo {
     public static void sendTransactionHelp() {
         ConsoleUtils.singleLine();
         System.out.println("Call non-constant method of smart contract.");
+        System.out.println("Usage:  sendTransaction [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println(
+                "types:  the types of return values, support: Void, Int, IntArray, String, StringArray.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void sendTransactionIntHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call non-constant method of smart contract with int returned.");
+        System.out.println("Usage:  sendTransaction [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void sendTransactionIntArrayHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call non-constant method of smart contract with int array returned.");
+        System.out.println("Usage:  sendTransaction [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void sendTransactionStringHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println("Call non-constant method of smart contract with string returned.");
+        System.out.println("Usage:  sendTransaction [path] [method] [...args]");
+        System.out.println("path:   the path of the contract resource in wecross server.");
+        System.out.println("method: the method in contract.");
+        System.out.println("args:   variable parameter list.");
+        ConsoleUtils.singleLine();
+    }
+
+    public static void sendTransactionStringArrayHelp() {
+        ConsoleUtils.singleLine();
+        System.out.println(
+                "Call non-constant method of smart contract with string array returned.");
         System.out.println("Usage:  sendTransaction [path] [method] [...args]");
         System.out.println("path:   the path of the contract resource in wecross server.");
         System.out.println("method: the method in contract.");

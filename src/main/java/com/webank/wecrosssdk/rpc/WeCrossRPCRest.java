@@ -1,15 +1,15 @@
 package com.webank.wecrosssdk.rpc;
 
-import com.webank.wecrosssdk.rpc.methods.GetDataRequest;
-import com.webank.wecrosssdk.rpc.methods.GetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.Request;
-import com.webank.wecrosssdk.rpc.methods.ResourcesRequest;
-import com.webank.wecrosssdk.rpc.methods.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.SetDataRequest;
-import com.webank.wecrosssdk.rpc.methods.SetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.TransactionRequest;
-import com.webank.wecrosssdk.rpc.methods.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.request.GetDataRequest;
+import com.webank.wecrosssdk.rpc.methods.request.ResourcesRequest;
+import com.webank.wecrosssdk.rpc.methods.request.SetDataRequest;
+import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
+import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
+import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public class WeCrossRPCRest implements WeCrossRPC {
@@ -67,6 +67,39 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<TransactionResponse> call(
+            String path, String[] retTypes, String method, Object... args) {
+        TransactionRequest transactionRequest = new TransactionRequest("", retTypes, method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> callInt(String path, String method, Object... args) {
+        return call(path, new String[] {"Int"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> callIntArray(
+            String path, String method, Object... args) {
+        return call(path, new String[] {"IntArray"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> callString(String path, String method, Object... args) {
+        return call(path, new String[] {"String"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> callStringArray(
+            String path, String method, Object... args) {
+        return call(path, new String[] {"StringArray"}, method, args);
+    }
+
+    @Override
     public RemoteCall<TransactionResponse> sendTransaction(
             String path, String method, Object... args) {
         TransactionRequest transactionRequest = new TransactionRequest("", method, args);
@@ -76,6 +109,42 @@ public class WeCrossRPCRest implements WeCrossRPC {
                 new Request(path, "sendTransaction", transactionRequest);
         return new RemoteCall<TransactionResponse>(
                 weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransaction(
+            String path, String[] retTypes, String method, Object... args) {
+        TransactionRequest transactionRequest = new TransactionRequest("", retTypes, method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<TransactionRequest> request =
+                new Request(path, "sendTransaction", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransactionInt(
+            String path, String method, Object... args) {
+        return sendTransaction(path, new String[] {"Int"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransactionIntArray(
+            String path, String method, Object... args) {
+        return sendTransaction(path, new String[] {"IntArray"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransactionString(
+            String path, String method, Object... args) {
+        return sendTransaction(path, new String[] {"String"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransactionStringArray(
+            String path, String method, Object... args) {
+        return sendTransaction(path, new String[] {"StringArray"}, method, args);
     }
 
     public WeCrossService getWeCrossService() {

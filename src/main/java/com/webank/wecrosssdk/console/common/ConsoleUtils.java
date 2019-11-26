@@ -7,12 +7,22 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 public class ConsoleUtils {
+    public static String[] parseRetTypes(String retTypes) {
+        String[] types = retTypes.split(",");
+        String[] result = new String[types.length];
+        int i = 0;
+        for (String type : types) {
+            result[i++] = type.trim();
+        }
+        return result;
+    }
 
     public static boolean isValidPathVar(String path, Map<String, String> pathMaps) {
         if (pathMaps.containsKey(path)) {
@@ -236,15 +246,48 @@ public class ConsoleUtils {
                 : tokens2.toArray(new String[tokens2.size()]);
     }
 
+    private static Boolean isGrooveyCommand(String command) {
+        List<String> grovvyCommands =
+                Arrays.asList(
+                        ".callInt",
+                        ".callIntArray",
+                        ".callString",
+                        ".callStringArray",
+                        ".sendTransactionInt",
+                        ".sendTransactionIntArray",
+                        ".sendTransactionString",
+                        ".sendTransactionStringArray");
+        for (String grooveyCommand : grovvyCommands) {
+            if (command.endsWith(grooveyCommand)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String parseRequest(String[] params) throws ConsoleException {
+
         String result = "";
         Boolean isArgs = false;
         Integer length = params.length;
         Integer start = 0;
+        Integer startArgs = 1;
         if (length != 0) {
-            if ((params[0].endsWith(".call")
-                    || params[0].endsWith(".sendTransaction")
-                    || params[0].endsWith(".setData"))) {
+            if (params[0].endsWith(".call") || params[0].endsWith(".sendTransaction")) {
+                isArgs = true;
+                if (length < 2) {
+                    throw new ConsoleException(Status.TYPES_MISSING, "Types is missing");
+                }
+                if (length < 3) {
+                    throw new ConsoleException(Status.METHOD_MISSING, "Method is missing");
+                }
+
+                params[1] = "\"" + parseString(params[1]) + "\"";
+                params[2] = "\"" + parseString(params[2]) + "\"";
+                start = 1;
+                startArgs = 3;
+                result = params[0] + " ";
+            } else if (isGrooveyCommand(params[0])) {
                 isArgs = true;
                 if (length < 2) {
                     throw new ConsoleException(Status.METHOD_MISSING, "Method is missing");
@@ -252,13 +295,19 @@ public class ConsoleUtils {
 
                 params[1] = "\"" + parseString(params[1]) + "\"";
                 start = 1;
-                result = params[0];
+                startArgs = 2;
+                result = params[0] + " ";
+            } else if (params[0].endsWith(".getData") || params[0].endsWith(".setData")) {
+                isArgs = true;
+                start = 1;
+                startArgs = 1;
+                result = params[0] + " ";
             } else if (params[0].endsWith(".exists")) {
                 if (length != 1) {
                     throw new ConsoleException(Status.INTERNAL_ERROR, "Redundant parameters");
                 }
-                result = params[0] + "() ";
-                start = 1;
+                result = params[0] + "()";
+                return result;
             }
 
             for (; start < length; ++start) {
@@ -266,8 +315,8 @@ public class ConsoleUtils {
                 if (!isArgs && RPCUtils.isValidPath(temp)) {
                     result += ("\"" + temp + "\"" + " ");
                 } else if (isArgs) {
-                    if (start > 1) {
-                        // args1 args2 ...
+                    // args1 args2 ...
+                    if (start >= startArgs) {
                         if (temp.equals(params[start])) {
                             // as int
                             try {
@@ -289,6 +338,7 @@ public class ConsoleUtils {
 
             result = result.substring(0, result.length() - 1);
         }
+        //        System.out.println(result);
         return result;
     }
 

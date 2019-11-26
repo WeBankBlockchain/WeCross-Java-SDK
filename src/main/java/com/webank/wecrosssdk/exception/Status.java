@@ -12,5 +12,6 @@ public class Status {
 
     // status in param
     public static final int ILLEGAL_PARAM = 2000;
-    public static final int METHOD_MISSING = 2000;
+    public static final int TYPES_MISSING = 2001;
+    public static final int METHOD_MISSING = 2002;
 }

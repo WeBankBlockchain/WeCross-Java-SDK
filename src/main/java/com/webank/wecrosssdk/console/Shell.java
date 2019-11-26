@@ -199,10 +199,50 @@ public class Shell {
                             rpcFace.call(params, pathMaps);
                             break;
                         }
+                    case "callInt":
+                        {
+                            rpcFace.callInt(params, pathMaps);
+                            break;
+                        }
+                    case "callIntArray":
+                        {
+                            rpcFace.callIntArray(params, pathMaps);
+                            break;
+                        }
+                    case "callString":
+                        {
+                            rpcFace.callString(params, pathMaps);
+                            break;
+                        }
+                    case "callStringArray":
+                        {
+                            rpcFace.callStringArray(params, pathMaps);
+                            break;
+                        }
                     case "send":
                     case "sendTransaction":
                         {
                             rpcFace.sendTransaction(params, pathMaps);
+                            break;
+                        }
+                    case "sendTransactionInt":
+                        {
+                            rpcFace.sendTransactionInt(params, pathMaps);
+                            break;
+                        }
+                    case "sendTransactionIntArray":
+                        {
+                            rpcFace.sendTransactionIntArray(params, pathMaps);
+                            break;
+                        }
+                    case "sendTransactionString":
+                        {
+                            rpcFace.sendTransactionString(params, pathMaps);
+                            break;
+                        }
+                    case "sendTransactionStringArray":
+                        {
+                            rpcFace.sendTransactionStringArray(params, pathMaps);
                             break;
                         }
                     default:
