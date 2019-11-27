@@ -1,6 +1,8 @@
+![](docs/images/menu_logo_wecross.svg)
+
 # WeCross-Java-SDK
-## 简介
-WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java API。开发者通过SDK可以方便快捷地基于WeCross开发自己的跨链应用，此版本只支持[WeCross 1.0+](https://github.com/WeBankFinTech/WeCross)
+
+WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java API。开发者通过SDK可以方便快捷地基于WeCross开发自己的跨链应用。
 
 ## 关键特性
 
@@ -26,8 +28,6 @@ $ ./gradlew build
 ```shell
 WeCross-Java-SDK/dist/apps/wecross-java-sdk.jar
 ```
-
-
 
 ## 贡献说明
 
