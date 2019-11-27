@@ -3,7 +3,6 @@ package com.webank.wecrosssdk.rpc.service;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.utils.RPCUtils;
-import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -69,14 +68,14 @@ public class WeCrossRPCService implements WeCrossService {
         return response;
     }
 
-    @Override
-    public void sendOnly(Request request) {}
-
-    @Override
-    public <T extends Response> CompletableFuture<T> sendAsync(
-            Request request, Class<T> responseType) {
-        return null;
-    }
+    //    @Override
+    //    public void sendOnly(Request request) {}
+    //
+    //    @Override
+    //    public <T extends Response> CompletableFuture<T> sendAsync(
+    //            Request request, Class<T> responseType) {
+    //        return null;
+    //    }
 
     public String getServer() {
         return server;
