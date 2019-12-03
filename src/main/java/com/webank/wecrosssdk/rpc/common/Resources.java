@@ -1,11 +1,11 @@
-package com.webank.wecrosssdk.rpc.data;
+package com.webank.wecrosssdk.rpc.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
 public class Resources {
-    private Integer errorCode;
+    private int errorCode;
     private String errorMessage;
 
     @JsonProperty("resources")
@@ -19,11 +19,11 @@ public class Resources {
         this.resourceList = resourceList;
     }
 
-    public Integer getErrorCode() {
+    public int getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(Integer errorCode) {
+    public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
     }
 
