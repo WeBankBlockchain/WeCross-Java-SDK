@@ -1,10 +1,10 @@
-package com.webank.wecrosssdk.rpc.data;
+package com.webank.wecrosssdk.rpc.common;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 public class CallContractResult {
-    private Integer errorCode;
+    private int errorCode;
     private String errorMessage;
     private String hash;
     private Object result[];
@@ -19,11 +19,11 @@ public class CallContractResult {
         this.result = result;
     }
 
-    public Integer getErrorCode() {
+    public int getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(Integer errorCode) {
+    public void setErrorCode(int errorCode) {
         this.errorCode = errorCode;
     }
 

@@ -3,8 +3,8 @@ package com.webank.wecrosssdk.rpc.methods;
 import java.util.Objects;
 
 public class Response<T> {
-    private String version = "0.1";
-    private Integer result = -1;
+    private String version;
+    private int result = -1;
     private String message;
     private T data;
 
@@ -24,11 +24,11 @@ public class Response<T> {
         this.version = version;
     }
 
-    public Integer getResult() {
+    public int getResult() {
         return result;
     }
 
-    public void setResult(Integer result) {
+    public void setResult(int result) {
         this.result = result;
     }
 

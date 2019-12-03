@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.rpc.data;
+package com.webank.wecrosssdk.rpc.common;
 
 import org.springframework.core.ParameterizedTypeReference;
 

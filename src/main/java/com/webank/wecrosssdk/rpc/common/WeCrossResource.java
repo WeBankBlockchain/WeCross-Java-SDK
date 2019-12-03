@@ -1,11 +1,11 @@
-package com.webank.wecrosssdk.rpc.data;
+package com.webank.wecrosssdk.rpc.common;
 
 import java.util.Objects;
 
 public class WeCrossResource {
     private String checksum;
     private String type;
-    private Integer distance;
+    private int distance;
     private String path;
 
     public String getChecksum() {
@@ -24,11 +24,11 @@ public class WeCrossResource {
         this.type = type;
     }
 
-    public Integer getDistance() {
+    public int getDistance() {
         return distance;
     }
 
-    public void setDistance(Integer distance) {
+    public void setDistance(int distance) {
         this.distance = distance;
     }
 

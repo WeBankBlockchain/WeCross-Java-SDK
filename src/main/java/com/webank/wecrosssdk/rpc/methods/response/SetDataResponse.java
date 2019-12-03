@@ -19,14 +19,14 @@ public class SetDataResponse extends Response<Status> {
     }
 
     public static class Status {
-        private Integer errorCode;
+        private int errorCode;
         private String errorMessage;
 
-        public Integer getErrorCode() {
+        public int getErrorCode() {
             return errorCode;
         }
 
-        public void setErrorCode(Integer errorCode) {
+        public void setErrorCode(int errorCode) {
             this.errorCode = errorCode;
         }
 

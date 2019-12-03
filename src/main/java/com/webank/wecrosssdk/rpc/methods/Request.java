@@ -1,10 +1,11 @@
 package com.webank.wecrosssdk.rpc.methods;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.webank.wecrosssdk.rpc.data.WeCrossCallback;
+import com.webank.wecrosssdk.rpc.common.Version;
+import com.webank.wecrosssdk.rpc.common.WeCrossCallback;
 
 public class Request<T> {
-    private String version = "0.1";
+    private String version;
     private String path;
     private String method;
     private T data;
@@ -14,6 +15,7 @@ public class Request<T> {
     public Request() {}
 
     public Request(String path, String method, T data) {
+        this.version = Version.CurrentVersion;
         this.path = path;
         this.method = method;
         this.data = data;
