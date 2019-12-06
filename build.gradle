@@ -37,7 +37,7 @@ configurations.all {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.4.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-log4j2:2.1.4.RELEASE'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
+    compile 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'

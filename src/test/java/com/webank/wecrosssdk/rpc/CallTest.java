@@ -6,14 +6,12 @@ import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public class CallTest {
 
-    public static WeCrossRPC weCrossRPC;
-
     public static void main(String[] args) throws Exception {
 
         String server = "127.0.0.1:8080";
 
         WeCrossService weCrossService = new WeCrossRPCService(server);
-        weCrossRPC = WeCrossRPC.init(weCrossService);
+        WeCrossRPC weCrossRPC = WeCrossRPC.init(weCrossService);
 
         // call without return
         System.out.println("*************** void call ***************");
