@@ -19,7 +19,7 @@ WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java
 
 ```shell
 $ cd WeCross-Java-SDK
-$ ./gradlew build
+$ ./gradlew assemble
 ```
 
 **编译结果**: 

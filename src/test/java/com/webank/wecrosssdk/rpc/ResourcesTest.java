@@ -7,14 +7,12 @@ import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public class ResourcesTest {
 
-    public static WeCrossRPC weCrossRPC;
-
     public static void main(String[] args) throws Exception {
 
         String server = "127.0.0.1:8080";
 
         WeCrossService weCrossService = new WeCrossRPCService(server);
-        weCrossRPC = WeCrossRPC.init(weCrossService);
+        WeCrossRPC weCrossRPC = WeCrossRPC.init(weCrossService);
 
         // test exists
         System.out.println("*************** exists ***************");
