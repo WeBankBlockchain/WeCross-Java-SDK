@@ -13,7 +13,7 @@ public interface WeCrossRPC {
         return new WeCrossRPCRest(weCrossService);
     }
 
-    RemoteCall<Response> exists(String path);
+    RemoteCall<Response> status(String path);
 
     RemoteCall<ResourcesResponse> list(Boolean ignoreRemote);
 
