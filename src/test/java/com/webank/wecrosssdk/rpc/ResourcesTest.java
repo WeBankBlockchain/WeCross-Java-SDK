@@ -15,11 +15,11 @@ public class ResourcesTest {
         WeCrossRPC weCrossRPC = WeCrossRPC.init(weCrossService);
 
         // test exists
-        System.out.println("*************** exists ***************");
-        Response response = weCrossRPC.exists("payment.bcos2.HelloWorldContract").send();
+        System.out.println("*************** status ***************");
+        Response response = weCrossRPC.status("payment.bcos2.HelloWorldContract").send();
         System.out.println("Should exists: " + response.toString());
 
-        response = weCrossRPC.exists("test.test.test").send();
+        response = weCrossRPC.status("test.test.test").send();
         System.out.println("Not exists: " + response.toString());
 
         // list test

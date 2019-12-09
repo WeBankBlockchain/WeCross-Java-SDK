@@ -21,11 +21,11 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<Response> exists(String path) {
+    public RemoteCall<Response> status(String path) {
         //    String prefix = weCrossService.getWeCrossServer();
         //    String url = RPCUtils.pathToUrl(prefix, path);
         @SuppressWarnings("unchecked")
-        Request<?> request = new Request(path, "exists", null);
+        Request<?> request = new Request(path, "status", null);
         return new RemoteCall<>(weCrossService, Response.class, request);
     }
 
