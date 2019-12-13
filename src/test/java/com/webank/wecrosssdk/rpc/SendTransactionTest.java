@@ -8,7 +8,7 @@ public class SendTransactionTest {
 
     public static void main(String[] args) throws Exception {
 
-        String server = "127.0.0.1:8080";
+        String server = "127.0.0.1:8250";
 
         WeCrossService weCrossService = new WeCrossRPCService(server);
         WeCrossRPC weCrossRPC = WeCrossRPC.init(weCrossService);
