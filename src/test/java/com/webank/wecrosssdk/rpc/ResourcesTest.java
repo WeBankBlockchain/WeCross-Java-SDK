@@ -16,7 +16,7 @@ public class ResourcesTest {
 
         // test exists
         System.out.println("*************** status ***************");
-        Response response = weCrossRPC.status("payment.bcos2.HelloWorldContract").send();
+        Response response = weCrossRPC.status("payment.bcos.HelloWeCross").send();
         System.out.println("Should exists: " + response.toString());
 
         response = weCrossRPC.status("test.test.test").send();

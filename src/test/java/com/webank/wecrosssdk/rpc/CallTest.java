@@ -18,10 +18,12 @@ public class CallTest {
         TransactionResponse transactionResponseVoid =
                 weCrossRPC
                         .call(
-                                "payment.bcos2.HelloWorldContract",
-                                "setAndgetConstant",
-                                "hello world",
-                                10086)
+                                "payment.bcos.HelloWeCross",
+                                "getInputs",
+                                0,
+                                new int[] {1, 2, 3},
+                                "Hello World",
+                                new String[] {"Bei Bei", "Jing Jing", "Huan Huan", "Ying Ying"})
                         .send();
         System.out.println("Result: " + transactionResponseVoid.toString());
 
@@ -29,46 +31,34 @@ public class CallTest {
         TransactionResponse transactionResponse =
                 weCrossRPC
                         .call(
-                                "payment.bcos2.HelloWorldContract",
+                                "payment.bcos.HelloWeCross",
                                 new String[] {"Int", "IntArray", "String", "StringArray"},
-                                "getAll",
-                                10086,
+                                "getInputs",
+                                0,
                                 new int[] {1, 2, 3},
-                                "hello",
-                                new String[] {"Int", "IntArray", "String", "StringArray"})
+                                "Hello World",
+                                new String[] {"Bei Bei", "Jing Jing", "Huan Huan", "Ying Ying"})
                         .send();
         System.out.println("Result: " + transactionResponse.toString());
 
         System.out.println("*************** callInt ***************");
         TransactionResponse transactionResponseInt =
-                weCrossRPC.callInt("payment.bcos2.HelloWorldContract", "getInt", 10086).send();
+                weCrossRPC.callInt("payment.bcos.HelloWeCross", "getNumber").send();
         System.out.println("Result: " + transactionResponseInt.toString());
 
         System.out.println("*************** callString ***************");
         TransactionResponse decodeCallTransactionResponse =
-                weCrossRPC
-                        .callString("payment.bcos2.HelloWorldContract", "getString", "hello")
-                        .send();
+                weCrossRPC.callString("payment.bcos.HelloWeCross", "getMessage").send();
         System.out.println("Result: " + decodeCallTransactionResponse.toString());
 
         System.out.println("*************** callIntArray ***************");
         TransactionResponse transactionResponseIntArray =
-                weCrossRPC
-                        .callIntArray(
-                                "payment.bcos2.HelloWorldContract",
-                                "getIntArray",
-                                (Object) new int[] {1, 2, 3})
-                        .send();
+                weCrossRPC.callIntArray("payment.bcos.HelloWeCross", "getNumbers").send();
         System.out.println("Result: " + transactionResponseIntArray.toString());
 
         System.out.println("*************** callStringArray ***************");
         TransactionResponse transactionResponseStringArray =
-                weCrossRPC
-                        .callStringArray(
-                                "payment.bcos2.HelloWorldContract",
-                                "getStringArray",
-                                (Object) new String[] {"Int", "IntArray", "String", "StringArray"})
-                        .send();
+                weCrossRPC.callStringArray("payment.bcos.HelloWeCross", "getMessages").send();
         System.out.println("Result: " + transactionResponseStringArray.toString());
     }
 }
