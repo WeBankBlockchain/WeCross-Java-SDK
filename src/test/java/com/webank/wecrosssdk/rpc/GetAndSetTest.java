@@ -17,13 +17,13 @@ public class GetAndSetTest {
         // getData test
         System.out.println("*************** getData ***************");
         GetDataResponse getDataResponse =
-                weCrossRPC.getData("payment.bcos2.HelloWorldContract", "get").send();
+                weCrossRPC.getData("payment.bcos.HelloWeCross", "get").send();
         System.out.println("Result: " + getDataResponse.toString());
 
         // setData test
         System.out.println("*************** getData ***************");
         SetDataResponse setDataResponse =
-                weCrossRPC.setData("payment.bcos2.HelloWorldContract", "set", "data").send();
+                weCrossRPC.setData("payment.bcos.HelloWeCross", "set", "data").send();
         System.out.println("Result: " + setDataResponse.toString());
     }
 }

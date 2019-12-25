@@ -18,10 +18,12 @@ public class SendTransactionTest {
         TransactionResponse transactionResponseVoid =
                 weCrossRPC
                         .sendTransaction(
-                                "payment.bcos2.HelloWorldContract",
-                                "setAndgetConstant",
-                                "hello world",
-                                10086)
+                                "payment.bcos.HelloWeCross",
+                                "setAll",
+                                0,
+                                new int[] {1, 2, 3},
+                                "Hello World",
+                                new String[] {"Bei Bei", "Jing Jing", "Huan Huan", "Ying Ying"})
                         .send();
         System.out.println("Result: " + transactionResponseVoid.toString());
 
@@ -29,20 +31,20 @@ public class SendTransactionTest {
         TransactionResponse transactionResponse =
                 weCrossRPC
                         .sendTransaction(
-                                "payment.bcos2.HelloWorldContract",
+                                "payment.bcos.HelloWeCross",
                                 new String[] {"Int", "IntArray", "String", "StringArray"},
-                                "getAll",
-                                10086,
+                                "setAll",
+                                0,
                                 new int[] {1, 2, 3},
-                                "hello",
-                                new String[] {"Int", "IntArray", "String", "StringArray"})
+                                "Hello World",
+                                new String[] {"Bei Bei", "Jing Jing", "Huan Huan", "Ying Ying"})
                         .send();
         System.out.println("Result: " + transactionResponse.toString());
 
         System.out.println("*************** sendTransactionInt ***************");
         TransactionResponse transactionResponseInt =
                 weCrossRPC
-                        .sendTransactionInt("payment.bcos2.HelloWorldContract", "getInt", 10086)
+                        .sendTransactionInt("payment.bcos.HelloWeCross", "setNumber", 10086)
                         .send();
         System.out.println("Result: " + transactionResponseInt.toString());
 
@@ -50,7 +52,7 @@ public class SendTransactionTest {
         TransactionResponse decodeCallTransactionResponse =
                 weCrossRPC
                         .sendTransactionString(
-                                "payment.bcos2.HelloWorldContract", "getString", "hello")
+                                "payment.bcos.HelloWeCross", "setMessage", "Hello World")
                         .send();
         System.out.println("Result: " + decodeCallTransactionResponse.toString());
 
@@ -58,8 +60,8 @@ public class SendTransactionTest {
         TransactionResponse transactionResponseIntArray =
                 weCrossRPC
                         .sendTransactionIntArray(
-                                "payment.bcos2.HelloWorldContract",
-                                "getIntArray",
+                                "payment.bcos.HelloWeCross",
+                                "setNumbers",
                                 (Object) new int[] {1, 2, 3})
                         .send();
         System.out.println("Result: " + transactionResponseIntArray.toString());
@@ -68,9 +70,12 @@ public class SendTransactionTest {
         TransactionResponse transactionResponseStringArray =
                 weCrossRPC
                         .sendTransactionStringArray(
-                                "payment.bcos2.HelloWorldContract",
-                                "getStringArray",
-                                (Object) new String[] {"Int", "IntArray", "String", "StringArray"})
+                                "payment.bcos.HelloWeCross",
+                                "setMessages",
+                                (Object)
+                                        new String[] {
+                                            "Bei Bei", "Jing Jing", "Huan Huan", "Ying Ying"
+                                        })
                         .send();
         System.out.println("Result: " + transactionResponseStringArray.toString());
     }
