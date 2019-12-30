@@ -1,9 +1,9 @@
 ![](docs/images/menu_logo_wecross.svg)
 
 # WeCross-Java-SDK
-[![CodeFactor](https://www.codefactor.io/repository/github/webankfintech/wecross-Java-SDK/badge)](https://www.codefactor.io/repository/github/webankfintech/wecross-Java-SDK) [![Build Status](https://travis-ci.org/WeBankFinTech/WeCross-Java-SDK.svg?branch=dev)](https://travis-ci.org/WeBankFinTech/WeCross-Java-SDK) [![codecov](https://codecov.io/gh/WeBankFinTech/WeCross-Java-SDK/branch/dev/graph/badge.svg)](https://codecov.io/gh/WeBankFinTech/WeCross-Java-SDK) [![Latest release](https://img.shields.io/github/release/WeBankFinTech/WeCross-Java-Sdk.svg)](https://github.com/WeBankFinTech/WeCross-Java-SDK/releases/latest)
-[![Maven Central](https://img.shields.io/maven-central/v/com.webank.wecross/wecross-client.svg?label=Maven%20Central)]() ![](https://img.shields.io/github/license/WeBankFinTech/WeCross-Java-SDK) 
-#
+[![CodeFactor](https://www.codefactor.io/repository/github/webankfintech/wecross-Java-SDK/badge)](https://www.codefactor.io/repository/github/webankfintech/wecross-Java-SDK) [![Build Status](https://travis-ci.org/WeBankFinTech/WeCross-Java-SDK.svg?branch=master)](https://travis-ci.org/WeBankFinTech/WeCross-Java-SDK) [![codecov](https://codecov.io/gh/WeBankFinTech/WeCross-Java-SDK/branch/dev/graph/badge.svg)](https://codecov.io/gh/WeBankFinTech/WeCross-Java-SDK) [![Latest release](https://img.shields.io/github/release/WeBankFinTech/WeCross-Java-SDK.svg)](https://github.com/WeBankFnTech/WeCross-Java-SDK/releases/latest)
+[![Maven Central](https://img.shields.io/maven-central/v/com.webank/wecross-java-sdk)]() ![](https://img.shields.io/github/license/WeBankFinTech/WeCross-Java-SDK) 
+
 WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java API。开发者通过SDK可以方便快捷地基于WeCross开发自己的跨链应用。
 
 ## 关键特性
