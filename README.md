@@ -10,6 +10,24 @@ WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java
 
 - 实现WeCross的[Resetful-RPC](https://wecross.readthedocs.io/zh_CN/latest/docs/manual/api.html)的Java API。
 
+## 使用SDK
+
+gradle
+
+```
+compile ('com.webank:wecross-java-sdk:1.0.0-rc1')
+```
+
+maven
+
+```
+<dependency>
+    <groupId>com.webank</groupId>
+    <artifactId>wecross-java-sdk</artifactId>
+    <version>1.0.0-rc1</version>
+</dependency>
+```
+
 ## 源码编译
 
 **环境要求**:
