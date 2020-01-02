@@ -8,7 +8,7 @@ WeCross-Java-SDK为[WeCross](https://github.com/WeBankFinTech/WeCross)提供Java
 
 ## 关键特性
 
-- 实现WeCross的[Resetful-RPC](https://wecross.readthedocs.io/zh_CN/latest/docs/manual/api.html)的Java API。
+- 实现WeCross的[JSON-RPC](https://wecross.readthedocs.io/zh_CN/latest/docs/manual/api.html)的Java API。
 
 ## 使用SDK
 
