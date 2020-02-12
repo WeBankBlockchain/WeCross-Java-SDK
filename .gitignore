@@ -36,3 +36,4 @@ logs
 .classpath
 .project
 src/main/resources/console.xml
+out/
