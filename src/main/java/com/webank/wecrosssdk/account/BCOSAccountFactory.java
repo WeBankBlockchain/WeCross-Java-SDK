@@ -17,23 +17,39 @@ import org.fisco.bcos.channel.client.P12Manager;
 import org.fisco.bcos.channel.client.PEMManager;
 import org.fisco.bcos.web3j.crypto.Credentials;
 import org.fisco.bcos.web3j.crypto.ECKeyPair;
+import org.fisco.bcos.web3j.crypto.EncryptType;
+import org.fisco.bcos.web3j.crypto.Hash;
+import org.fisco.bcos.web3j.crypto.HashInterface;
 import org.fisco.bcos.web3j.crypto.gm.GenCredential;
+import org.fisco.bcos.web3j.crypto.gm.sm3.SM3Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BCOSAccountFactory {
     static Logger logger = LoggerFactory.getLogger(BCOSAccountFactory.class);
 
-    public static BCOSAccount build(String name, String accountPath) throws Exception {
+    public static synchronized BCOSAccount build(String name, String accountPath) throws Exception {
         Credentials credentials = buildCredentials(accountPath);
         BCOSAccount account = new BCOSAccount(name, credentials);
         return account;
     }
 
-    public static BCOSGMAccount buildGM(String name, String accountPath) throws Exception {
-        Credentials credentials = buildCredentials(accountPath);
-        BCOSGMAccount account = new BCOSGMAccount(name, credentials);
-        return account;
+    public static synchronized BCOSGMAccount buildGM(String name, String accountPath)
+            throws Exception {
+        int prevEncryptType = EncryptType.encryptType;
+        HashInterface prevHasher = Hash.getHashInterface();
+        try {
+            EncryptType.encryptType = EncryptType.SM2_TYPE;
+            Hash.setHashInterface(new SM3Digest());
+            Credentials credentials = buildCredentials(accountPath);
+            System.out.println(credentials.getEcKeyPair().getPublicKey().toString(16));
+            BCOSGMAccount account = new BCOSGMAccount(name, credentials);
+
+            return account;
+        } finally {
+            EncryptType.encryptType = prevEncryptType;
+            Hash.setHashInterface(prevHasher);
+        }
     }
 
     public static Credentials buildCredentials(String accountPath) throws Exception {
@@ -78,7 +94,6 @@ public class BCOSAccountFactory {
         ECKeyPair keyPair = pem.getECKeyPair();
         Credentials credentials = GenCredential.create(keyPair.getPrivateKey().toString(16));
 
-        logger.info("BCOS account address: {}", credentials.getAddress());
         return credentials;
     }
 
@@ -93,7 +108,6 @@ public class BCOSAccountFactory {
         ECKeyPair keyPair = p12Manager.getECKeyPair();
         Credentials credentials = GenCredential.create(keyPair.getPrivateKey().toString(16));
 
-        logger.info("BCOS account address: {}", credentials.getAddress());
         return credentials;
     }
 }
