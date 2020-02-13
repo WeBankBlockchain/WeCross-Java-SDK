@@ -16,12 +16,12 @@ public class AccountsFactory {
     private static final String TYPE_BCOS_GM = "BCOS_SMCRYPTO";
     private static final String TYPE_FABRIC = "Fabric";
 
-    public static Accounts build() {
+    public static Accounts build() throws Exception {
         Accounts accounts = new Accounts(buildAccountsMap());
         return accounts;
     }
 
-    private static Map<String, Account> buildAccountsMap() {
+    private static Map<String, Account> buildAccountsMap() throws Exception {
         Map<String, Account> accountsMap = new HashMap<>();
         try {
             Toml config = ConfigUtils.getToml(Default.ACCOUNTS_CONFIG_FILE);
@@ -40,8 +40,7 @@ public class AccountsFactory {
         } catch (Exception e) {
             String errorMsg = "Load accounts exception: " + e.getMessage();
             logger.error(errorMsg);
-            System.out.println(errorMsg);
-            System.exit(1); // If any config failed, just exit!
+            throw new Exception(errorMsg);
         }
         return accountsMap;
     }
