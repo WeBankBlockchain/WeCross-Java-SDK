@@ -2,6 +2,7 @@ package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -26,6 +27,14 @@ public interface WeCrossRPC {
     RemoteCall<TransactionResponse> call(
             String path, String retTypes[], String method, Object... args);
 
+    RemoteCall<TransactionResponse> call(
+            String path,
+            byte[] proposalBytes,
+            byte[] sign,
+            String retTypes[],
+            String method,
+            Object... args);
+
     RemoteCall<TransactionResponse> callInt(String path, String method, Object... args);
 
     RemoteCall<TransactionResponse> callIntArray(String path, String method, Object... args);
@@ -34,10 +43,20 @@ public interface WeCrossRPC {
 
     RemoteCall<TransactionResponse> callStringArray(String path, String method, Object... args);
 
+    RemoteCall<ProposalResponse> callProposal(String path, String method, Object... args);
+
     RemoteCall<TransactionResponse> sendTransaction(String path, String method, Object... args);
 
     RemoteCall<TransactionResponse> sendTransaction(
             String path, String retTypes[], String method, Object... args);
+
+    RemoteCall<TransactionResponse> sendTransaction(
+            String path,
+            byte[] proposalBytes,
+            byte[] sign,
+            String retTypes[],
+            String method,
+            Object... args);
 
     RemoteCall<TransactionResponse> sendTransactionInt(String path, String method, Object... args);
 
@@ -48,5 +67,8 @@ public interface WeCrossRPC {
             String path, String method, Object... args);
 
     RemoteCall<TransactionResponse> sendTransactionStringArray(
+            String path, String method, Object... args);
+
+    RemoteCall<ProposalResponse> sendTransactionProposal(
             String path, String method, Object... args);
 }

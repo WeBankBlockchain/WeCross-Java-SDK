@@ -1,7 +1,5 @@
-package com.webank.wecrosssdk.rpc.account;
+package com.webank.wecrosssdk.account;
 
-import com.webank.wecrosssdk.account.Accounts;
-import com.webank.wecrosssdk.account.AccountsFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
