@@ -76,6 +76,16 @@ public class Resource {
                 (ProposalResponse.Proposal)
                         mustOkRequest(weCrossRPC.callProposal(iPath, method, args)).getData();
 
+        if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
+            throw new Exception(
+                    "Crypto suite invalid, require: "
+                            + proposal.getCryptoSuite()
+                            + " account("
+                            + account.getName()
+                            + "): "
+                            + account.getSignCryptoSuite());
+        }
+
         byte[] proposalBytes = proposal.getProposalToSign();
         byte[] sign = account.sign(proposalBytes);
 
@@ -95,6 +105,16 @@ public class Resource {
                 (ProposalResponse.Proposal)
                         mustOkRequest(weCrossRPC.sendTransactionProposal(iPath, method, args))
                                 .getData();
+
+        if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
+            throw new Exception(
+                    "Crypto suite invalid, require: "
+                            + proposal.getCryptoSuite()
+                            + " account("
+                            + account.getName()
+                            + "): "
+                            + account.getSignCryptoSuite());
+        }
 
         byte[] proposalBytes = proposal.getProposalToSign();
         byte[] sign = account.sign(proposalBytes);

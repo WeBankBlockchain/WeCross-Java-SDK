@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.account;
 
+import com.webank.wecrosssdk.common.WeCrossType;
 import org.hyperledger.fabric.sdk.User;
 import org.hyperledger.fabric.sdk.identity.IdentityFactory;
 import org.hyperledger.fabric.sdk.identity.SigningIdentity;
@@ -30,6 +31,11 @@ public class FabricAccount implements Account {
     @Override
     public String getAddress() {
         return user.getAccount();
+    }
+
+    @Override
+    public String getSignCryptoSuite() {
+        return WeCrossType.BC_SECP256R1;
     }
 
     public void setUser(User user) {
