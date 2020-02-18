@@ -1,9 +1,5 @@
-package com.webank.wecrosssdk.rpc.account;
+package com.webank.wecrosssdk.account;
 
-import com.webank.wecrosssdk.account.Account;
-import com.webank.wecrosssdk.account.BCOSAccount;
-import com.webank.wecrosssdk.account.BCOSAccountFactory;
-import com.webank.wecrosssdk.account.BCOSSignatureEncoder;
 import com.webank.wecrosssdk.config.Default;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import java.io.File;

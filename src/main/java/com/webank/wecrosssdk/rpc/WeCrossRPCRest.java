@@ -3,10 +3,12 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.GetDataRequest;
+import com.webank.wecrosssdk.rpc.methods.request.ProposalRequest;
 import com.webank.wecrosssdk.rpc.methods.request.ResourcesRequest;
 import com.webank.wecrosssdk.rpc.methods.request.SetDataRequest;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -58,7 +60,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<TransactionResponse> call(String path, String method, Object... args) {
-        TransactionRequest transactionRequest = new TransactionRequest("", method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(null, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
@@ -69,7 +71,25 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> call(
             String path, String[] retTypes, String method, Object... args) {
-        TransactionRequest transactionRequest = new TransactionRequest("", retTypes, method, args);
+        TransactionRequest transactionRequest =
+                new TransactionRequest(null, retTypes, method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> call(
+            String path,
+            byte[] proposalBytes,
+            byte[] sign,
+            String[] retTypes,
+            String method,
+            Object... args) {
+        TransactionRequest transactionRequest =
+                new TransactionRequest(proposalBytes, sign, retTypes, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
@@ -100,9 +120,18 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<ProposalResponse> callProposal(String path, String method, Object... args) {
+        ProposalRequest proposalRequest = new ProposalRequest(method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<ProposalRequest> request = new Request(path, "callProposal", proposalRequest);
+        return new RemoteCall<ProposalResponse>(weCrossService, ProposalResponse.class, request);
+    }
+
+    @Override
     public RemoteCall<TransactionResponse> sendTransaction(
             String path, String method, Object... args) {
-        TransactionRequest transactionRequest = new TransactionRequest("", method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(null, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
@@ -114,7 +143,26 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> sendTransaction(
             String path, String[] retTypes, String method, Object... args) {
-        TransactionRequest transactionRequest = new TransactionRequest("", retTypes, method, args);
+        TransactionRequest transactionRequest =
+                new TransactionRequest(null, retTypes, method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<TransactionRequest> request =
+                new Request(path, "sendTransaction", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransaction(
+            String path,
+            byte[] proposalBytes,
+            byte[] sign,
+            String[] retTypes,
+            String method,
+            Object... args) {
+        TransactionRequest transactionRequest =
+                new TransactionRequest(proposalBytes, sign, retTypes, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
@@ -145,6 +193,17 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<TransactionResponse> sendTransactionStringArray(
             String path, String method, Object... args) {
         return sendTransaction(path, new String[] {"StringArray"}, method, args);
+    }
+
+    @Override
+    public RemoteCall<ProposalResponse> sendTransactionProposal(
+            String path, String method, Object... args) {
+        ProposalRequest proposalRequest = new ProposalRequest(method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<ProposalRequest> request =
+                new Request(path, "sendTransactionProposal", proposalRequest);
+        return new RemoteCall<ProposalResponse>(weCrossService, ProposalResponse.class, request);
     }
 
     public WeCrossService getWeCrossService() {

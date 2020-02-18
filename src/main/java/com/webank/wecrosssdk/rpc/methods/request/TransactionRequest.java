@@ -3,29 +3,40 @@ package com.webank.wecrosssdk.rpc.methods.request;
 import java.util.Arrays;
 
 public class TransactionRequest {
-    private String sig;
+    private int seq = 0;
+    private byte[] sig;
+    private byte[] proposalBytes;
     private String retTypes[];
     private String method;
     private Object args[];
 
-    public TransactionRequest(String sig, String method, Object[] args) {
+    public TransactionRequest(byte[] sig, String method, Object[] args) {
         this.sig = sig;
         this.method = method;
         this.args = args;
     }
 
-    public TransactionRequest(String sig, String[] retTypes, String method, Object[] args) {
+    public TransactionRequest(byte[] sig, String[] retTypes, String method, Object[] args) {
         this.sig = sig;
         this.retTypes = retTypes;
         this.method = method;
         this.args = args;
     }
 
-    public String getSig() {
+    public TransactionRequest(
+            byte[] proposalBytes, byte[] sig, String[] retTypes, String method, Object[] args) {
+        this.proposalBytes = proposalBytes;
+        this.sig = sig;
+        this.retTypes = retTypes;
+        this.method = method;
+        this.args = args;
+    }
+
+    public byte[] getSig() {
         return sig;
     }
 
-    public void setSig(String sig) {
+    public void setSig(byte[] sig) {
         this.sig = sig;
     }
 
@@ -67,5 +78,21 @@ public class TransactionRequest {
                 + ", args="
                 + Arrays.toString(args)
                 + '}';
+    }
+
+    public byte[] getProposalBytes() {
+        return proposalBytes;
+    }
+
+    public void setProposalBytes(byte[] proposalBytes) {
+        this.proposalBytes = proposalBytes;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
     }
 }

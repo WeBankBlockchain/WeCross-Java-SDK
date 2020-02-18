@@ -6,4 +6,6 @@ public interface Account {
     String getName();
 
     String getAddress();
+
+    String getSignCryptoSuite();
 }

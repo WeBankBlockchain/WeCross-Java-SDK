@@ -1,7 +1,5 @@
-package com.webank.wecrosssdk.rpc.account;
+package com.webank.wecrosssdk.account;
 
-import com.webank.wecrosssdk.account.FabricAccount;
-import com.webank.wecrosssdk.account.FabricAccountFactory;
 import java.io.File;
 import java.util.Arrays;
 import org.junit.Assert;
