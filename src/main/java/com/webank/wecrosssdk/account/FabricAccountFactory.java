@@ -34,7 +34,7 @@ public class FabricAccountFactory {
         Map<String, String> accountConfig =
                 (Map<String, String>) ConfigUtils.getTomlMap(accountConfigFile).get("account");
 
-        String mspid = accountPath + File.separator + accountConfig.get("mspid");
+        String mspid = accountConfig.get("mspid");
         Enrollment enrollment = buildEnrollment(accountPath);
         return new User() {
             @Override

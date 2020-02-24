@@ -30,7 +30,7 @@ public class ConfigUtils {
     public static Toml getToml(String fileName) throws WeCrossSDKException {
         try {
             if (!fileIsExists(fileName)) {
-                throw new Exception(fileName + " is not exists");
+                throw new Exception(fileName + " does not exists");
             }
 
             PathMatchingResourcePatternResolver resolver =

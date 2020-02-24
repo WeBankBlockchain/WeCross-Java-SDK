@@ -12,6 +12,7 @@ public class ProposalResponse extends Response<ProposalResponse.Proposal> {
         private int seq;
         private byte[] proposalToSign;
         private String cryptoSuite;
+        private String type;
 
         public int getErrorCode() {
             return errorCode;
@@ -84,6 +85,14 @@ public class ProposalResponse extends Response<ProposalResponse.Proposal> {
 
         public void setCryptoSuite(String cryptoSuite) {
             this.cryptoSuite = cryptoSuite;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 }

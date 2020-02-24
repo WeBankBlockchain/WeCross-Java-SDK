@@ -6,17 +6,15 @@ public class ProposalRequest {
     private int seq;
     private String method;
     private Object args[];
+    private byte[] extraData;
+    private byte[] extraSig;
 
-    public ProposalRequest(String method, Object[] args) {
+    public ProposalRequest(String method, byte[] extraData, byte[] extraSig, Object[] args) {
         this.seq = SeqUtils.newSeq();
         this.method = method;
         this.args = args;
-    }
-
-    public ProposalRequest(int seq, String method, Object[] args) {
-        this.seq = seq;
-        this.method = method;
-        this.args = args;
+        this.extraData = extraData;
+        this.extraSig = extraSig;
     }
 
     public int getSeq() {
@@ -41,5 +39,21 @@ public class ProposalRequest {
 
     public void setArgs(Object args[]) {
         this.args = args;
+    }
+
+    public byte[] getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(byte[] extraData) {
+        this.extraData = extraData;
+    }
+
+    public byte[] getExtraSig() {
+        return extraSig;
+    }
+
+    public void setExtraSig(byte[] extraSig) {
+        this.extraSig = extraSig;
     }
 }

@@ -3,6 +3,7 @@ package com.webank.wecrosssdk.resource;
 import com.webank.wecrosssdk.account.Account;
 import com.webank.wecrosssdk.rpc.RemoteCall;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
+import com.webank.wecrosssdk.rpc.common.WeCrossResource;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
@@ -33,9 +34,20 @@ public class Resource {
     }
 
     public void load() throws Exception {
-        String data = (String) mustOkRequest(weCrossRPC.status(iPath)).getData();
-        if (!data.equals("exists")) {
-            throw new Exception("Resource " + iPath + " not found in WeCross network!");
+        WeCrossResource weCrossResource =
+                (WeCrossResource) mustOkRequest(weCrossRPC.info(iPath)).getData();
+
+        if (account != null
+                && !weCrossResource.getCryptoSuite().equals(account.getSignCryptoSuite())) {
+            throw new Exception(
+                    "Account("
+                            + account.getName()
+                            + "."
+                            + account.getSignCryptoSuite()
+                            + ") does not match the resource "
+                            + iPath
+                            + ", crypto suite: "
+                            + weCrossResource.getCryptoSuite());
         }
     }
 
@@ -86,7 +98,8 @@ public class Resource {
                             + account.getSignCryptoSuite());
         }
 
-        byte[] proposalBytes = proposal.getProposalToSign();
+        byte[] proposalBytes =
+                account.reassembleProposal(proposal.getProposalToSign(), proposal.getType());
         byte[] sign = account.sign(proposalBytes);
 
         return (TransactionResponse)
@@ -101,23 +114,36 @@ public class Resource {
 
     private TransactionResponse sendTransactionWithLocalAccount(
             String retTypes[], String method, Object... args) throws Exception {
-        ProposalResponse.Proposal proposal =
-                (ProposalResponse.Proposal)
-                        mustOkRequest(weCrossRPC.sendTransactionProposal(iPath, method, args))
-                                .getData();
 
-        if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
-            throw new Exception(
-                    "Crypto suite invalid, require: "
-                            + proposal.getCryptoSuite()
-                            + " account("
-                            + account.getName()
-                            + "): "
-                            + account.getSignCryptoSuite());
-        }
+        byte[] proposalBytes = null;
+        byte[] sign = null;
+        Boolean isProposalReady = false;
+        do {
+            ProposalResponse.Proposal proposal =
+                    (ProposalResponse.Proposal)
+                            mustOkRequest(
+                                            weCrossRPC.sendTransactionProposal(
+                                                    iPath, method, proposalBytes, sign, args))
+                                    .getData();
 
-        byte[] proposalBytes = proposal.getProposalToSign();
-        byte[] sign = account.sign(proposalBytes);
+            // Check proposal crypto suite
+            if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
+                throw new Exception(
+                        "Crypto suite invalid, require: "
+                                + proposal.getCryptoSuite()
+                                + " account("
+                                + account.getName()
+                                + "): "
+                                + account.getSignCryptoSuite());
+            }
+
+            proposalBytes =
+                    account.reassembleProposal(proposal.getProposalToSign(), proposal.getType());
+            sign = account.sign(proposalBytes);
+
+            isProposalReady =
+                    account.isProposalReady(proposal.getProposalToSign(), proposal.getType());
+        } while (!isProposalReady);
 
         return (TransactionResponse)
                 mustOkRequest(

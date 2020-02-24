@@ -6,6 +6,7 @@ import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.WeCrossResourceResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public interface WeCrossRPC {
@@ -15,6 +16,8 @@ public interface WeCrossRPC {
     }
 
     RemoteCall<Response> status(String path);
+
+    RemoteCall<WeCrossResourceResponse> info(String path);
 
     RemoteCall<ResourcesResponse> list(Boolean ignoreRemote);
 
@@ -70,5 +73,5 @@ public interface WeCrossRPC {
             String path, String method, Object... args);
 
     RemoteCall<ProposalResponse> sendTransactionProposal(
-            String path, String method, Object... args);
+            String path, String method, byte[] extraData, byte[] sign, Object... args);
 }

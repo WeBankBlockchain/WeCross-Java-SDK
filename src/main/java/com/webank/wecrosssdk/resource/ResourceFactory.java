@@ -7,6 +7,9 @@ public class ResourceFactory {
 
     public static Resource load(WeCrossRPC weCrossRPC, String iPath, Account account)
             throws Exception {
+        if (account == null) {
+            throw new Exception("Account is null");
+        }
         Resource resource = new Resource(weCrossRPC, iPath, account);
         resource.load();
         return resource;

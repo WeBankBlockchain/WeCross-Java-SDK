@@ -7,6 +7,7 @@ public class WeCrossResource {
     private String type;
     private int distance;
     private String path;
+    private String cryptoSuite;
 
     public String getChecksum() {
         return checksum;
@@ -60,6 +61,14 @@ public class WeCrossResource {
         return Objects.hash(getChecksum(), getType(), getDistance(), getPath());
     }
 
+    public String getCryptoSuite() {
+        return cryptoSuite;
+    }
+
+    public void setCryptoSuite(String cryptoSuite) {
+        this.cryptoSuite = cryptoSuite;
+    }
+
     @Override
     public String toString() {
         return "WeCrossResource{"
@@ -73,6 +82,9 @@ public class WeCrossResource {
                 + distance
                 + ", path='"
                 + path
+                + '\''
+                + ", cryptoSuite='"
+                + cryptoSuite
                 + '\''
                 + '}';
     }
