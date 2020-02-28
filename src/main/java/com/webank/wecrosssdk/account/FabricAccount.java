@@ -67,7 +67,7 @@ public class FabricAccount implements Account {
 
     @Override
     public String getSignCryptoSuite() {
-        return WeCrossType.CRYPTO_SUITE_BC_SECP256R1;
+        return WeCrossType.CRYPTO_SUITE_FABRIC_BC_SECP256R1;
     }
 
     public void setUser(User user) {

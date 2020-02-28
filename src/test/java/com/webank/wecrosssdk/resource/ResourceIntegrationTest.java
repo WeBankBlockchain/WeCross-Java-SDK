@@ -17,9 +17,9 @@ public class ResourceIntegrationTest {
         String iPath = "payment.bcos1.HelloWorldContract";
 
         Accounts accounts = AccountsFactory.build();
-        Account bcos1 = accounts.getAccount("bcos1");
+        Account account = accounts.getAccount("bcos1");
 
-        Resource resource = ResourceFactory.load(weCrossRPC, iPath, bcos1);
+        Resource resource = ResourceFactory.load(weCrossRPC, iPath, account);
 
         TransactionResponse response = resource.call(new String[] {"String"}, "get");
         System.out.println(response.toString());

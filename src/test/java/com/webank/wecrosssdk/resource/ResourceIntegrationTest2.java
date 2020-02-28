@@ -17,9 +17,9 @@ public class ResourceIntegrationTest2 {
         String iPath = "payment.fabric.HelloWeCross";
 
         Accounts accounts = AccountsFactory.build();
-        Account bcos1 = accounts.getAccount("fabric2");
+        Account account = accounts.getAccount("fabric2");
 
-        Resource resource = ResourceFactory.load(weCrossRPC, iPath, bcos1);
+        Resource resource = ResourceFactory.load(weCrossRPC, iPath, account);
 
         TransactionResponse response = resource.call(new String[] {"String"}, "query", "a");
         System.out.println(response.toString());
