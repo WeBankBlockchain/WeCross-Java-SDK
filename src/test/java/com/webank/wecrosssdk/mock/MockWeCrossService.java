@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.mock;
 
+import com.webank.wecrosssdk.rpc.common.WeCrossResource;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.GetDataRequest;
@@ -20,6 +21,8 @@ public class MockWeCrossService implements WeCrossService {
         switch (request.getMethod()) {
             case "status":
                 return (T) handleStatus(request);
+            case "info":
+                return (T) handleInfo(request);
             case "getData":
                 return (T) handleGetData(request);
             case "setData":
@@ -41,6 +44,15 @@ public class MockWeCrossService implements WeCrossService {
         Response response = new Response();
         response.setResult(0);
         response.setData("exists");
+        return response;
+    }
+
+    public Response handleInfo(Request request) throws Exception {
+        WeCrossResource resource = new WeCrossResource();
+
+        Response response = new Response();
+        response.setResult(0);
+        response.setData(resource);
         return response;
     }
 

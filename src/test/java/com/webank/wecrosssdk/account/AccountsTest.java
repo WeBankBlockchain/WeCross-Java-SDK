@@ -16,6 +16,11 @@ public class AccountsTest {
         Assert.assertNotNull(accounts.getAccount("bcos4"));
         Assert.assertNotNull(accounts.getAccount("fabric1"));
 
-        Assert.assertNull(accounts.getAccount("null")); // Assume never goes here
+        try {
+            accounts.getAccount("null"); // throw exception
+            Assert.assertTrue(false); // Assume never goes here
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
     }
 }
