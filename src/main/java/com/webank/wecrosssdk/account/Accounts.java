@@ -11,7 +11,7 @@ public class Accounts {
 
     public Account getAccount(String name) throws Exception {
         if (!accountsMap.containsKey(name)) {
-            return null;
+            throw new Exception("Account " + name + " does not exists");
         }
         return accountsMap.get(name);
     }

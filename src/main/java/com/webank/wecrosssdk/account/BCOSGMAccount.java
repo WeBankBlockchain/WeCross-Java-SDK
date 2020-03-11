@@ -15,6 +15,6 @@ public class BCOSGMAccount extends BCOSAccount {
 
     @Override
     public String getSignCryptoSuite() {
-        return WeCrossType.BCOS_SM2_SM3;
+        return WeCrossType.CRYPTO_SUITE_BCOS_SM2_SM3;
     }
 }

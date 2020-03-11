@@ -54,7 +54,7 @@ WeCross-Java-SDK/dist/apps/wecross-java-sdk.jar
 欢迎参与WeCross社区的维护和建设：
 
 - 如项目对您有帮助，欢迎点亮我们的小星星(点击项目左上方Star按钮)。
-- 提交代码(Pull requests)，参考我们的[代码贡献流程](CONTRIBUTING_CN.md)。
+- 提交代码(Pull requests)，参考我们的[代码贡献流程](CONTRIBUTING.md)。
 - [提问和提交BUG](https://github.com/WeBankFinTech/WeCross-Java-SDK/issues/new)。
 - 如果发现代码存在安全漏洞，请在[这里](https://security.webank.com)上报。
 

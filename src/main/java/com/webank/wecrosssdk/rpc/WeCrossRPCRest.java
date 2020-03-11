@@ -12,6 +12,7 @@ import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
 import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.WeCrossResourceResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public class WeCrossRPCRest implements WeCrossRPC {
@@ -29,6 +30,13 @@ public class WeCrossRPCRest implements WeCrossRPC {
         @SuppressWarnings("unchecked")
         Request<?> request = new Request(path, "status", null);
         return new RemoteCall<>(weCrossService, Response.class, request);
+    }
+
+    @Override
+    public RemoteCall<WeCrossResourceResponse> info(String path) {
+        Request<?> request = new Request(path, "info", null);
+        return new RemoteCall<WeCrossResourceResponse>(
+                weCrossService, WeCrossResourceResponse.class, request);
     }
 
     @Override
@@ -121,7 +129,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<ProposalResponse> callProposal(String path, String method, Object... args) {
-        ProposalRequest proposalRequest = new ProposalRequest(method, args);
+        ProposalRequest proposalRequest = new ProposalRequest(method, null, null, args);
 
         @SuppressWarnings("unchecked")
         Request<ProposalRequest> request = new Request(path, "callProposal", proposalRequest);
@@ -197,8 +205,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<ProposalResponse> sendTransactionProposal(
-            String path, String method, Object... args) {
-        ProposalRequest proposalRequest = new ProposalRequest(method, args);
+            String path, String method, byte[] extraData, byte[] sign, Object... args) {
+        ProposalRequest proposalRequest = new ProposalRequest(method, extraData, sign, args);
 
         @SuppressWarnings("unchecked")
         Request<ProposalRequest> request =

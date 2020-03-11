@@ -21,6 +21,17 @@ public class BCOSAccount implements Account {
     }
 
     @Override
+    public byte[] reassembleProposal(byte[] proposalBytes, String proposalType) throws Exception {
+        // BCOS no needs to set account's identity in the before signing
+        return proposalBytes;
+    }
+
+    @Override
+    public Boolean isProposalReady(byte[] proposalBytes, String proposalType) {
+        return true;
+    }
+
+    @Override
     public byte[] sign(byte[] message) throws Exception {
         Sign.SignatureData signData =
                 signer.signMessage(message, innerBCOSCredentials.getEcKeyPair());
@@ -41,7 +52,7 @@ public class BCOSAccount implements Account {
 
     @Override
     public String getSignCryptoSuite() {
-        return WeCrossType.BCOS_SHA3_256_SECP256K1;
+        return WeCrossType.CRYPTO_SUITE_BCOS_SHA3_256_SECP256K1;
     }
 
     public void setInnerBCOSCredentials(Credentials innerBCOSCredentials) {
