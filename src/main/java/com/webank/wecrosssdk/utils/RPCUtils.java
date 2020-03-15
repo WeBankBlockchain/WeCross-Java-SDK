@@ -8,8 +8,8 @@ public class RPCUtils {
 
     public static String pathToUrl(String prefix, String path) {
         if (path.isEmpty()) {
-            return "http://" + prefix;
+            return "https://" + prefix;
         }
-        return "http://" + prefix + "/" + path.replace('.', '/');
+        return "https://" + prefix + "/" + path.replace('.', '/');
     }
 }
