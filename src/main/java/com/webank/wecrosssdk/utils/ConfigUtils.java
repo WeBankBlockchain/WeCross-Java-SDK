@@ -1,31 +1,15 @@
 package com.webank.wecrosssdk.utils;
 
 import com.moandjiezana.toml.Toml;
-import com.webank.wecrosssdk.config.Default;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 public class ConfigUtils {
-
-    private static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
-
-    public static void checkPath(String path) throws WeCrossSDKException {
-        String templateUrl = Default.TEMPLATE_URL + path.replace('.', '/');
-
-        try {
-            new URL(templateUrl);
-        } catch (Exception e) {
-            throw new WeCrossSDKException(ErrorCode.ILLEGAL_SYMBOL, "Invalid path: " + path);
-        }
-    }
 
     public static Toml getToml(String fileName) throws WeCrossSDKException {
         try {

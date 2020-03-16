@@ -2,12 +2,11 @@ package com.webank.wecrosssdk.rpc.common;
 
 import java.util.Objects;
 
-public class WeCrossResource {
+public class ResourceInfo {
     private String checksum;
     private String type;
     private int distance;
     private String path;
-    private String cryptoSuite;
 
     public String getChecksum() {
         return checksum;
@@ -46,13 +45,13 @@ public class WeCrossResource {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WeCrossResource)) {
+        if (!(o instanceof ResourceInfo)) {
             return false;
         }
-        WeCrossResource that = (WeCrossResource) o;
-        return Objects.equals(getChecksum(), that.getChecksum())
+        ResourceInfo that = (ResourceInfo) o;
+        return getDistance() == that.getDistance()
+                && Objects.equals(getChecksum(), that.getChecksum())
                 && Objects.equals(getType(), that.getType())
-                && Objects.equals(getDistance(), that.getDistance())
                 && Objects.equals(getPath(), that.getPath());
     }
 
@@ -61,17 +60,9 @@ public class WeCrossResource {
         return Objects.hash(getChecksum(), getType(), getDistance(), getPath());
     }
 
-    public String getCryptoSuite() {
-        return cryptoSuite;
-    }
-
-    public void setCryptoSuite(String cryptoSuite) {
-        this.cryptoSuite = cryptoSuite;
-    }
-
     @Override
     public String toString() {
-        return "WeCrossResource{"
+        return "ResourceInfo{"
                 + "checksum='"
                 + checksum
                 + '\''
@@ -82,9 +73,6 @@ public class WeCrossResource {
                 + distance
                 + ", path='"
                 + path
-                + '\''
-                + ", cryptoSuite='"
-                + cryptoSuite
                 + '\''
                 + '}';
     }

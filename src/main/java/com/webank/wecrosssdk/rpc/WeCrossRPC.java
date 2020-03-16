@@ -1,77 +1,27 @@
 package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourcesResponse;
-import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
+import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
-import com.webank.wecrosssdk.rpc.methods.response.WeCrossResourceResponse;
-import com.webank.wecrosssdk.rpc.service.WeCrossService;
 
 public interface WeCrossRPC {
 
-    static WeCrossRPC init(WeCrossService weCrossService) {
-        return new WeCrossRPCRest(weCrossService);
-    }
+    RemoteCall<StubResponse> supportedStubs();
+
+    RemoteCall<AccountResponse> listAccounts();
+
+    RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote);
 
     RemoteCall<Response> status(String path);
 
-    RemoteCall<WeCrossResourceResponse> info(String path);
-
-    RemoteCall<ResourcesResponse> list(Boolean ignoreRemote);
-
-    RemoteCall<GetDataResponse> getData(String path, String key);
-
-    RemoteCall<SetDataResponse> setData(String path, String key, String value);
-
-    RemoteCall<TransactionResponse> call(String path, String method, Object... args);
+    RemoteCall<ResourceInfoResponse> info(String path);
 
     RemoteCall<TransactionResponse> call(
-            String path, String retTypes[], String method, Object... args);
-
-    RemoteCall<TransactionResponse> call(
-            String path,
-            byte[] proposalBytes,
-            byte[] sign,
-            String retTypes[],
-            String method,
-            Object... args);
-
-    RemoteCall<TransactionResponse> callInt(String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> callIntArray(String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> callString(String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> callStringArray(String path, String method, Object... args);
-
-    RemoteCall<ProposalResponse> callProposal(String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> sendTransaction(String path, String method, Object... args);
+            String path, String accountName, String method, String... args);
 
     RemoteCall<TransactionResponse> sendTransaction(
-            String path, String retTypes[], String method, Object... args);
-
-    RemoteCall<TransactionResponse> sendTransaction(
-            String path,
-            byte[] proposalBytes,
-            byte[] sign,
-            String retTypes[],
-            String method,
-            Object... args);
-
-    RemoteCall<TransactionResponse> sendTransactionInt(String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> sendTransactionIntArray(
-            String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> sendTransactionString(
-            String path, String method, Object... args);
-
-    RemoteCall<TransactionResponse> sendTransactionStringArray(
-            String path, String method, Object... args);
-
-    RemoteCall<ProposalResponse> sendTransactionProposal(
-            String path, String method, byte[] extraData, byte[] sign, Object... args);
+            String path, String accountName, String method, String... args);
 }
