@@ -1,203 +1,104 @@
 package com.webank.wecrosssdk.resource;
 
-import com.webank.wecrosssdk.account.Account;
+import com.webank.wecrosssdk.common.StatusCode;
+import com.webank.wecrosssdk.exception.ErrorCode;
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.RemoteCall;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.common.WeCrossResource;
+import com.webank.wecrosssdk.rpc.common.Receipt;
+import com.webank.wecrosssdk.rpc.common.ResourceInfo;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ProposalResponse;
-import com.webank.wecrosssdk.rpc.methods.response.SetDataResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.utils.RPCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Resource {
     private Logger logger = LoggerFactory.getLogger(Resource.class);
-    private String iPath;
     private WeCrossRPC weCrossRPC;
-    private Account account;
+    private String path;
+    private String accountName;
 
     // Use given account to send transaction
-    Resource(WeCrossRPC weCrossRPC, String iPath, Account account) throws Exception {
+    Resource(WeCrossRPC weCrossRPC, String path, String accountName) {
         this.weCrossRPC = weCrossRPC;
-        this.iPath = iPath;
-        this.account = account;
-        check();
+        this.path = path;
+        this.accountName = accountName;
     }
 
-    // Use router's account to send transaction
-    Resource(WeCrossRPC weCrossRPC, String iPath) throws Exception {
-        this.weCrossRPC = weCrossRPC;
-        this.iPath = iPath;
-        check();
-    }
-
-    public void load() throws Exception {
-        WeCrossResource weCrossResource =
-                (WeCrossResource) mustOkRequest(weCrossRPC.info(iPath)).getData();
-
-        if (account != null
-                && !weCrossResource.getCryptoSuite().equals(account.getSignCryptoSuite())) {
-            throw new Exception(
-                    "Account("
-                            + account.getName()
-                            + "."
-                            + account.getSignCryptoSuite()
-                            + ") does not match the resource "
-                            + iPath
-                            + ", crypto suite: "
-                            + weCrossResource.getCryptoSuite());
-        }
-    }
-
-    public GetDataResponse getData(String key) throws Exception {
-        return (GetDataResponse) mustOkRequest(weCrossRPC.getData(iPath, key));
-    }
-
-    public SetDataResponse setData(String key, String value) throws Exception {
-        return (SetDataResponse) mustOkRequest(weCrossRPC.setData(iPath, key, value));
-    }
-
-    public TransactionResponse call(String retTypes[], String method, Object... args)
-            throws Exception {
-        if (account != null) {
-            return callWithLocalAccount(retTypes, method, args);
-        } else {
-            return callWithRouterAccount(retTypes, method, args);
-        }
-    }
-
-    public TransactionResponse sendTransaction(String retTypes[], String method, Object... args)
-            throws Exception {
-        if (account != null) {
-            return sendTransactionWithLocalAccount(retTypes, method, args);
-        } else {
-            return sendTransactionWithRouterAccount(retTypes, method, args);
-        }
-    }
-
-    private TransactionResponse callWithRouterAccount(
-            String retTypes[], String method, Object... args) throws Exception {
-        return (TransactionResponse) mustOkRequest(weCrossRPC.call(iPath, retTypes, method, args));
-    }
-
-    private TransactionResponse callWithLocalAccount(
-            String retTypes[], String method, Object... args) throws Exception {
-        ProposalResponse.Proposal proposal =
-                (ProposalResponse.Proposal)
-                        mustOkRequest(weCrossRPC.callProposal(iPath, method, args)).getData();
-
-        if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
-            throw new Exception(
-                    "Crypto suite invalid, require: "
-                            + proposal.getCryptoSuite()
-                            + " account("
-                            + account.getName()
-                            + "): "
-                            + account.getSignCryptoSuite());
-        }
-
-        byte[] proposalBytes =
-                account.reassembleProposal(proposal.getProposalToSign(), proposal.getType());
-        byte[] sign = account.sign(proposalBytes);
-
-        return (TransactionResponse)
-                mustOkRequest(weCrossRPC.call(iPath, proposalBytes, sign, retTypes, method, args));
-    }
-
-    private TransactionResponse sendTransactionWithRouterAccount(
-            String retTypes[], String method, Object... args) throws Exception {
-        return (TransactionResponse)
-                mustOkRequest(weCrossRPC.sendTransaction(iPath, retTypes, method, args));
-    }
-
-    private TransactionResponse sendTransactionWithLocalAccount(
-            String retTypes[], String method, Object... args) throws Exception {
-
-        byte[] proposalBytes = null;
-        byte[] sign = null;
-        Boolean isProposalReady = false;
-        do {
-            ProposalResponse.Proposal proposal =
-                    (ProposalResponse.Proposal)
-                            mustOkRequest(
-                                            weCrossRPC.sendTransactionProposal(
-                                                    iPath, method, proposalBytes, sign, args))
-                                    .getData();
-
-            // Check proposal crypto suite
-            if (!account.getSignCryptoSuite().equals(proposal.getCryptoSuite())) {
-                throw new Exception(
-                        "Crypto suite invalid, require: "
-                                + proposal.getCryptoSuite()
-                                + " account("
-                                + account.getName()
-                                + "): "
-                                + account.getSignCryptoSuite());
-            }
-
-            proposalBytes =
-                    account.reassembleProposal(proposal.getProposalToSign(), proposal.getType());
-            sign = account.sign(proposalBytes);
-
-            isProposalReady =
-                    account.isProposalReady(proposal.getProposalToSign(), proposal.getType());
-        } while (!isProposalReady);
-
-        return (TransactionResponse)
-                mustOkRequest(
-                        weCrossRPC.sendTransaction(
-                                iPath, proposalBytes, sign, retTypes, method, args));
-    }
-
-    private void check() throws Exception {
+    public void check() throws WeCrossSDKException {
         checkWeCrossRPC(this.weCrossRPC);
-        checkIPath(this.iPath);
-        checkAccount(this.account);
+        checkIPath(this.path);
+        checkAccountName(this.accountName);
     }
 
-    private void checkWeCrossRPC(WeCrossRPC weCrossRPC) throws Exception {
-        if (weCrossRPC == null) {
-            throw new Exception("WeCrossRPC not set");
-        }
-    }
-
-    private void checkIPath(String iPath) throws Exception {
-        String[] sp = iPath.split("\\.");
-        if (sp.length < 3) {
-            throw new Exception("Invalid IPath format: " + iPath);
-        }
-    }
-
-    private void checkAccount(Account account) throws Exception {
-        if (account != null) {
-            // if has account
-            try {
-                byte[] msg = {0, 1, 2, 3};
-                account.sign(msg);
-            } catch (Exception e) {
-                throw new Exception("Invalid account: " + account.getName());
-            }
-        }
-    }
-
-    private void checkResponse(Response response) throws Exception {
-        if (response == null) {
-            throw new Exception("Response null");
-        } else if (response.getResult() != 0) {
-            throw new Exception(
-                    "Response error, errorCode: "
-                            + response.getResult()
-                            + " message: "
-                            + response.getMessage());
-        }
-    }
-
-    // If ok, get response. If error throw exception
-    private Response mustOkRequest(RemoteCall call) throws Exception {
-        Response response = call.send();
+    public String status() throws WeCrossSDKException {
+        Response<String> response = (Response<String>) mustOkRequest(weCrossRPC.status(path));
         checkResponse(response);
-        return response;
+        return response.getData();
+    }
+
+    public ResourceInfo info() throws WeCrossSDKException {
+        ResourceInfoResponse response = (ResourceInfoResponse) mustOkRequest(weCrossRPC.info(path));
+        checkResponse(response);
+        return response.getData();
+    }
+
+    public String[] call(String method, String... args) throws WeCrossSDKException {
+        TransactionResponse response =
+                (TransactionResponse)
+                        mustOkRequest(weCrossRPC.call(path, accountName, method, args));
+        checkResponse(response);
+        Receipt receipt = response.getReceipt();
+        if (receipt == null || receipt.getErrorCode() != StatusCode.SUCCESS) {
+            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.getErrorMessage());
+        }
+        return receipt.getResult();
+    }
+
+    public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
+        TransactionResponse response =
+                (TransactionResponse)
+                        mustOkRequest(weCrossRPC.sendTransaction(path, accountName, method, args));
+        checkResponse(response);
+        Receipt receipt = response.getReceipt();
+        if (receipt == null || receipt.getErrorCode() != StatusCode.SUCCESS) {
+            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.getErrorMessage());
+        }
+        return receipt.getResult();
+    }
+
+    private void checkWeCrossRPC(WeCrossRPC weCrossRPC) throws WeCrossSDKException {
+        if (weCrossRPC == null) {
+            throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "WeCrossRPC not set");
+        }
+    }
+
+    private void checkIPath(String path) throws WeCrossSDKException {
+        RPCUtils.checkPath(path);
+    }
+
+    private void checkAccountName(String accountName) throws WeCrossSDKException {
+        if (accountName == null || accountName.equals("")) {
+            throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "AccountName not set");
+        }
+    }
+
+    private Response<?> mustOkRequest(RemoteCall<?> call) throws WeCrossSDKException {
+        try {
+            return call.send();
+        } catch (Exception e) {
+            logger.error("Error in RemoteCall: " + e.getMessage());
+            throw new WeCrossSDKException(ErrorCode.REMOTECALL_ERROR, e.getMessage());
+        }
+    }
+
+    private void checkResponse(Response<?> response) throws WeCrossSDKException {
+        if (response == null
+                || response.getResult() != StatusCode.SUCCESS
+                || response.getData() == null) {
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, response.getMessage());
+        }
     }
 }

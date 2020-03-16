@@ -1,62 +1,65 @@
 package com.webank.wecrosssdk.resource;
 
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.methods.response.GetDataResponse;
+import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
+import com.webank.wecrosssdk.rpc.common.ResourceInfo;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ResourceTest {
-    @Test
-    public void buildTest() throws Exception {
-
-        WeCrossRPC weCrossRPC = WeCrossRPC.init(new MockWeCrossService());
-
-        String iPath = "test.test.test";
-        ResourceFactory.load(weCrossRPC, iPath);
-        Assert.assertTrue(true); // Assume no exception, goes here
-    }
 
     @Test
-    public void setGetDataTest() throws Exception {
-        WeCrossRPC weCrossRPC = WeCrossRPC.init(new MockWeCrossService());
-
-        String iPath = "test.test.test";
-        Resource resource = ResourceFactory.load(weCrossRPC, iPath);
-        resource.setData("name", "Tom");
-
-        GetDataResponse response = resource.getData("name");
-        String value = response.getData().getValue();
-        Assert.assertEquals("Tom", value);
-
+    public void statusTest() {
         try {
-            resource.getData("aa"); // Throw exception
-            Assert.assertTrue(false); // Assume never goes here
-        } catch (Exception e) {
-            Assert.assertTrue(true);
+            WeCrossService service = new MockWeCrossService();
+            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            String result = resource.status();
+            Assert.assertEquals(result, "test");
+        } catch (WeCrossSDKException e) {
+            Assert.fail();
         }
     }
 
     @Test
-    public void callTest() throws Exception {
-        WeCrossService service = new MockWeCrossService();
-        WeCrossRPC weCrossRPC = WeCrossRPC.init(service);
-        String iPath = "test.test.test";
-        Resource resource = ResourceFactory.load(weCrossRPC, iPath);
-
-        resource.call(new String[] {""}, "get");
-        Assert.assertTrue(true);
+    public void infoTest() {
+        try {
+            WeCrossService service = new MockWeCrossService();
+            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            ResourceInfo result = resource.info();
+            Assert.assertNotEquals(result, null);
+        } catch (WeCrossSDKException e) {
+            Assert.fail();
+        }
     }
 
     @Test
-    public void sendTransactionTest() throws Exception {
-        WeCrossService service = new MockWeCrossService();
-        WeCrossRPC weCrossRPC = WeCrossRPC.init(service);
-        String iPath = "test.test.test";
-        Resource resource = ResourceFactory.load(weCrossRPC, iPath);
+    public void callTest() {
+        try {
+            WeCrossService service = new MockWeCrossService();
+            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            String[] result = resource.call("test");
+            Assert.assertEquals(result, null);
+        } catch (WeCrossSDKException e) {
+            Assert.fail();
+        }
+    }
 
-        resource.sendTransaction(new String[] {""}, "get");
-        Assert.assertTrue(true);
+    @Test
+    public void sendTransactionTest() {
+        try {
+            WeCrossService service = new MockWeCrossService();
+            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            String[] result = resource.sendTransaction("test", "test");
+            Assert.assertEquals(result, null);
+        } catch (WeCrossSDKException e) {
+            Assert.fail();
+        }
     }
 }

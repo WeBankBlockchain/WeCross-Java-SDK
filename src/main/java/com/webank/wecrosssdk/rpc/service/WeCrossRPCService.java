@@ -1,7 +1,7 @@
 package com.webank.wecrosssdk.rpc.service;
 
 import com.moandjiezana.toml.Toml;
-import com.webank.wecrosssdk.config.Default;
+import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.Connection;
@@ -41,11 +41,11 @@ import org.springframework.web.client.RestTemplate;
 public class WeCrossRPCService implements WeCrossService {
     private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
 
-    // specify wecross node ip and port
-    private String server;
+    private Connection connection;
 
-    public WeCrossRPCService(String server) {
-        this.server = server;
+    public void init() throws WeCrossSDKException {
+        connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        logger.info(connection.toString());
     }
 
     private void checkRequest(Request<?> request) throws Exception {
@@ -65,12 +65,11 @@ public class WeCrossRPCService implements WeCrossService {
 
     @Override
     public <T extends Response> T send(Request request, Class<T> responseType) throws Exception {
-        Connection connection = getConnection();
         String url =
                 RPCUtils.pathToUrl(connection.getServer(), request.getPath())
                         + "/"
                         + request.getMethod();
-        logger.info("method: {}; url: {}", request.getMethod(), url);
+        logger.info("request: {}; url: {}", request.toString(), url);
 
         checkRequest(request);
 
@@ -90,21 +89,13 @@ public class WeCrossRPCService implements WeCrossService {
 
         checkResponse(httpResponse);
         T response = httpResponse.getBody();
-        logger.info(
-                "receive status:{} message:{} data:{}",
-                response.getResult(),
-                response.getMessage(),
-                response.getData());
-
-        if (response.getData() != null) {
-            logger.info("response data: {}", response.getData());
-        }
+        logger.info("response: {}", response.toString());
 
         return response;
     }
 
-    private Connection getConnection() throws WeCrossSDKException {
-        Toml toml = ConfigUtils.getToml(Default.APPLICATION_CONFIG_FILE);
+    private Connection getConnection(String config) throws WeCrossSDKException {
+        Toml toml = ConfigUtils.getToml(config);
         Connection connection = new Connection();
         connection.setServer(getServer(toml));
         connection.setKeyStoreType(getKeyStoreType(toml));
@@ -190,8 +181,7 @@ public class WeCrossRPCService implements WeCrossService {
         HttpComponentsClientHttpRequestFactory requestFactory =
                 new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-        return restTemplate;
+        return new RestTemplate(requestFactory);
     }
 
     private SSLContext getSSLContext(
@@ -204,19 +194,19 @@ public class WeCrossRPCService implements WeCrossService {
                     CertificateException, UnrecoverableKeyException {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         KeyStore keyStore =
-                getKeyStore(
+                getRealKeyStore(
                         keyStoreType,
                         resolver.getResource(keyStoreFile).getInputStream(),
                         keyStorePass);
         KeyManager[] keyManagers = getKeyManager(keyStore, keyStorePass);
         KeyStore trustStore =
-                getKeyStore(
+                getRealKeyStore(
                         keyStoreType,
                         resolver.getResource(trustStoreFile).getInputStream(),
                         trustStorePass);
         TrustManager[] trustManagers = getTrustManager(trustStore);
 
-        SSLContext context = SSLContext.getInstance(Default.SSL_TYPE);
+        SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
         context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
         return context;
     }
@@ -237,18 +227,10 @@ public class WeCrossRPCService implements WeCrossService {
         return factory.getTrustManagers();
     }
 
-    public KeyStore getKeyStore(String keyStoreType, InputStream stream, String password)
+    private KeyStore getRealKeyStore(String keyStoreType, InputStream stream, String password)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
         KeyStore keyStore = KeyStore.getInstance(keyStoreType);
         keyStore.load(stream, password.toCharArray());
         return keyStore;
-    }
-
-    public String getServer() {
-        return server;
-    }
-
-    public void setServer(String server) {
-        this.server = server;
     }
 }

@@ -40,17 +40,11 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.4.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-log4j2:2.1.4.RELEASE'
     compile 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
+    compile 'org.apache.httpcomponents:httpclient:4.5.12'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.1.4.RELEASE'
-
-    // FISCO BCOS
-    compile 'org.fisco-bcos:web3sdk:2.2.0'
-
-    // Fabric
-    compile 'javassist:javassist:3.12.1.GA'
-    compile "org.hyperledger.fabric-sdk-java:fabric-sdk-java:1.4.4"
 }
 
 jar {
