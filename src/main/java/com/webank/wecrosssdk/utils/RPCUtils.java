@@ -12,7 +12,6 @@ public class RPCUtils {
         if (sp.length < 3) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "Invalid iPath: " + path);
         }
-
         String templateUrl = ConfigDefault.TEMPLATE_URL + path.replace('.', '/');
 
         try {
