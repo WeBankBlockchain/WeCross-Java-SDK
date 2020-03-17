@@ -35,5 +35,7 @@ logs
 .settings/
 .classpath
 .project
-src/main/resources/console.xml
+application.toml
 out/
+*.keystore
+*.truststore
