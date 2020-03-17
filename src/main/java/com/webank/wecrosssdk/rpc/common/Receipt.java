@@ -2,7 +2,7 @@ package com.webank.wecrosssdk.rpc.common;
 
 import java.util.Arrays;
 
-public class CallContractResult {
+public class Receipt {
     private int errorCode;
     private String errorMessage;
     private String hash;
@@ -42,7 +42,7 @@ public class CallContractResult {
 
     @Override
     public String toString() {
-        return "CallContractResult{"
+        return "Receipt{"
                 + "errorCode="
                 + errorCode
                 + ", errorMessage='"

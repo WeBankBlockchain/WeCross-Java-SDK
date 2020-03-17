@@ -1,7 +1,7 @@
 package com.webank.wecrosssdk.rpc.service;
 
 import com.moandjiezana.toml.Toml;
-import com.webank.wecrosssdk.config.Default;
+import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.Connection;
@@ -44,7 +44,8 @@ public class WeCrossRPCService implements WeCrossService {
     private Connection connection;
 
     public void init() throws WeCrossSDKException {
-        this.connection = getConnection(Default.APPLICATION_CONFIG_FILE);
+        connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        logger.info(connection.toString());
     }
 
     private void checkRequest(Request<?> request) throws Exception {
@@ -68,7 +69,7 @@ public class WeCrossRPCService implements WeCrossService {
                 RPCUtils.pathToUrl(connection.getServer(), request.getPath())
                         + "/"
                         + request.getMethod();
-        logger.info("method: {}; url: {}", request.getMethod(), url);
+        logger.info("request: {}; url: {}", request.toString(), url);
 
         checkRequest(request);
 
@@ -88,15 +89,7 @@ public class WeCrossRPCService implements WeCrossService {
 
         checkResponse(httpResponse);
         T response = httpResponse.getBody();
-        logger.info(
-                "receive status:{} message:{} data:{}",
-                response.getResult(),
-                response.getMessage(),
-                response.getData());
-
-        if (response.getData() != null) {
-            logger.info("response data: {}", response.getData());
-        }
+        logger.info("response: {}", response.toString());
 
         return response;
     }
@@ -213,7 +206,7 @@ public class WeCrossRPCService implements WeCrossService {
                         trustStorePass);
         TrustManager[] trustManagers = getTrustManager(trustStore);
 
-        SSLContext context = SSLContext.getInstance(Default.SSL_TYPE);
+        SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
         context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
         return context;
     }

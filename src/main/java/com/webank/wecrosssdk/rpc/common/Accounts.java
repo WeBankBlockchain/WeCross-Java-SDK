@@ -1,5 +1,7 @@
 package com.webank.wecrosssdk.rpc.common;
 
+import java.util.Arrays;
+
 public class Accounts {
     AccountInfo[] accountInfos;
 
@@ -30,5 +32,10 @@ public class Accounts {
 
     public void setAccountInfos(AccountInfo[] accountInfos) {
         this.accountInfos = accountInfos;
+    }
+
+    @Override
+    public String toString() {
+        return "Accounts{" + "accountInfos=" + Arrays.toString(accountInfos) + '}';
     }
 }

@@ -1,6 +1,8 @@
 package com.webank.wecrosssdk.mock;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.common.Receipt;
+import com.webank.wecrosssdk.rpc.common.ResourceInfo;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
@@ -43,13 +45,14 @@ public class MockWeCrossService implements WeCrossService {
     public Response handleStatus(Request request) {
         Response response = new Response();
         response.setResult(0);
-        response.setData("exists");
+        response.setData("test");
         return response;
     }
 
     public ResourceInfoResponse handleInfo(Request request) {
         ResourceInfoResponse response = new ResourceInfoResponse();
         response.setResult(0);
+        response.setData(new ResourceInfo());
         return response;
     }
 
@@ -74,12 +77,14 @@ public class MockWeCrossService implements WeCrossService {
     public TransactionResponse handleCall(Request request) {
         TransactionResponse response = new TransactionResponse();
         response.setResult(0);
+        response.setData(new Receipt());
         return response; // Use Mockito to define handler
     }
 
     public TransactionResponse handleSendTransaction(Request request) {
         TransactionResponse response = new TransactionResponse();
         response.setResult(0);
+        response.setData(new Receipt());
         return response; // Use Mockito to define handler
     }
 

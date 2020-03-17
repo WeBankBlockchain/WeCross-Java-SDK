@@ -1,6 +1,6 @@
 package com.webank.wecrosssdk.utils;
 
-import com.webank.wecrosssdk.config.Default;
+import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import java.net.URL;
@@ -12,8 +12,7 @@ public class RPCUtils {
         if (sp.length < 3) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "Invalid iPath: " + path);
         }
-
-        String templateUrl = Default.TEMPLATE_URL + path.replace('.', '/');
+        String templateUrl = ConfigDefault.TEMPLATE_URL + path.replace('.', '/');
 
         try {
             new URL(templateUrl);

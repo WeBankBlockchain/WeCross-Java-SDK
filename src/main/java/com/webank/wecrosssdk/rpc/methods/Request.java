@@ -69,4 +69,24 @@ public class Request<T> {
     public void setCallback(WeCrossCallback callback) {
         this.callback = callback;
     }
+
+    @Override
+    public String toString() {
+        return "Request{"
+                + "version='"
+                + version
+                + '\''
+                + ", path='"
+                + path
+                + '\''
+                + ", method='"
+                + method
+                + '\''
+                + ", accountName='"
+                + accountName
+                + '\''
+                + ", data="
+                + data
+                + '}';
+    }
 }

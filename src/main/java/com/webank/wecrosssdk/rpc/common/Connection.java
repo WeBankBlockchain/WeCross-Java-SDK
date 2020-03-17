@@ -55,4 +55,28 @@ public class Connection {
     public void setTrustStorePass(String trustStorePass) {
         this.trustStorePass = trustStorePass;
     }
+
+    @Override
+    public String toString() {
+        return "Connection{"
+                + "server='"
+                + server
+                + '\''
+                + ", keyStoreType='"
+                + keyStoreType
+                + '\''
+                + ", keyStore='"
+                + keyStore
+                + '\''
+                + ", keyStorePass='"
+                + keyStorePass
+                + '\''
+                + ", trustStore='"
+                + trustStore
+                + '\''
+                + ", trustStorePass='"
+                + trustStorePass
+                + '\''
+                + '}';
+    }
 }

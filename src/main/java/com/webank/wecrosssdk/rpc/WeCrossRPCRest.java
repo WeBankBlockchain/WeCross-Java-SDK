@@ -57,6 +57,12 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<TransactionResponse> call(Request<TransactionRequest> request) {
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
     public RemoteCall<TransactionResponse> call(
             String path, String accountName, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
@@ -64,6 +70,12 @@ public class WeCrossRPCRest implements WeCrossRPC {
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
                 new Request(path, accountName, "call", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request) {
         return new RemoteCall<TransactionResponse>(
                 weCrossService, TransactionResponse.class, request);
     }
