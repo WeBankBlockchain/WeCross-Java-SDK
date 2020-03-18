@@ -1,6 +1,5 @@
 package com.webank.wecrosssdk.resource;
 
-import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
@@ -19,7 +18,7 @@ public class ResourceTest {
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
             String result = resource.status();
             Assert.assertEquals(result, "test");
-        } catch (WeCrossSDKException e) {
+        } catch (Exception e) {
             Assert.fail();
         }
     }
@@ -32,7 +31,7 @@ public class ResourceTest {
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
             ResourceInfo result = resource.info();
             Assert.assertNotEquals(result, null);
-        } catch (WeCrossSDKException e) {
+        } catch (Exception e) {
             Assert.fail();
         }
     }
@@ -44,8 +43,8 @@ public class ResourceTest {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
             String[] result = resource.call("test");
-            Assert.assertEquals(result, null);
-        } catch (WeCrossSDKException e) {
+            Assert.assertNull(result);
+        } catch (Exception e) {
             Assert.fail();
         }
     }
@@ -57,8 +56,8 @@ public class ResourceTest {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
             String[] result = resource.sendTransaction("test", "test");
-            Assert.assertEquals(result, null);
-        } catch (WeCrossSDKException e) {
+            Assert.assertNull(result);
+        } catch (Exception e) {
             Assert.fail();
         }
     }
