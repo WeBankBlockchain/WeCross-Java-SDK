@@ -1,7 +1,5 @@
 [connection]
     server =  '127.0.0.1:8250'
-    keyStoreType = 'PKCS12'
-    keyStore = 'classpath:client.keystore'
-    keyStorePass = '123456'
-    trustStore = 'classpath:client.truststore'
-    trustStorePass = '123456'
+    sslKey = 'classpath:node.key'
+    sslCert = 'classpath:node.crt'
+    caCert = 'classpath:ca.crt'

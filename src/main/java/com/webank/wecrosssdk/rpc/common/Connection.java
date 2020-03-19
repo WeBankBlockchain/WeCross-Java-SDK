@@ -2,11 +2,9 @@ package com.webank.wecrosssdk.rpc.common;
 
 public class Connection {
     String server;
-    String keyStoreType;
-    String keyStore;
-    String keyStorePass;
-    String trustStore;
-    String trustStorePass;
+    String sslKey;
+    String sslCert;
+    String caCert;
 
     public String getServer() {
         return server;
@@ -16,44 +14,28 @@ public class Connection {
         this.server = server;
     }
 
-    public String getKeyStoreType() {
-        return keyStoreType;
+    public String getSSLKey() {
+        return sslKey;
     }
 
-    public void setKeyStoreType(String keyStoreType) {
-        this.keyStoreType = keyStoreType;
+    public void setSSLKey(String keyStore) {
+        this.sslKey = keyStore;
     }
 
-    public String getKeyStore() {
-        return keyStore;
+    public String getSSLCert() {
+        return sslCert;
     }
 
-    public void setKeyStore(String keyStore) {
-        this.keyStore = keyStore;
+    public void setSSLCert(String trustStore) {
+        this.sslCert = trustStore;
     }
 
-    public String getKeyStorePass() {
-        return keyStorePass;
+    public String getCaCert() {
+        return caCert;
     }
 
-    public void setKeyStorePass(String keyStorePass) {
-        this.keyStorePass = keyStorePass;
-    }
-
-    public String getTrustStore() {
-        return trustStore;
-    }
-
-    public void setTrustStore(String trustStore) {
-        this.trustStore = trustStore;
-    }
-
-    public String getTrustStorePass() {
-        return trustStorePass;
-    }
-
-    public void setTrustStorePass(String trustStorePass) {
-        this.trustStorePass = trustStorePass;
+    public void setCaCert(String caCert) {
+        this.caCert = caCert;
     }
 
     @Override
@@ -62,20 +44,14 @@ public class Connection {
                 + "server='"
                 + server
                 + '\''
-                + ", keyStoreType='"
-                + keyStoreType
                 + '\''
                 + ", keyStore='"
-                + keyStore
+                + sslKey
                 + '\''
-                + ", keyStorePass='"
-                + keyStorePass
                 + '\''
                 + ", trustStore='"
-                + trustStore
+                + sslCert
                 + '\''
-                + ", trustStorePass='"
-                + trustStorePass
                 + '\''
                 + '}';
     }

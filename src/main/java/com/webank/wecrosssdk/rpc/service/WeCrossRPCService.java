@@ -8,26 +8,24 @@ import com.webank.wecrosssdk.rpc.common.Connection;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.utils.ConfigUtils;
+import com.webank.wecrosssdk.utils.KeyCertLoader;
 import com.webank.wecrosssdk.utils.RPCUtils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -42,9 +40,12 @@ public class WeCrossRPCService implements WeCrossService {
     private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
 
     private Connection connection;
+    RestTemplate restTemplate;
 
-    public void init() throws WeCrossSDKException {
+    public void init() throws Exception {
         connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        restTemplate = getRestTemplate(connection);
+
         logger.info(connection.toString());
     }
 
@@ -73,13 +74,6 @@ public class WeCrossRPCService implements WeCrossService {
 
         checkRequest(request);
 
-        RestTemplate restTemplate =
-                getRestTemplate(
-                        connection.getKeyStoreType(),
-                        connection.getKeyStore(),
-                        connection.getKeyStorePass(),
-                        connection.getTrustStore(),
-                        connection.getTrustStorePass());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -98,11 +92,9 @@ public class WeCrossRPCService implements WeCrossService {
         Toml toml = ConfigUtils.getToml(config);
         Connection connection = new Connection();
         connection.setServer(getServer(toml));
-        connection.setKeyStoreType(getKeyStoreType(toml));
-        connection.setKeyStore(getKeyStore(toml));
-        connection.setKeyStorePass(getKeyStorePass(toml));
-        connection.setTrustStore(getTrustStore(toml));
-        connection.setTrustStorePass(getTrustStorePass(toml));
+        connection.setSSLKey(getSSLKey(toml));
+        connection.setSSLCert(getSSLCert(toml));
+        connection.setCaCert(getCACert(toml));
         return connection;
     }
 
@@ -116,121 +108,88 @@ public class WeCrossRPCService implements WeCrossService {
         return server;
     }
 
-    private String getKeyStoreType(Toml toml) throws WeCrossSDKException {
-        String keyStoreType = toml.getString("connection.keyStoreType");
-        if (keyStoreType == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.keyStoreType], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
-        }
-        return keyStoreType;
-    }
-
-    private String getKeyStore(Toml toml) throws WeCrossSDKException {
-        String keyStore = toml.getString("connection.keyStore");
-        if (keyStore == null) {
+    private String getSSLKey(Toml toml) throws WeCrossSDKException {
+        String sslKey = toml.getString("connection.sslKey");
+        if (sslKey == null) {
             String errorMessage =
                     "Something wrong with parsing [connection.keyStore], please check configuration";
             throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
         }
-        return keyStore;
+        return sslKey;
     }
 
-    private String getKeyStorePass(Toml toml) throws WeCrossSDKException {
-        String keyStorePass = toml.getString("connection.keyStorePass");
-        if (keyStorePass == null) {
+    private String getSSLCert(Toml toml) throws WeCrossSDKException {
+        String sslCert = toml.getString("connection.sslCert");
+        if (sslCert == null) {
             String errorMessage =
-                    "Something wrong with parsing [connection.keyStorePass], please check configuration";
+                    "Something wrong with parsing [connection.keyStore], please check configuration";
             throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
         }
-        return keyStorePass;
+        return sslCert;
     }
 
-    private String getTrustStore(Toml toml) throws WeCrossSDKException {
-        String trustStore = toml.getString("connection.trustStore");
-        if (trustStore == null) {
+    private String getCACert(Toml toml) throws WeCrossSDKException {
+        String caCert = toml.getString("connection.caCert");
+        if (caCert == null) {
             String errorMessage =
                     "Something wrong with parsing [connection.trustStore], please check configuration";
             throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
         }
-        return trustStore;
+        return caCert;
     }
 
-    private String getTrustStorePass(Toml toml) throws WeCrossSDKException {
-        String trustStorePass = toml.getString("connection.trustStorePass");
-        if (trustStorePass == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.trustStorePass], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
+    private RestTemplate getRestTemplate(Connection connection) {
+        try {
+            PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
+                    new PathMatchingResourcePatternResolver();
+            Resource sslKey =
+                    pathMatchingResourcePatternResolver.getResource(connection.getSSLKey());
+            Resource sslCert =
+                    pathMatchingResourcePatternResolver.getResource(connection.getSSLCert());
+            Resource caCert =
+                    pathMatchingResourcePatternResolver.getResource(connection.getCaCert());
+
+            KeyCertLoader keyCertLoader = new KeyCertLoader();
+
+            KeyStore keystore = KeyStore.getInstance("pkcs12");
+            keystore.load(null);
+
+            PrivateKey privateKey = keyCertLoader.toPrivateKey(sslKey.getInputStream(), null);
+            X509Certificate[] certificates =
+                    keyCertLoader.toX509Certificates(sslCert.getInputStream());
+            keystore.setKeyEntry("mykey", privateKey, "".toCharArray(), certificates);
+
+            KeyManagerFactory factory =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            factory.init(keystore, "".toCharArray());
+            KeyManager[] keyManagers = factory.getKeyManagers();
+
+            KeyStore truststore = KeyStore.getInstance("pkcs12");
+            truststore.load(null);
+
+            X509Certificate[] caCertificates =
+                    keyCertLoader.toX509Certificates(caCert.getInputStream());
+            truststore.setCertificateEntry("mykey", caCertificates[0]);
+
+            TrustManagerFactory trustFactory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustFactory.init(truststore);
+            TrustManager[] trustManagers = trustFactory.getTrustManagers();
+
+            SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
+            context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
+
+            SSLConnectionSocketFactory csf =
+                    new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+            HttpComponentsClientHttpRequestFactory requestFactory =
+                    new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient(httpClient);
+            return new RestTemplate(requestFactory);
+        } catch (Exception e) {
+            logger.error("Init rest template error", e);
         }
-        return trustStorePass;
-    }
 
-    private RestTemplate getRestTemplate(
-            String keyStoreType,
-            String keyStore,
-            String keyStorePass,
-            String trustStore,
-            String trustStorePass)
-            throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException,
-                    KeyStoreException, KeyManagementException, IOException {
-        SSLContext sslContext =
-                getSSLContext(keyStoreType, keyStore, keyStorePass, trustStore, trustStorePass);
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
-        HttpComponentsClientHttpRequestFactory requestFactory =
-                new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-        return new RestTemplate(requestFactory);
-    }
-
-    private SSLContext getSSLContext(
-            String keyStoreType,
-            String keyStoreFile,
-            String keyStorePass,
-            String trustStoreFile,
-            String trustStorePass)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException,
-                    CertificateException, UnrecoverableKeyException {
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        KeyStore keyStore =
-                getRealKeyStore(
-                        keyStoreType,
-                        resolver.getResource(keyStoreFile).getInputStream(),
-                        keyStorePass);
-        KeyManager[] keyManagers = getKeyManager(keyStore, keyStorePass);
-        KeyStore trustStore =
-                getRealKeyStore(
-                        keyStoreType,
-                        resolver.getResource(trustStoreFile).getInputStream(),
-                        trustStorePass);
-        TrustManager[] trustManagers = getTrustManager(trustStore);
-
-        SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
-        context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
-        return context;
-    }
-
-    private KeyManager[] getKeyManager(KeyStore keyStore, String password)
-            throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
-        KeyManagerFactory factory =
-                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        factory.init(keyStore, password.toCharArray());
-        return factory.getKeyManagers();
-    }
-
-    private TrustManager[] getTrustManager(KeyStore trustStore)
-            throws NoSuchAlgorithmException, KeyStoreException {
-        TrustManagerFactory factory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        factory.init(trustStore);
-        return factory.getTrustManagers();
-    }
-
-    private KeyStore getRealKeyStore(String keyStoreType, InputStream stream, String password)
-            throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-        keyStore.load(stream, password.toCharArray());
-        return keyStore;
+        return null;
     }
 }
