@@ -19,6 +19,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -93,7 +94,7 @@ public class WeCrossRPCService implements WeCrossService {
         connection.setServer(getServer(toml));
         connection.setSSLKey(getSSLKey(toml));
         connection.setSSLCert(getSSLCert(toml));
-        connection.setSSLCert(getCACert(toml));
+        connection.setCaCert(getCACert(toml));
         return connection;
     }
 
@@ -139,8 +140,6 @@ public class WeCrossRPCService implements WeCrossService {
 
     private RestTemplate getRestTemplate(Connection connection) {
         try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-
             PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
                     new PathMatchingResourcePatternResolver();
             Resource sslKey =
@@ -152,7 +151,7 @@ public class WeCrossRPCService implements WeCrossService {
 
             KeyCertLoader keyCertLoader = new KeyCertLoader();
 
-            KeyStore keystore = KeyStore.getInstance("jks");
+            KeyStore keystore = KeyStore.getInstance("pkcs12");
             keystore.load(null);
 
             PrivateKey privateKey = keyCertLoader.toPrivateKey(sslKey.getInputStream(), null);
@@ -165,7 +164,7 @@ public class WeCrossRPCService implements WeCrossService {
             factory.init(keystore, "".toCharArray());
             KeyManager[] keyManagers = factory.getKeyManagers();
 
-            KeyStore truststore = KeyStore.getInstance("jks");
+            KeyStore truststore = KeyStore.getInstance("pkcs12");
             truststore.load(null);
 
             X509Certificate[] caCertificates =
@@ -180,14 +179,15 @@ public class WeCrossRPCService implements WeCrossService {
             SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
             context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
 
-            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+            SSLConnectionSocketFactory csf =
+                    new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
             CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
             HttpComponentsClientHttpRequestFactory requestFactory =
                     new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             return new RestTemplate(requestFactory);
         } catch (Exception e) {
-
+            logger.error("Init rest template error", e);
         }
 
         return null;
