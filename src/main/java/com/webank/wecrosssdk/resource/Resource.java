@@ -7,7 +7,9 @@ import com.webank.wecrosssdk.rpc.RemoteCall;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceInfo;
+import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.utils.RPCUtils;
@@ -45,16 +47,26 @@ public class Resource {
         return response.getData();
     }
 
+    public TransactionResponse call(Request<TransactionRequest> request)
+            throws WeCrossSDKException {
+        return (TransactionResponse) mustOkRequest(weCrossRPC.call(request));
+    }
+
     public String[] call(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
                 (TransactionResponse)
                         mustOkRequest(weCrossRPC.call(path, accountName, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
-        if (receipt == null || receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.getErrorMessage());
+        if (receipt.getErrorCode() != StatusCode.SUCCESS) {
+            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
         }
         return receipt.getResult();
+    }
+
+    public TransactionResponse sendTransaction(Request<TransactionRequest> request)
+            throws WeCrossSDKException {
+        return (TransactionResponse) mustOkRequest(weCrossRPC.sendTransaction(request));
     }
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
@@ -63,8 +75,8 @@ public class Resource {
                         mustOkRequest(weCrossRPC.sendTransaction(path, accountName, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
-        if (receipt == null || receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.getErrorMessage());
+        if (receipt.getErrorCode() != StatusCode.SUCCESS) {
+            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
         }
         return receipt.getResult();
     }
@@ -89,16 +101,40 @@ public class Resource {
         try {
             return call.send();
         } catch (Exception e) {
-            logger.error("Error in RemoteCall: " + e.getMessage());
+            logger.error("Error in RemoteCall: {}, exception: {}", e.getMessage(), e);
             throw new WeCrossSDKException(ErrorCode.REMOTECALL_ERROR, e.getMessage());
         }
     }
 
     private void checkResponse(Response<?> response) throws WeCrossSDKException {
-        if (response == null
-                || response.getResult() != StatusCode.SUCCESS
-                || response.getData() == null) {
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, response.getMessage());
+        if (response == null) {
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "response is null");
+        } else if (response.getResult() != StatusCode.SUCCESS || response.getData() == null) {
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, response.toString());
         }
+    }
+
+    public WeCrossRPC getWeCrossRPC() {
+        return weCrossRPC;
+    }
+
+    public void setWeCrossRPC(WeCrossRPC weCrossRPC) {
+        this.weCrossRPC = weCrossRPC;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }

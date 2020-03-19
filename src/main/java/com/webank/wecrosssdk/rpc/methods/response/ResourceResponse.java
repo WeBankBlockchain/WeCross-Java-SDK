@@ -13,7 +13,7 @@ public class ResourceResponse extends Response<Resources> {
         return getData();
     }
 
-    public void SetResources(Resources resources) {
+    public void setResources(Resources resources) {
         setData(resources);
     }
 }

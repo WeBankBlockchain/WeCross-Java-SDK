@@ -9,11 +9,11 @@ public class AccountResponse extends Response<Accounts> {
         super();
     }
 
-    public Accounts getResources() {
+    public Accounts getAccounts() {
         return getData();
     }
 
-    public void SetResources(Accounts accounts) {
+    public void setAccounts(Accounts accounts) {
         setData(accounts);
     }
 }
