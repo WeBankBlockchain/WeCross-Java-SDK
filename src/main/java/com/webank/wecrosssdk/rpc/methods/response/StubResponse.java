@@ -8,11 +8,11 @@ public class StubResponse extends Response<Stubs> {
         super();
     }
 
-    public Stubs getResources() {
+    public Stubs getStubs() {
         return getData();
     }
 
-    public void SetResources(Stubs stubs) {
+    public void setStubs(Stubs stubs) {
         setData(stubs);
     }
 }

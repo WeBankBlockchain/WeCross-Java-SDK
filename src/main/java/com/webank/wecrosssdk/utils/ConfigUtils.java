@@ -25,7 +25,7 @@ public class ConfigUtils {
         } catch (Exception e) {
             throw new WeCrossSDKException(
                     ErrorCode.INTERNAL_ERROR,
-                    "Something wrong with parse " + fileName + ": " + e.getMessage());
+                    "Something wrong with parsing " + fileName + ": " + e.getMessage());
         }
     }
 

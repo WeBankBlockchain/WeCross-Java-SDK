@@ -39,3 +39,5 @@ application.toml
 out/
 *.keystore
 *.truststore
+*.key
+*.crt

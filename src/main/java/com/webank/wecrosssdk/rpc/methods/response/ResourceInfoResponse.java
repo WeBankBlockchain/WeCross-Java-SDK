@@ -7,4 +7,12 @@ public class ResourceInfoResponse extends Response<ResourceInfo> {
     public ResourceInfoResponse() {
         super();
     }
+
+    public ResourceInfo getResourceInfo() {
+        return getData();
+    }
+
+    public void setResourceInfo(ResourceInfo resourceInfo) {
+        setData(resourceInfo);
+    }
 }

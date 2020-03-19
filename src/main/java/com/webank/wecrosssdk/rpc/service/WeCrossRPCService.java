@@ -49,6 +49,13 @@ public class WeCrossRPCService implements WeCrossService {
         logger.info(connection.toString());
     }
 
+    public void init(String config) throws Exception {
+        connection = getConnection(config);
+        restTemplate = getRestTemplate(connection);
+
+        logger.info(connection.toString());
+    }
+
     private void checkRequest(Request<?> request) throws Exception {
         if (request.getVersion().isEmpty()) {
             throw new Exception("request version is empty");
