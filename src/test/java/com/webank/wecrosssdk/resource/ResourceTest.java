@@ -3,7 +3,7 @@ package com.webank.wecrosssdk.resource;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.common.ResourceInfo;
+import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -32,7 +32,7 @@ public class ResourceTest {
             WeCrossService service = new MockWeCrossService();
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
-            ResourceInfo result = resource.info();
+            ResourceDetail result = resource.detail();
             Assert.assertNotEquals(result, null);
         } catch (Exception e) {
             Assert.fail();

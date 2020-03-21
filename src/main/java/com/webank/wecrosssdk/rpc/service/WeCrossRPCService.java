@@ -39,44 +39,38 @@ import org.springframework.web.client.RestTemplate;
 public class WeCrossRPCService implements WeCrossService {
     private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
 
-    private Connection connection;
-    RestTemplate restTemplate;
+    private String server;
+    private RestTemplate restTemplate;
 
-    public void init() throws Exception {
-        connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+    public void init() throws WeCrossSDKException {
+        Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        server = connection.getServer();
         restTemplate = getRestTemplate(connection);
 
         logger.info(connection.toString());
     }
 
-    public void init(String config) throws Exception {
-        connection = getConnection(config);
-        restTemplate = getRestTemplate(connection);
-
-        logger.info(connection.toString());
-    }
-
-    private void checkRequest(Request<?> request) throws Exception {
+    private void checkRequest(Request<?> request) throws WeCrossSDKException {
         if (request.getVersion().isEmpty()) {
-            throw new Exception("request version is empty");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "Request version is empty");
         }
         if (request.getMethod().isEmpty()) {
-            throw new Exception("request method is empty");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "Request method is empty");
         }
     }
 
-    private <T extends Response> void checkResponse(ResponseEntity<T> response) throws Exception {
+    private <T extends Response> void checkResponse(ResponseEntity<T> response)
+            throws WeCrossSDKException {
         if (response.getStatusCode() != HttpStatus.OK) {
-            throw new Exception("method not exists: " + response.toString());
+            throw new WeCrossSDKException(
+                    ErrorCode.RPC_ERROR, "method not exists: " + response.toString());
         }
     }
 
     @Override
-    public <T extends Response> T send(Request request, Class<T> responseType) throws Exception {
-        String url =
-                RPCUtils.pathToUrl(connection.getServer(), request.getPath())
-                        + "/"
-                        + request.getMethod();
+    public <T extends Response> T send(Request request, Class<T> responseType)
+            throws WeCrossSDKException {
+        String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
         logger.info("request: {}; url: {}", request.toString(), url);
 
         checkRequest(request);
@@ -145,7 +139,7 @@ public class WeCrossRPCService implements WeCrossService {
         return caCert;
     }
 
-    private RestTemplate getRestTemplate(Connection connection) {
+    private RestTemplate getRestTemplate(Connection connection) throws WeCrossSDKException {
         try {
             PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
                     new PathMatchingResourcePatternResolver();
@@ -194,9 +188,9 @@ public class WeCrossRPCService implements WeCrossService {
             requestFactory.setHttpClient(httpClient);
             return new RestTemplate(requestFactory);
         } catch (Exception e) {
-            logger.error("Init rest template error", e);
+            logger.error("Init rest template error: {}", e);
+            throw new WeCrossSDKException(
+                    ErrorCode.INTERNAL_ERROR, "Init rest template error: " + e);
         }
-
-        return null;
     }
 }

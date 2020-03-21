@@ -2,11 +2,11 @@ package com.webank.wecrosssdk.mock;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.Receipt;
-import com.webank.wecrosssdk.rpc.common.ResourceInfo;
+import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
 import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -25,8 +25,8 @@ public class MockWeCrossService implements WeCrossService {
         switch (request.getMethod()) {
             case "status":
                 return (T) handleStatus(request);
-            case "info":
-                return (T) handleInfo(request);
+            case "detail":
+                return (T) handleDetail(request);
             case "supportedStubs":
                 return (T) handleSupportedStubs(request);
             case "listAccounts":
@@ -49,10 +49,10 @@ public class MockWeCrossService implements WeCrossService {
         return response;
     }
 
-    public ResourceInfoResponse handleInfo(Request request) {
-        ResourceInfoResponse response = new ResourceInfoResponse();
+    public ResourceDetailResponse handleDetail(Request request) {
+        ResourceDetailResponse response = new ResourceDetailResponse();
         response.setResult(0);
-        response.setData(new ResourceInfo());
+        response.setData(new ResourceDetail());
         return response;
     }
 

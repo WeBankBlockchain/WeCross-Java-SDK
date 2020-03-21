@@ -3,7 +3,7 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
 import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -46,11 +46,11 @@ public class CallRPCTest {
     }
 
     @Test
-    public void infoTest() throws Exception {
+    public void detailTest() throws Exception {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
-        ResourceInfoResponse resourceInfoResponse = weCrossRPC.info("test.test.test").send();
-        Assert.assertEquals(resourceInfoResponse.getResult(), 0);
+        ResourceDetailResponse resourceDetailResponse = weCrossRPC.detail("test.test.test").send();
+        Assert.assertEquals(resourceDetailResponse.getResult(), 0);
     }
 
     @Test

@@ -5,7 +5,7 @@ import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.ResourceRequest;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
 import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -27,10 +27,10 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<ResourceInfoResponse> info(String path) {
-        Request<?> request = new Request(path, "", "info", null);
-        return new RemoteCall<ResourceInfoResponse>(
-                weCrossService, ResourceInfoResponse.class, request);
+    public RemoteCall<ResourceDetailResponse> detail(String path) {
+        Request<?> request = new Request(path, "", "detail", null);
+        return new RemoteCall<ResourceDetailResponse>(
+                weCrossService, ResourceDetailResponse.class, request);
     }
 
     @Override
