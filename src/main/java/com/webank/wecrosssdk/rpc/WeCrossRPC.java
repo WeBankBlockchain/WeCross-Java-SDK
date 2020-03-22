@@ -4,7 +4,7 @@ import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
 import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
@@ -19,7 +19,7 @@ public interface WeCrossRPC {
 
     RemoteCall<Response> status(String path);
 
-    RemoteCall<ResourceInfoResponse> info(String path);
+    RemoteCall<ResourceDetailResponse> detail(String path);
 
     RemoteCall<TransactionResponse> call(Request<TransactionRequest> request);
 

@@ -3,18 +3,18 @@ package com.webank.wecrosssdk.rpc.common;
 import java.util.Arrays;
 
 public class Resources {
-    private ResourceInfo[] resourceInfos;
+    private ResourceDetail[] resourceDetails;
 
-    public ResourceInfo[] getResourceInfos() {
-        return resourceInfos;
+    public ResourceDetail[] getResourceDetails() {
+        return resourceDetails;
     }
 
-    public void setResourceInfos(ResourceInfo[] resourceInfos) {
-        this.resourceInfos = resourceInfos;
+    public void setResourceDetails(ResourceDetail[] resourceDetails) {
+        this.resourceDetails = resourceDetails;
     }
 
     @Override
     public String toString() {
-        return "Resources{" + "resourceInfos=" + Arrays.toString(resourceInfos) + '}';
+        return "Resources{" + "resourceDetails=" + Arrays.toString(resourceDetails) + '}';
     }
 }

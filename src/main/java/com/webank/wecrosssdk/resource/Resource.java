@@ -6,11 +6,11 @@ import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.RemoteCall;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.common.Receipt;
-import com.webank.wecrosssdk.rpc.common.ResourceInfo;
+import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceInfoResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.utils.RPCUtils;
 import org.slf4j.Logger;
@@ -41,8 +41,9 @@ public class Resource {
         return response.getData();
     }
 
-    public ResourceInfo info() throws WeCrossSDKException {
-        ResourceInfoResponse response = (ResourceInfoResponse) mustOkRequest(weCrossRPC.info(path));
+    public ResourceDetail detail() throws WeCrossSDKException {
+        ResourceDetailResponse response =
+                (ResourceDetailResponse) mustOkRequest(weCrossRPC.detail(path));
         checkResponse(response);
         return response.getData();
     }
