@@ -51,7 +51,7 @@ public class ResourceTest {
             Request<TransactionRequest> request = new Request<>();
             request.setMethod("call");
             TransactionResponse response = resource.call(request);
-            Assert.assertEquals(response.getResult(), 0);
+            Assert.assertEquals(response.getErrorCode(), 0);
         } catch (Exception e) {
             Assert.fail();
         }
@@ -69,7 +69,7 @@ public class ResourceTest {
             Request<TransactionRequest> request = new Request<>();
             request.setMethod("sendTransaction");
             TransactionResponse response = resource.sendTransaction(request);
-            Assert.assertEquals(response.getResult(), 0);
+            Assert.assertEquals(response.getErrorCode(), 0);
         } catch (Exception e) {
             Assert.fail();
         }
