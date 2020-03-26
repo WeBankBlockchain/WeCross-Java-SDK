@@ -44,53 +44,53 @@ public class MockWeCrossService implements WeCrossService {
 
     public Response handleStatus(Request request) {
         Response response = new Response();
-        response.setResult(0);
+        response.setErrorCode(0);
         response.setData("test");
         return response;
     }
 
     public ResourceDetailResponse handleDetail(Request request) {
         ResourceDetailResponse response = new ResourceDetailResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         response.setData(new ResourceDetail());
         return response;
     }
 
     public StubResponse handleSupportedStubs(Request request) {
         StubResponse response = new StubResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         return response; // Use Mockito to define handler
     }
 
     public AccountResponse handleListAccounts(Request request) {
         AccountResponse response = new AccountResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         return response; // Use Mockito to define handler
     }
 
     public ResourceResponse handleListResources(Request request) {
         ResourceResponse response = new ResourceResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         return response; // Use Mockito to define handler
     }
 
     public TransactionResponse handleCall(Request request) {
         TransactionResponse response = new TransactionResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         response.setData(new Receipt());
         return response; // Use Mockito to define handler
     }
 
     public TransactionResponse handleSendTransaction(Request request) {
         TransactionResponse response = new TransactionResponse();
-        response.setResult(0);
+        response.setErrorCode(0);
         response.setData(new Receipt());
         return response; // Use Mockito to define handler
     }
 
     public <T extends Response> T handleMethodNotFound(Request request, Class<T> responseType) {
         Response response = new Response();
-        response.setResult(-1);
+        response.setErrorCode(-1);
         response.setMessage("Method not found");
         return (T) response;
     }

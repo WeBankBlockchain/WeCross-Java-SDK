@@ -18,7 +18,7 @@ public class CallRPCTest {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         StubResponse stubResponse = weCrossRPC.supportedStubs().send();
-        Assert.assertEquals(stubResponse.getResult(), 0);
+        Assert.assertEquals(stubResponse.getErrorCode(), 0);
     }
 
     @Test
@@ -26,7 +26,7 @@ public class CallRPCTest {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         AccountResponse accountResponse = weCrossRPC.listAccounts().send();
-        Assert.assertEquals(accountResponse.getResult(), 0);
+        Assert.assertEquals(accountResponse.getErrorCode(), 0);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class CallRPCTest {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         ResourceResponse resourceResponse = weCrossRPC.listResources(true).send();
-        Assert.assertEquals(resourceResponse.getResult(), 0);
+        Assert.assertEquals(resourceResponse.getErrorCode(), 0);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class CallRPCTest {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         Response response = weCrossRPC.status("test.test.test").send();
-        Assert.assertEquals(response.getResult(), 0);
+        Assert.assertEquals(response.getErrorCode(), 0);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class CallRPCTest {
         WeCrossService service = new MockWeCrossService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         ResourceDetailResponse resourceDetailResponse = weCrossRPC.detail("test.test.test").send();
-        Assert.assertEquals(resourceDetailResponse.getResult(), 0);
+        Assert.assertEquals(resourceDetailResponse.getErrorCode(), 0);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class CallRPCTest {
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         TransactionResponse transactionResponse =
                 weCrossRPC.call("test.test.test", "test", "test", "test").send();
-        Assert.assertEquals(transactionResponse.getResult(), 0);
+        Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
     @Test
@@ -68,6 +68,6 @@ public class CallRPCTest {
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         TransactionResponse transactionResponse =
                 weCrossRPC.sendTransaction("test.test.test", "test", "test", "test").send();
-        Assert.assertEquals(transactionResponse.getResult(), 0);
+        Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 }

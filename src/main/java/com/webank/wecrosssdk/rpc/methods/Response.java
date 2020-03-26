@@ -4,14 +4,14 @@ import java.util.Objects;
 
 public class Response<T> {
     private String version;
-    private int result = -1;
+    private int errorCode = -1;
     private String message;
     private T data;
 
     public Response() {}
 
-    public Response(Integer result, String message, T data) {
-        this.result = result;
+    public Response(Integer errorCode, String message, T data) {
+        this.errorCode = errorCode;
         this.message = message;
         this.data = data;
     }
@@ -24,12 +24,12 @@ public class Response<T> {
         this.version = version;
     }
 
-    public int getResult() {
-        return result;
+    public int getErrorCode() {
+        return errorCode;
     }
 
-    public void setResult(int result) {
-        this.result = result;
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
 
     public String getMessage() {
@@ -58,14 +58,14 @@ public class Response<T> {
         }
         Response<?> response = (Response<?>) o;
         return Objects.equals(getVersion(), response.getVersion())
-                && Objects.equals(getResult(), response.getResult())
+                && Objects.equals(getErrorCode(), response.getErrorCode())
                 && Objects.equals(getMessage(), response.getMessage())
                 && Objects.equals(getData(), response.getData());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getVersion(), getResult(), getMessage(), getData());
+        return Objects.hash(getVersion(), getErrorCode(), getMessage(), getData());
     }
 
     @Override
@@ -74,8 +74,8 @@ public class Response<T> {
                 + "version='"
                 + version
                 + '\''
-                + ", result="
-                + result
+                + ", errorCode="
+                + errorCode
                 + ", message='"
                 + message
                 + '\''

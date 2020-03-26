@@ -110,7 +110,7 @@ public class Resource {
     private void checkResponse(Response<?> response) throws WeCrossSDKException {
         if (response == null) {
             throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "response is null");
-        } else if (response.getResult() != StatusCode.SUCCESS || response.getData() == null) {
+        } else if (response.getErrorCode() != StatusCode.SUCCESS || response.getData() == null) {
             throw new WeCrossSDKException(ErrorCode.RPC_ERROR, response.toString());
         }
     }
