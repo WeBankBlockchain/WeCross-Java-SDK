@@ -43,6 +43,8 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.5.12'
 	compile 'io.netty:netty-buffer:4.1.47.Final'
 	compile 'io.netty:netty-handler:4.1.47.Final'
+	// compile 'org.bouncycastle:bcprov-jdk15on:1.64'
+	// compile 'org.bouncycastle:bctls-jdk15on:1.64'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
