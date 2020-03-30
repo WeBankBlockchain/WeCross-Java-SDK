@@ -6,6 +6,7 @@ public class Receipt {
     private int errorCode;
     private String errorMessage;
     private String hash;
+    private long blockNumber;
     private String[] result;
 
     public int getErrorCode() {
@@ -32,6 +33,14 @@ public class Receipt {
         this.hash = hash;
     }
 
+    public long getBlockNumber() {
+        return blockNumber;
+    }
+
+    public void setBlockNumber(long blockNumber) {
+        this.blockNumber = blockNumber;
+    }
+
     public String[] getResult() {
         return result;
     }
@@ -51,6 +60,8 @@ public class Receipt {
                 + ", hash='"
                 + hash
                 + '\''
+                + ", blockNumber="
+                + blockNumber
                 + ", result="
                 + Arrays.toString(result)
                 + '}';
