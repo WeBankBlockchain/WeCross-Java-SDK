@@ -178,7 +178,7 @@ public class WeCrossRPCService implements WeCrossService {
             TrustManager[] trustManagers = trustFactory.getTrustManagers();
 
             SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
-            context.init(keyManagers, trustManagers, SecureRandom.getInstanceStrong());
+            context.init(keyManagers, trustManagers, new SecureRandom());
 
             SSLConnectionSocketFactory csf =
                     new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
