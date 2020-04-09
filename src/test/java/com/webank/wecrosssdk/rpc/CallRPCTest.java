@@ -19,6 +19,7 @@ public class CallRPCTest {
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         StubResponse stubResponse = weCrossRPC.supportedStubs().send();
         Assert.assertEquals(stubResponse.getErrorCode(), 0);
+        Assert.assertNotNull(stubResponse.getStubs());
     }
 
     @Test
@@ -27,6 +28,7 @@ public class CallRPCTest {
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         AccountResponse accountResponse = weCrossRPC.listAccounts().send();
         Assert.assertEquals(accountResponse.getErrorCode(), 0);
+        Assert.assertNotNull(accountResponse.getAccounts());
     }
 
     @Test
@@ -35,6 +37,7 @@ public class CallRPCTest {
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
         ResourceResponse resourceResponse = weCrossRPC.listResources(true).send();
         Assert.assertEquals(resourceResponse.getErrorCode(), 0);
+        Assert.assertNotNull(resourceResponse.getResources());
     }
 
     @Test

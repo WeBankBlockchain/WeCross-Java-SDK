@@ -3,18 +3,18 @@ package com.webank.wecrosssdk.rpc.common;
 import java.util.Arrays;
 
 public class Stubs {
-    String[] stubs;
+    String[] stubTypes;
 
-    public String[] getStubs() {
-        return stubs;
+    public String[] getStubTypes() {
+        return stubTypes;
     }
 
-    public void setStubs(String[] stubs) {
-        this.stubs = stubs;
+    public void setStubTypes(String[] stubTypes) {
+        this.stubTypes = stubTypes;
     }
 
     @Override
     public String toString() {
-        return "Stubs{" + "stubs=" + Arrays.toString(stubs) + '}';
+        return "Stubs{" + "stubTypes=" + Arrays.toString(stubTypes) + '}';
     }
 }
