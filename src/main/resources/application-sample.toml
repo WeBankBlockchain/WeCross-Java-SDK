@@ -1,5 +1,5 @@
 [connection]
     server =  '127.0.0.1:8250'
-    sslKey = 'classpath:sdk.key'
-    sslCert = 'classpath:sdk.crt'
+    sslKey = 'classpath:ssl.key'
+    sslCert = 'classpath:ssl.crt'
     caCert = 'classpath:ca.crt'

@@ -6,7 +6,6 @@ import java.util.Map;
 public class ResourceDetail {
     private String path;
     private int distance;
-    private String type;
     private String stubType;
     private Map<Object, Object> properties = new HashMap<Object, Object>();
     private String checksum;
@@ -25,14 +24,6 @@ public class ResourceDetail {
 
     public void setDistance(int distance) {
         this.distance = distance;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getStubType() {
@@ -67,8 +58,6 @@ public class ResourceDetail {
                 + '\''
                 + ", distance="
                 + distance
-                + ", type='"
-                + type
                 + '\''
                 + ", stubType='"
                 + stubType

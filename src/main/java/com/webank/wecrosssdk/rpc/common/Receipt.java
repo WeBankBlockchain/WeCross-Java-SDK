@@ -3,7 +3,7 @@ package com.webank.wecrosssdk.rpc.common;
 import java.util.Arrays;
 
 public class Receipt {
-    private int errorCode;
+    private int errorCode = -1;
     private String errorMessage;
     private String hash;
     private long blockNumber;

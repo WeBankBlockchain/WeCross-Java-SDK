@@ -4,7 +4,6 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
-import com.webank.wecrosssdk.rpc.common.Connection;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.utils.ConfigUtils;

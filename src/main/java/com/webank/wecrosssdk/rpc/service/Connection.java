@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.rpc.common;
+package com.webank.wecrosssdk.rpc.service;
 
 public class Connection {
     String server;
