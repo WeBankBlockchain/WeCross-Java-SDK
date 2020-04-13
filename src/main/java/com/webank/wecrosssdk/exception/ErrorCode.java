@@ -12,4 +12,8 @@ public class ErrorCode {
     public static final int REMOTECALL_ERROR = 201;
     public static final int RPC_ERROR = 202;
     public static final int CALL_CONTRACT_ERROR = 203;
+
+    // performance
+    public static final int RESOURCE_INACTIVE = 301;
+    public static final int INVALID_CONTRACT = 302;
 }

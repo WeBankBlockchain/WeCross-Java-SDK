@@ -40,12 +40,12 @@ public class PerformanceManager {
 
         this.limiter = RateLimiter.create(qps.intValue());
         this.area = count.intValue() / 10;
+        this.area = this.area == 0 ? 1 : this.area;
     }
 
     public void run() {
         try {
             PerformanceCollector collector = new PerformanceCollector(count.intValue());
-            PerformanceSuiteCallback callback = buildCallback(collector);
 
             System.out.println("Performance Test: " + suite.getName());
             System.out.println(
@@ -60,6 +60,7 @@ public class PerformanceManager {
                             @Override
                             public void run() {
                                 limiter.acquire();
+                                PerformanceSuiteCallback callback = buildCallback(collector);
                                 suite.call(callback);
 
                                 int current = sended.incrementAndGet();
@@ -99,14 +100,18 @@ public class PerformanceManager {
 
     private PerformanceSuiteCallback buildCallback(PerformanceCollector collector) {
         return new PerformanceSuiteCallback() {
+            private Long startTimestamp = System.currentTimeMillis();
+
             @Override
             public void onSuccess(String message) {
-                collector.onMessage(PerformanceCollector.Status.SUCCESS);
+                Long cost = System.currentTimeMillis() - this.startTimestamp;
+                collector.onMessage(PerformanceCollector.Status.SUCCESS, cost);
             }
 
             @Override
             public void onFailed(String message) {
-                collector.onMessage(PerformanceCollector.Status.FAILED);
+                Long cost = System.currentTimeMillis() - this.startTimestamp;
+                collector.onMessage(PerformanceCollector.Status.FAILED, cost);
             }
         };
     }

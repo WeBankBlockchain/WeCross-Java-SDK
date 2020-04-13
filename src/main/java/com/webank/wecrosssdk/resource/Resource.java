@@ -35,6 +35,15 @@ public class Resource {
         checkAccountName(this.accountName);
     }
 
+    public boolean isActive() {
+        try {
+            return status().equals("exists");
+        } catch (Exception e) {
+            logger.error("Get status exception: " + e);
+            return false;
+        }
+    }
+
     public String status() throws WeCrossSDKException {
         Response<String> response = (Response<String>) mustOkRequest(weCrossRPC.status(path));
         checkResponse(response);
