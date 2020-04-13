@@ -93,7 +93,7 @@ public class PerformanceManager {
             collector.dumpSummary();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Run exception: " + e);
         }
     }
 
