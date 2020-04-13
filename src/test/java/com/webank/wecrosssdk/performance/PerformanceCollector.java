@@ -38,10 +38,8 @@ public class PerformanceCollector {
         return received.intValue() >= total;
     }
 
-    public void onMessage(Status status) {
+    public void onMessage(Status status, Long cost) {
         try {
-            Long cost = System.currentTimeMillis() - this.startTimestamp;
-
             if (!status.equals(Status.SUCCESS)) {
                 // System.out.println("receipt error! status: " + receipt.getStatus());
                 error.addAndGet(1);
@@ -89,6 +87,7 @@ public class PerformanceCollector {
         try {
             Long totalTime = System.currentTimeMillis() - startTimestamp;
 
+            System.out.println(isEnd() ? "Collector: Finish!" : "Collector: Running...");
             System.out.println(
                     "===================================================================");
 
@@ -149,7 +148,6 @@ public class PerformanceCollector {
                             + "  : "
                             + String.valueOf((double) timeout2000.get() / total * 100)
                             + "%");
-            System.out.println(isEnd() ? "Finish!" : "Running...");
 
         } catch (Exception e) {
             logger.error("error:", e);
