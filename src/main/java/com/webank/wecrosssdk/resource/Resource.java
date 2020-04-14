@@ -62,6 +62,10 @@ public class Resource {
         return (TransactionResponse) mustOkRequest(weCrossRPC.call(request));
     }
 
+    public String[] call(String method) throws WeCrossSDKException {
+        return call(method, null);
+    }
+
     public String[] call(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
                 (TransactionResponse)
@@ -77,6 +81,10 @@ public class Resource {
     public TransactionResponse sendTransaction(Request<TransactionRequest> request)
             throws WeCrossSDKException {
         return (TransactionResponse) mustOkRequest(weCrossRPC.sendTransaction(request));
+    }
+
+    public String[] sendTransaction(String method) throws WeCrossSDKException {
+        return sendTransaction(method, null);
     }
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
