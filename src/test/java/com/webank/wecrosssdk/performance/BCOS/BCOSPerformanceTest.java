@@ -18,9 +18,14 @@ public class BCOSPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest call count qps");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] call [count] [qps]");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest sendTransaction count qps");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] sendTransaction [count] [qps]");
+        System.out.println("Example:");
+        System.out.println(
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 call 100 10");
+        System.out.println(
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 sendTransaction 100 10");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
@@ -35,13 +40,14 @@ public class BCOSPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 3) {
+        if (args.length != 4) {
             usage();
         }
 
-        String command = args[0];
-        BigInteger count = new BigInteger(args[1]);
-        BigInteger qps = new BigInteger(args[2]);
+        String accountName = args[0];
+        String command = args[1];
+        BigInteger count = new BigInteger(args[2]);
+        BigInteger qps = new BigInteger(args[3]);
 
         System.out.println(
                 "BCOSPerformanceTest: command is "
@@ -53,18 +59,18 @@ public class BCOSPerformanceTest {
 
         switch (command) {
             case "call":
-                callTest(count, qps);
+                callTest(accountName, count, qps);
                 exit();
             case "sendTransaction":
-                sendTransactionTest(count, qps);
+                sendTransactionTest(accountName, count, qps);
                 exit();
             default:
                 usage();
         }
     }
 
-    public static void callTest(BigInteger count, BigInteger qps) {
-        Resource resource = loadResource("payment.bcos.HelloWeCross", "bcos");
+    public static void callTest(String accountName, BigInteger count, BigInteger qps) {
+        Resource resource = loadResource("payment.bcos.HelloWeCross", accountName);
         if (resource != null) {
             try {
                 PerformanceSuite suite = new BCOSCallSuite(resource);
@@ -77,8 +83,8 @@ public class BCOSPerformanceTest {
         }
     }
 
-    public static void sendTransactionTest(BigInteger count, BigInteger qps) {
-        Resource resource = loadResource("payment.bcos.HelloWeCross", "bcos");
+    public static void sendTransactionTest(String accountName, BigInteger count, BigInteger qps) {
+        Resource resource = loadResource("payment.bcos.HelloWeCross", accountName);
         if (resource != null) {
             try {
                 PerformanceSuite suite = new BCOSSendTransactionSuite(resource);

@@ -19,7 +19,7 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
             String[] ret = resource.call("invoke", "a", "b", "1");
         } catch (WeCrossSDKException e) {
             throw new WeCrossSDKException(
-                    ErrorCode.INVALID_CONTRACT, "Invalid contract, method is not exists");
+                    ErrorCode.INVALID_CONTRACT, "Invalid contract or user: " + e.getMessage());
         }
 
         this.resource = resource;
