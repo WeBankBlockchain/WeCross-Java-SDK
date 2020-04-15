@@ -43,6 +43,7 @@ public class WeCrossRPCService implements WeCrossService {
 
     public void init() throws WeCrossSDKException {
         Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
         restTemplate = getRestTemplate(connection);
 

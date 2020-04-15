@@ -91,7 +91,7 @@ public class PerformanceCollector {
             System.out.println(
                     "===================================================================");
 
-            System.out.println("Total transactions:  " + String.valueOf(total));
+            System.out.println("Total tasks:  " + String.valueOf(total));
             System.out.println("Total time: " + String.valueOf(totalTime) + "ms");
             System.out.println("TPS: " + String.valueOf(total / ((double) totalTime / 1000)));
             System.out.println("Avg time cost: " + String.valueOf(totalCost.get() / total) + "ms");

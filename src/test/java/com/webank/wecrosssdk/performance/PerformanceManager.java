@@ -28,6 +28,11 @@ public class PerformanceManager {
     }
 
     public PerformanceManager(PerformanceSuite suite, BigInteger count, BigInteger qps) {
+        if (count.compareTo(new BigInteger(String.valueOf(10))) < 0) {
+            System.out.println("Require: count >= 10");
+            System.exit(1);
+        }
+
         this.suite = suite;
         this.count = count;
         this.qps = qps;
