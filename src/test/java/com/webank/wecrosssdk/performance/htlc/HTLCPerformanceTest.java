@@ -12,10 +12,10 @@ public class HTLCPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.htlc.HTLCPerformanceTest [selfPath] [senderAccount0] [sender0] [receiver0] [counterpartyPath] [senderAccount1] [sender1] [receiver1] [count] [qps]");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.htlc.HTLCPerformanceTest [selfPath] [senderAccount0] [sender0] [receiver0] [counterpartyPath] [senderAccount1] [sender1] [receiver1] [count] [qps]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.htlc.HTLCPerformanceTest payment.bcos.htlc bcos 0x55f934bcbe1e9aef8337f5551142a442fdde781c 0x2b5ad5c4795c026514f8317c7a215e218dccd6cf payment.fabric.htlc fabric Admin@org1.example.com User1@org1.example.com 100 10");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.htlc.HTLCPerformanceTest payment.bcos.htlc bcos 0x55f934bcbe1e9aef8337f5551142a442fdde781c 0x2b5ad5c4795c026514f8317c7a215e218dccd6cf payment.fabric.htlc fabric Admin@org1.example.com User1@org1.example.com 10 1");
         System.out.println(
                 "======================================================================================================================================");
         System.out.println(
