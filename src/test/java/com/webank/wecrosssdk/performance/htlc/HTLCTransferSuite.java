@@ -6,7 +6,6 @@ import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -55,23 +54,21 @@ public class HTLCTransferSuite implements PerformanceSuite {
 
     @Override
     public void call(PerformanceSuiteCallback callback) {
-
-        long now = System.currentTimeMillis() / 1000;
-        // use timelock as secret
-        String secret = String.valueOf(now);
-        Hash myHash = new Hash();
-        // generate timelock
-        long t0 = now + 500;
-        long t1 = now + 250;
-        BigInteger balance = null;
-
         try {
+            lock.writeLock().lock();
+            long now = System.currentTimeMillis() / 1000;
+            // use timelock as secret
+            String secret = String.valueOf(now);
+            Hash myHash = new Hash();
             String hash = myHash.sha256(secret);
+            // generate timelock
+            long t0 = now + 500;
+            long t1 = now + 250;
 
             String[] args =
                     new String[] {
                         hash,
-                        "true",
+                        "false",
                         sender0,
                         receiver0,
                         "1",
@@ -82,27 +79,16 @@ public class HTLCTransferSuite implements PerformanceSuite {
                         String.valueOf(t1)
                     };
 
-            balance = getBalance(selfPath, senderAccount0, receiver0);
+            // participant
+            newContract(counterpartyPath, senderAccount1, "null", args);
+            logger.info("participant newContract: {}", Arrays.toString(args));
 
-            lock.writeLock().lock();
+            args[1] = "true";
             // initiator
             newContract(selfPath, senderAccount0, secret, args);
             logger.info("initiator newContract: {}", Arrays.toString(args));
 
-            // participant
-            args[1] = "false";
-            newContract(counterpartyPath, senderAccount1, "null", args);
-            logger.info("participant newContract: {}", Arrays.toString(args));
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            callback.onFailed(e.getMessage());
-        } finally {
-            lock.writeLock().unlock();
-        }
-
-        try {
-            if (checkBalance(selfPath, senderAccount0, receiver0, t0, balance)) {
+            if (checkStatus(selfPath, senderAccount0, hash, t0)) {
                 callback.onSuccess("transfer successfully");
             } else {
                 callback.onFailed("transfer unsuccessfully");
@@ -110,6 +96,8 @@ public class HTLCTransferSuite implements PerformanceSuite {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             callback.onFailed(e.getMessage());
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 
@@ -191,7 +179,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
                 }
                 done = true;
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("round: {}, error: {}", maxRound, e.getMessage());
             }
         }
 
@@ -229,12 +217,10 @@ public class HTLCTransferSuite implements PerformanceSuite {
         }
     }
 
-    private boolean checkBalance(
-            String path, String account, String receiver, long timelock, BigInteger balance)
+    private boolean checkStatus(String path, String account, String hash, long timelock)
             throws Exception {
         while ((System.currentTimeMillis() / 1000) <= timelock) {
-            BigInteger current = getBalance(path, account, receiver);
-            if (current.compareTo(balance) == 0) {
+            if (!getStatus(path, account, hash)) {
                 Thread.sleep(500);
             } else {
                 return true;
@@ -243,14 +229,14 @@ public class HTLCTransferSuite implements PerformanceSuite {
         return false;
     }
 
-    private BigInteger getBalance(String path, String account, String receiver) throws Exception {
+    private boolean getStatus(String path, String account, String hash) throws Exception {
         boolean done = false;
         int maxRound = 0;
         TransactionResponse response;
         Receipt receipt = new Receipt();
         while (!done && maxRound++ < 5) {
             try {
-                response = weCrossRPC.call(path, account, "balanceOf", receiver).send();
+                response = weCrossRPC.call(path, account, "getSelfUnlockStatus", hash).send();
 
                 receipt = response.getReceipt();
                 if (response.getErrorCode() != StatusCode.SUCCESS
@@ -270,6 +256,6 @@ public class HTLCTransferSuite implements PerformanceSuite {
         if (!done) {
             throw new Exception("get balance failed");
         }
-        return new BigInteger(receipt.getResult()[0].trim());
+        return receipt.getResult()[0].trim().equalsIgnoreCase("true");
     }
 }
