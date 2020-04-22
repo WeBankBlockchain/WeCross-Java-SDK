@@ -9,8 +9,11 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FabricPerformanceTest {
+    private static Logger logger = LoggerFactory.getLogger(FabricPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
@@ -29,7 +32,7 @@ public class FabricPerformanceTest {
                         + "IPath: \tpayment.fabric.HelloWorld\n"
                         + "Config dir: \tstubs/fabric/stub.toml\n"
                         + "[[resources]]\n"
-                        + "    name = 'HelloWorld'\n"
+                        + "    name = 'abac'\n"
                         + "    type = 'FABRIC_CONTRACT'\n"
                         + "    chainCodeName = 'mycc'\n"
                         + "    chainLanguage = \"go\"\n"
@@ -68,7 +71,12 @@ public class FabricPerformanceTest {
     }
 
     public static void callTest(String accountName, BigInteger count, BigInteger qps) {
-        Resource resource = loadResource("payment.fabric.HelloWorld", accountName);
+        Resource resource = loadResource("payment.fabric.abac", accountName);
+        if (resource == null) {
+            logger.warn("Default to payment.fabric.HelloWeCross");
+            resource = loadResource("payment.fabric.HelloWeCross", accountName);
+        }
+
         if (resource != null) {
             try {
                 PerformanceSuite suite = new FabricCallSuite(resource);
@@ -82,7 +90,12 @@ public class FabricPerformanceTest {
     }
 
     public static void sendTransactionTest(String accountName, BigInteger count, BigInteger qps) {
-        Resource resource = loadResource("payment.fabric.HelloWorld", accountName);
+        Resource resource = loadResource("payment.fabric.abac", accountName);
+        if (resource == null) {
+            logger.warn("Default to payment.fabric.HelloWeCross");
+            resource = loadResource("payment.fabric.HelloWeCross", accountName);
+        }
+
         if (resource != null) {
             try {
                 PerformanceSuite suite = new FabricSendTransactionSuite(resource);
