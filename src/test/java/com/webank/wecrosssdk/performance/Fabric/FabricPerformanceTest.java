@@ -9,8 +9,11 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FabricPerformanceTest {
+    private static Logger logger = LoggerFactory.getLogger(FabricPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
