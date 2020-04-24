@@ -2,6 +2,8 @@ package com.webank.wecrosssdk.rpc.service;
 
 public class Connection {
     String server;
+    int maxTotal;
+    int maxPerRoute;
     String sslKey;
     String sslCert;
     String caCert;
@@ -12,6 +14,22 @@ public class Connection {
 
     public void setServer(String server) {
         this.server = server;
+    }
+
+    public int getMaxTotal() {
+        return maxTotal;
+    }
+
+    public void setMaxTotal(int maxTotal) {
+        this.maxTotal = maxTotal;
+    }
+
+    public int getMaxPerRoute() {
+        return maxPerRoute;
+    }
+
+    public void setMaxPerRoute(int maxPerRoute) {
+        this.maxPerRoute = maxPerRoute;
     }
 
     public String getSSLKey() {
@@ -44,14 +62,18 @@ public class Connection {
                 + "server='"
                 + server
                 + '\''
-                + '\''
-                + ", keyStore='"
+                + ", maxTotal="
+                + maxTotal
+                + ", maxPerRoute="
+                + maxPerRoute
+                + ", sslKey='"
                 + sslKey
                 + '\''
-                + '\''
-                + ", trustStore='"
+                + ", sslCert='"
                 + sslCert
                 + '\''
+                + ", caCert='"
+                + caCert
                 + '\''
                 + '}';
     }
