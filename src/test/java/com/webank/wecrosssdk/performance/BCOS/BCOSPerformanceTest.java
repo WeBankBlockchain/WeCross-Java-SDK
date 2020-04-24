@@ -18,18 +18,18 @@ public class BCOSPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] call [count] [qps]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] call [count] [qps] [poolSize]");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] sendTransaction [count] [qps]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 call 100 10");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 call 100 10 2000");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 sendTransaction 100 10");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 sendTransaction 100 10 500");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
-                        + "IPath: \tpayment.bcos.HelloWorld\n"
+                        + "IPath: \tpayment.bcos.HelloWeCross\n"
                         + "Config dir: \tstubs/bcos/stub.toml\n"
                         + "[[resources]]\n"
                         + "    # name cannot be repeated\n"
@@ -40,7 +40,7 @@ public class BCOSPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
+        if (args.length != 5) {
             usage();
         }
 
@@ -48,6 +48,7 @@ public class BCOSPerformanceTest {
         String command = args[1];
         BigInteger count = new BigInteger(args[2]);
         BigInteger qps = new BigInteger(args[3]);
+        int poolSize = Integer.parseInt(args[4]);
 
         System.out.println(
                 "BCOSPerformanceTest: command is "
@@ -59,22 +60,24 @@ public class BCOSPerformanceTest {
 
         switch (command) {
             case "call":
-                callTest(accountName, count, qps);
+                callTest(accountName, count, qps, poolSize);
                 exit();
             case "sendTransaction":
-                sendTransactionTest(accountName, count, qps);
+                sendTransactionTest(accountName, count, qps, poolSize);
                 exit();
             default:
                 usage();
         }
     }
 
-    public static void callTest(String accountName, BigInteger count, BigInteger qps) {
+    public static void callTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize) {
         Resource resource = loadResource("payment.bcos.HelloWeCross", accountName);
         if (resource != null) {
             try {
                 PerformanceSuite suite = new BCOSCallSuite(resource);
-                PerformanceManager performanceManager = new PerformanceManager(suite, count, qps);
+                PerformanceManager performanceManager =
+                        new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {
@@ -83,12 +86,14 @@ public class BCOSPerformanceTest {
         }
     }
 
-    public static void sendTransactionTest(String accountName, BigInteger count, BigInteger qps) {
+    public static void sendTransactionTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize) {
         Resource resource = loadResource("payment.bcos.HelloWeCross", accountName);
         if (resource != null) {
             try {
                 PerformanceSuite suite = new BCOSSendTransactionSuite(resource);
-                PerformanceManager performanceManager = new PerformanceManager(suite, count, qps);
+                PerformanceManager performanceManager =
+                        new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {

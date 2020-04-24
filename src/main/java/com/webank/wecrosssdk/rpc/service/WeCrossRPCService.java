@@ -18,10 +18,14 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -43,11 +47,10 @@ public class WeCrossRPCService implements WeCrossService {
 
     public void init() throws WeCrossSDKException {
         Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        logger.info(connection.toString());
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
         restTemplate = getRestTemplate(connection);
-
-        logger.info(connection.toString());
     }
 
     private void checkRequest(Request<?> request) throws WeCrossSDKException {
@@ -93,6 +96,8 @@ public class WeCrossRPCService implements WeCrossService {
         Toml toml = ConfigUtils.getToml(config);
         Connection connection = new Connection();
         connection.setServer(getServer(toml));
+        connection.setMaxTotal(toml.getLong("connection.maxTotal", 200L).intValue());
+        connection.setMaxPerRoute(toml.getLong("connection.maxPerRoute", 8L).intValue());
         connection.setSSLKey(getSSLKey(toml));
         connection.setSSLCert(getSSLCert(toml));
         connection.setCaCert(getCACert(toml));
@@ -182,7 +187,21 @@ public class WeCrossRPCService implements WeCrossService {
 
             SSLConnectionSocketFactory csf =
                     new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
-            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).build();
+
+            Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                    RegistryBuilder.<ConnectionSocketFactory>create()
+                            .register("https", csf)
+                            .build();
+            PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
+                    new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            poolingHttpClientConnectionManager.setMaxTotal(connection.getMaxTotal());
+            poolingHttpClientConnectionManager.setDefaultMaxPerRoute(connection.getMaxPerRoute());
+            CloseableHttpClient httpClient =
+                    HttpClients.custom()
+                            .setConnectionManager(poolingHttpClientConnectionManager)
+                            .build();
+            // CloseableHttpClient httpClient =
+            // HttpClients.custom().setSSLSocketFactory(csf).build();
             HttpComponentsClientHttpRequestFactory requestFactory =
                     new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);

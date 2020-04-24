@@ -18,14 +18,14 @@ public class FabricPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] call [count] [qps]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] call [count] [qps] [poolSize]");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] sendTransaction [count] [qps]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 call 100 10");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 call 100 10 2000");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 sendTransaction 100 10");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 sendTransaction 100 10 500");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
@@ -41,7 +41,7 @@ public class FabricPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
+        if (args.length != 5) {
             usage();
         }
 
@@ -49,6 +49,7 @@ public class FabricPerformanceTest {
         String command = args[1];
         BigInteger count = new BigInteger(args[2]);
         BigInteger qps = new BigInteger(args[3]);
+        int poolSize = Integer.parseInt(args[4]);
 
         System.out.println(
                 "FabricPerformanceTest: command is "
@@ -60,17 +61,18 @@ public class FabricPerformanceTest {
 
         switch (command) {
             case "call":
-                callTest(accountName, count, qps);
+                callTest(accountName, count, qps, poolSize);
                 exit();
             case "sendTransaction":
-                sendTransactionTest(accountName, count, qps);
+                sendTransactionTest(accountName, count, qps, poolSize);
                 exit();
             default:
                 usage();
         }
     }
 
-    public static void callTest(String accountName, BigInteger count, BigInteger qps) {
+    public static void callTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize) {
         Resource resource = loadResource("payment.fabric.abac", accountName);
         if (resource == null) {
             logger.warn("Default to payment.fabric.HelloWeCross");
@@ -80,7 +82,8 @@ public class FabricPerformanceTest {
         if (resource != null) {
             try {
                 PerformanceSuite suite = new FabricCallSuite(resource);
-                PerformanceManager performanceManager = new PerformanceManager(suite, count, qps);
+                PerformanceManager performanceManager =
+                        new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {
@@ -89,7 +92,8 @@ public class FabricPerformanceTest {
         }
     }
 
-    public static void sendTransactionTest(String accountName, BigInteger count, BigInteger qps) {
+    public static void sendTransactionTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize) {
         Resource resource = loadResource("payment.fabric.abac", accountName);
         if (resource == null) {
             logger.warn("Default to payment.fabric.HelloWeCross");
@@ -99,7 +103,8 @@ public class FabricPerformanceTest {
         if (resource != null) {
             try {
                 PerformanceSuite suite = new FabricSendTransactionSuite(resource);
-                PerformanceManager performanceManager = new PerformanceManager(suite, count, qps);
+                PerformanceManager performanceManager =
+                        new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {

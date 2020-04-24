@@ -17,17 +17,19 @@ public class PerformanceManager {
     private Integer area;
 
     public PerformanceManager(PerformanceSuite suite, String count, String qps) {
-        this(suite, new BigInteger(count), new BigInteger(qps));
+        this(suite, new BigInteger(count), new BigInteger(qps), 200);
     }
 
     public PerformanceManager(PerformanceSuite suite, long count, long qps) {
         this(
                 suite,
                 new BigInteger(Long.toString(count, 10)),
-                new BigInteger(Long.toString(qps, 10)));
+                new BigInteger(Long.toString(qps, 10)),
+                200);
     }
 
-    public PerformanceManager(PerformanceSuite suite, BigInteger count, BigInteger qps) {
+    public PerformanceManager(
+            PerformanceSuite suite, BigInteger count, BigInteger qps, int poolSize) {
         if (count.compareTo(new BigInteger(String.valueOf(10))) < 0) {
             System.out.println("Require: count >= 10");
             System.exit(1);
@@ -38,8 +40,8 @@ public class PerformanceManager {
         this.qps = qps;
 
         this.threadPool = new ThreadPoolTaskExecutor();
-        this.threadPool.setCorePoolSize(200);
-        this.threadPool.setMaxPoolSize(500);
+        this.threadPool.setCorePoolSize(poolSize);
+        this.threadPool.setMaxPoolSize(poolSize * 2);
         this.threadPool.setQueueCapacity(count.intValue());
         this.threadPool.initialize();
 

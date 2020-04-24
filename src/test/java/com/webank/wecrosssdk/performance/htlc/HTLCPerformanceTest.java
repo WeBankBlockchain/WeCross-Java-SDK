@@ -26,7 +26,7 @@ public class HTLCPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 10) {
+        if (args.length != 10 && args.length != 11) {
             usage();
         }
 
@@ -75,7 +75,7 @@ public class HTLCPerformanceTest {
                             senderAccount1,
                             sender1,
                             receiver1);
-            PerformanceManager performanceManager = new PerformanceManager(suite, count, qps);
+            PerformanceManager performanceManager = new PerformanceManager(suite, count, qps, 2);
             performanceManager.run();
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
