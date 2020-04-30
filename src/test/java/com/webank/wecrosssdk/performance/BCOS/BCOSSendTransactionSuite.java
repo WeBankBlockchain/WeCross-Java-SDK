@@ -18,8 +18,13 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
         try {
             String[] ret = resource.sendTransaction("set", data);
         } catch (WeCrossSDKException e) {
-            throw new WeCrossSDKException(
-                    ErrorCode.INVALID_CONTRACT, "Invalid contract or user: " + e.getMessage());
+            System.out.println("Invalid contract or user or db: " + e.getMessage());
+            System.out.println(
+                    "\tRollback: Check the HelloWecross address configuration in stub.toml");
+            System.out.println("\tUser type: check the user type is BCOS2.0");
+            System.out.println(
+                    "\tBlocklimit failed: check the router is syncing or couldn't be the next block");
+            throw new WeCrossSDKException(ErrorCode.INVALID_CONTRACT, "Init contract failed");
         }
 
         this.resource = resource;
