@@ -65,6 +65,9 @@ public class BCOSPerformanceTest {
             case "sendTransaction":
                 sendTransactionTest(accountName, count, qps, poolSize);
                 exit();
+            case "status":
+                statusTest(accountName, count, qps, poolSize);
+                exit();
             default:
                 usage();
         }
@@ -92,6 +95,22 @@ public class BCOSPerformanceTest {
         if (resource != null) {
             try {
                 PerformanceSuite suite = new BCOSSendTransactionSuite(resource);
+                PerformanceManager performanceManager =
+                        new PerformanceManager(suite, count, qps, poolSize);
+                performanceManager.run();
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void statusTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize) {
+        Resource resource = loadResource("payment.bcos.HelloWeCross", accountName);
+        if (resource != null) {
+            try {
+                PerformanceSuite suite = new StatusSuite(resource);
                 PerformanceManager performanceManager =
                         new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
