@@ -30,7 +30,7 @@ public class BCOSPerformanceTest {
         System.out.println(
                 "Performance test resource info: \n"
                         + "IPath: \tpayment.bcos.HelloWeCross\n"
-                        + "Config dir: \tstubs/bcos/stub.toml\n"
+                        + "Config dir: \tchains/bcos/stub.toml\n"
                         + "[[resources]]\n"
                         + "    # name cannot be repeated\n"
                         + "    name = 'HelloWeCross'\n"
