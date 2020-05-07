@@ -30,7 +30,7 @@ public class FabricPerformanceTest {
         System.out.println(
                 "Performance test resource info: \n"
                         + "IPath: \tpayment.fabric.HelloWorld\n"
-                        + "Config dir: \tstubs/fabric/stub.toml\n"
+                        + "Config dir: \tchains/fabric/stub.toml\n"
                         + "[[resources]]\n"
                         + "    name = 'abac'\n"
                         + "    type = 'FABRIC_CONTRACT'\n"
