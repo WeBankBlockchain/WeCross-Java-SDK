@@ -3,38 +3,23 @@ package com.webank.wecrosssdk.rpc.methods.request;
 import java.util.Arrays;
 
 public class TransactionRequest {
-    private String sig;
-    private String retTypes[];
+    private int seq = 0;
     private String method;
-    private Object args[];
+    private String[] args;
 
-    public TransactionRequest(String sig, String method, Object[] args) {
-        this.sig = sig;
+    public TransactionRequest() {}
+
+    public TransactionRequest(String method, String[] args) {
         this.method = method;
         this.args = args;
     }
 
-    public TransactionRequest(String sig, String[] retTypes, String method, Object[] args) {
-        this.sig = sig;
-        this.retTypes = retTypes;
-        this.method = method;
-        this.args = args;
+    public int getSeq() {
+        return seq;
     }
 
-    public String getSig() {
-        return sig;
-    }
-
-    public void setSig(String sig) {
-        this.sig = sig;
-    }
-
-    public String[] getRetTypes() {
-        return retTypes;
-    }
-
-    public void setRetTypes(String[] retTypes) {
-        this.retTypes = retTypes;
+    public void setSeq(int seq) {
+        this.seq = seq;
     }
 
     public String getMethod() {
@@ -45,22 +30,19 @@ public class TransactionRequest {
         this.method = method;
     }
 
-    public Object[] getArgs() {
+    public String[] getArgs() {
         return args;
     }
 
-    public void setArgs(Object args[]) {
+    public void setArgs(String[] args) {
         this.args = args;
     }
 
     @Override
     public String toString() {
         return "TransactionRequest{"
-                + "sig='"
-                + sig
-                + '\''
-                + ", retTypes="
-                + Arrays.toString(retTypes)
+                + "seq="
+                + seq
                 + ", method='"
                 + method
                 + '\''

@@ -1,0 +1,7 @@
+[connection]
+    server =  '127.0.0.1:8250'
+    sslKey = 'classpath:ssl.key'
+    sslCert = 'classpath:ssl.crt'
+    caCert = 'classpath:ca.crt'
+    maxTotal = 2000
+    maxPerRoute = 64

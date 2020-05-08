@@ -35,4 +35,11 @@ logs
 .settings/
 .classpath
 .project
-src/main/resources/console.xml
+application.toml
+out/
+*.keystore
+*.truststore
+*.key
+*.crt
+classes/
+build.bak
