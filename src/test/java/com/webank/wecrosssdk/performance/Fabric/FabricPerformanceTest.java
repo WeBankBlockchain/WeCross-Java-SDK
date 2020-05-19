@@ -29,14 +29,14 @@ public class FabricPerformanceTest {
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
-                        + "IPath: \tpayment.fabric.HelloWorld\n"
+                        + "IPath: \tpayment.fabric.sacc\n"
                         + "Config dir: \tchains/fabric/stub.toml\n"
                         + "[[resources]]\n"
-                        + "    name = 'abac'\n"
+                        + "    name = 'sacc'\n"
                         + "    type = 'FABRIC_CONTRACT'\n"
-                        + "    chainCodeName = 'mycc'\n"
+                        + "    chainCodeName = 'sacc'\n"
                         + "    chainLanguage = \"go\"\n"
-                        + "    peers=['org1', 'org2']");
+                        + "    peers=['org1']");
         exit();
     }
 
@@ -73,10 +73,10 @@ public class FabricPerformanceTest {
 
     public static void callTest(
             String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.abac", accountName);
+        Resource resource = loadResource("payment.fabric.sacc", accountName);
         if (resource == null) {
-            logger.warn("Default to payment.fabric.HelloWeCross");
-            resource = loadResource("payment.fabric.HelloWeCross", accountName);
+            logger.warn("Default to payment.fabric.sacc");
+            resource = loadResource("payment.fabric.sacc", accountName);
         }
 
         if (resource != null) {
@@ -94,10 +94,10 @@ public class FabricPerformanceTest {
 
     public static void sendTransactionTest(
             String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.abac", accountName);
+        Resource resource = loadResource("payment.fabric.sacc", accountName);
         if (resource == null) {
-            logger.warn("Default to payment.fabric.HelloWeCross");
-            resource = loadResource("payment.fabric.HelloWeCross", accountName);
+            logger.warn("Default to payment.fabric.sacc");
+            resource = loadResource("payment.fabric.sacc", accountName);
         }
 
         if (resource != null) {

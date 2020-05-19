@@ -5,9 +5,12 @@ import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
+import java.security.SecureRandom;
 
 public class FabricSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
+    static final int BOUND = Integer.MAX_VALUE - 1;
+    SecureRandom rand = new SecureRandom();
 
     public FabricSendTransactionSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
@@ -16,7 +19,7 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
         }
 
         try {
-            String[] ret = resource.call("invoke", "a", "b", "1");
+            String[] ret = resource.call("query", "a");
         } catch (WeCrossSDKException e) {
             throw new WeCrossSDKException(
                     ErrorCode.INVALID_CONTRACT, "Invalid contract or user: " + e.getMessage());
@@ -33,7 +36,9 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
     @Override
     public void call(PerformanceSuiteCallback callback) {
         try {
-            String[] ret = resource.sendTransaction("invoke", "a", "b", "1");
+            String key = String.valueOf(rand.nextInt(BOUND));
+            String value = String.valueOf(rand.nextInt(BOUND));
+            String[] ret = resource.sendTransaction("set", key, value);
             callback.onSuccess(ret[0]);
         } catch (WeCrossSDKException e) {
             callback.onFailed(e.getMessage());
