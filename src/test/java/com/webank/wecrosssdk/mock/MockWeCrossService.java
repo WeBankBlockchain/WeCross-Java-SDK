@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
+import org.apache.http.HttpResponse;
+import org.apache.http.concurrent.FutureCallback;
 
 public class MockWeCrossService implements WeCrossService {
     private Map<String, String> datas = new HashMap<>();
@@ -45,6 +48,12 @@ public class MockWeCrossService implements WeCrossService {
             default:
                 return handleMethodNotFound(request, responseType);
         }
+    }
+
+    @Override
+    public Future<HttpResponse> asyncSend(Request<?> request, FutureCallback<HttpResponse> callback)
+            throws Exception {
+        return null;
     }
 
     public Response handleStatus(Request request) {

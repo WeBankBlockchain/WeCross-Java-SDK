@@ -1,5 +1,7 @@
 package com.webank.wecrosssdk.rpc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
@@ -9,23 +11,33 @@ import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import com.webank.wecrosssdk.utils.KeyCertLoader;
 import com.webank.wecrosssdk.utils.RPCUtils;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.concurrent.Future;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -44,6 +56,8 @@ public class WeCrossRPCService implements WeCrossService {
 
     private String server;
     private RestTemplate restTemplate;
+    private CloseableHttpAsyncClient httpClient;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public void init() throws WeCrossSDKException {
         Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
@@ -51,6 +65,8 @@ public class WeCrossRPCService implements WeCrossService {
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
         restTemplate = getRestTemplate(connection);
+        httpClient = getHttpAsyncClient(connection);
+        httpClient.start();
     }
 
     private void checkRequest(Request<?> request) throws WeCrossSDKException {
@@ -90,6 +106,26 @@ public class WeCrossRPCService implements WeCrossService {
         logger.info("response: {}", response.toString());
 
         return response;
+    }
+
+    @Override
+    public Future<HttpResponse> asyncSend(Request<?> request, FutureCallback<HttpResponse> callback)
+            throws WeCrossSDKException {
+        try {
+            String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
+            logger.info("request: {}; url: {}", request.toString(), url);
+            checkRequest(request);
+            HttpPost httpPost = new HttpPost(url);
+            StringEntity entity = new StringEntity(objectMapper.writeValueAsString(request));
+            httpPost.setEntity(entity);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            return httpClient.execute(httpPost, callback);
+        } catch (UnsupportedEncodingException | JsonProcessingException e) {
+            logger.error("Encode json error when async sending: {}", e);
+            throw new WeCrossSDKException(
+                    ErrorCode.INTERNAL_ERROR, "Encode json error when async sending: " + e);
+        }
     }
 
     private Connection getConnection(String config) throws WeCrossSDKException {
@@ -144,7 +180,7 @@ public class WeCrossRPCService implements WeCrossService {
         return caCert;
     }
 
-    private RestTemplate getRestTemplate(Connection connection) throws WeCrossSDKException {
+    private SSLContext getSSLContext(Connection connection) throws WeCrossSDKException {
         try {
             PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
                     new PathMatchingResourcePatternResolver();
@@ -184,9 +220,18 @@ public class WeCrossRPCService implements WeCrossService {
 
             SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
             context.init(keyManagers, trustManagers, new SecureRandom());
+            return context;
+        } catch (Exception e) {
+            logger.error("Init SSLContext error: {}", e);
+            throw new WeCrossSDKException(ErrorCode.INTERNAL_ERROR, "Init SSLContext error: " + e);
+        }
+    }
 
+    private RestTemplate getRestTemplate(Connection connection) throws WeCrossSDKException {
+        try {
             SSLConnectionSocketFactory csf =
-                    new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
+                    new SSLConnectionSocketFactory(
+                            getSSLContext(connection), NoopHostnameVerifier.INSTANCE);
 
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
                     RegistryBuilder.<ConnectionSocketFactory>create()
@@ -200,8 +245,6 @@ public class WeCrossRPCService implements WeCrossService {
                     HttpClients.custom()
                             .setConnectionManager(poolingHttpClientConnectionManager)
                             .build();
-            // CloseableHttpClient httpClient =
-            // HttpClients.custom().setSSLSocketFactory(csf).build();
             HttpComponentsClientHttpRequestFactory requestFactory =
                     new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
@@ -210,6 +253,31 @@ public class WeCrossRPCService implements WeCrossService {
             logger.error("Init rest template error: {}", e);
             throw new WeCrossSDKException(
                     ErrorCode.INTERNAL_ERROR, "Init rest template error: " + e);
+        }
+    }
+
+    private CloseableHttpAsyncClient getHttpAsyncClient(Connection connection)
+            throws WeCrossSDKException {
+        try {
+            RequestConfig requestConfig =
+                    RequestConfig.custom()
+                            .setConnectTimeout(100000)
+                            .setSocketTimeout(100000)
+                            .setConnectionRequestTimeout(100000)
+                            .build();
+            CloseableHttpAsyncClient httpClient =
+                    HttpAsyncClients.custom()
+                            .setSSLContext(getSSLContext(connection))
+                            .setKeepAliveStrategy(DefaultConnectionKeepAliveStrategy.INSTANCE)
+                            .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
+                            .setDefaultRequestConfig(requestConfig)
+                            .setMaxConnTotal(connection.getMaxTotal())
+                            .setMaxConnPerRoute(connection.getMaxPerRoute())
+                            .build();
+            return httpClient;
+        } catch (Exception e) {
+            logger.error("Init http client error: {}", e);
+            throw new WeCrossSDKException(ErrorCode.INTERNAL_ERROR, "Init http client error: " + e);
         }
     }
 }
