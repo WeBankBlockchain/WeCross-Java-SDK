@@ -23,9 +23,9 @@ public class BCOSPerformanceTest {
                 " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 call 100 10 2000");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos_user1 call 100 10 2000");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos1 sendTransaction 100 10 500");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest bcos_user1 sendTransaction 100 10 500");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"

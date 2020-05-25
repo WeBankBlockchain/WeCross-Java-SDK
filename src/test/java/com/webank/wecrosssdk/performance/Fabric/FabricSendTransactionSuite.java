@@ -23,7 +23,10 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
     public FabricSendTransactionSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
             throw new WeCrossSDKException(
-                    ErrorCode.RESOURCE_INACTIVE, "Router or resource inactive, please check.");
+                    ErrorCode.RESOURCE_INACTIVE,
+                    "Resource sacc inactive, please check router has started and deploy it by:\n"
+                            + "\tdocker exec -it cli peer chaincode install -n sacc -v 1.0 -p github.com/chaincode/sacc/\n"
+                            + "\tdocker exec -it cli peer chaincode instantiate -o orderer.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n sacc -l golang -v 1.0 -c '{\"Args\":[\"a\",\"10\"]}' -P 'OR ('\\''Org1MSP.peer'\\'','\\''Org2MSP.peer'\\'')'");
         }
 
         try {

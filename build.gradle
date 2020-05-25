@@ -88,6 +88,13 @@ jar {
     exclude '**/*.crt'
     exclude '**/*.key'
 
+    manifest {
+        attributes(
+                'Main-Class': 'com.webank.wecrosssdk.Main',
+                'version': project.version,
+        )
+    }
+
     doLast {
         copy {
             from file('src/main/resources/')
