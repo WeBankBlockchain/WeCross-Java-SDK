@@ -259,29 +259,11 @@ public class WeCrossRPCService implements WeCrossService {
     private CloseableHttpAsyncClient getHttpAsyncClient(Connection connection)
             throws WeCrossSDKException {
         try {
-            //            Registry<SchemeIOSessionStrategy> registry =
-            //                    RegistryBuilder.<SchemeIOSessionStrategy>create()
-            //                            .register("http", NoopIOSessionStrategy.INSTANCE)
-            //                            .register("https", new
-            // SSLIOSessionStrategy(getSSLContext(connection)))
-            //                            .build();
-            //            IOReactorConfig ioReactorConfig =
-            //                    IOReactorConfig.custom()
-            //
-            // .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-            //                            .setSoKeepAlive(true)
-            //                            .build();
-            //            ConnectingIOReactor ioReactor;
-            //            ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
-            //            PoolingNHttpClientConnectionManager connManager =
-            //                    new PoolingNHttpClientConnectionManager(ioReactor, registry);
-            //            connManager.setMaxTotal(connection.getMaxTotal());
-            //            connManager.setDefaultMaxPerRoute(connection.getMaxPerRoute());
             RequestConfig requestConfig =
                     RequestConfig.custom()
-                            .setConnectTimeout(10000)
-                            .setSocketTimeout(10000)
-                            .setConnectionRequestTimeout(1000)
+                            .setConnectTimeout(100000)
+                            .setSocketTimeout(100000)
+                            .setConnectionRequestTimeout(100000)
                             .build();
             CloseableHttpAsyncClient httpClient =
                     HttpAsyncClients.custom()

@@ -8,6 +8,7 @@ import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import java.security.SecureRandom;
 import org.apache.http.HttpResponse;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.util.EntityUtils;
@@ -16,6 +17,8 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
     private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
     private ObjectMapper objectMapper = new ObjectMapper();
+    static final int BOUND = Integer.MAX_VALUE - 1;
+    SecureRandom rand = new SecureRandom();
 
     public FabricSendTransactionSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
@@ -24,7 +27,7 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
         }
 
         try {
-            resource.call("invoke", "a", "b", "1");
+            resource.call("query", "a");
         } catch (WeCrossSDKException e) {
             throw new WeCrossSDKException(
                     ErrorCode.INVALID_CONTRACT, "Invalid contract or user: " + e.getMessage());
@@ -43,7 +46,11 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
         try {
             resource.getWeCrossRPC()
                     .sendTransaction(
-                            resource.getPath(), resource.getAccountName(), "invoke", "a", "b", "1")
+                            resource.getPath(),
+                            resource.getAccountName(),
+                            "set",
+                            String.valueOf(rand.nextInt(BOUND)),
+                            String.valueOf(rand.nextInt(BOUND)))
                     .asyncSend(
                             new FutureCallback<HttpResponse>() {
                                 @Override
