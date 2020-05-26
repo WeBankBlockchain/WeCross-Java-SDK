@@ -89,7 +89,7 @@ jar {
 
     manifest {
         attributes(
-                'Main-Class': 'com.webank.wecrosssdk.Main',
+                'Main-Class': 'com.webank.wecrosssdk.TestMain',
                 'version': project.version,
         )
     }

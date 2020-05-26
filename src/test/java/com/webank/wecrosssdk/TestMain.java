@@ -1,6 +1,6 @@
 package com.webank.wecrosssdk;
 
-public class Main {
+public class TestMain {
     public static void main(String[] args) throws Exception {
         System.out.println("This is WeCross Java SDK");
         System.out.println("For performance test, please run the command for more info:");
