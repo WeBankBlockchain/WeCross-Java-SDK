@@ -248,7 +248,7 @@ public class WeCrossRPCService implements WeCrossService {
                             .setPooledConnectionIdleTimeout(httpClientTimeOut)
                             .setAcquireFreeChannelTimeout(httpClientTimeOut)
                             .setConnectionPoolCleanerPeriod(httpClientTimeOut)
-                            .setMaxConnections(connection.getMaxTotal())
+                            // .setMaxConnections(connection.getMaxTotal())
                             // .setMaxConnectionsPerHost(connection.getMaxPerRoute())
                             .setKeepAlive(true));
 
