@@ -118,7 +118,7 @@ public class PerformanceManager {
             @Override
             public void onFailed(String message) {
                 Long cost = System.currentTimeMillis() - this.startTimestamp;
-                System.out.println("Error message: " + message);
+                System.out.println("On failed: " + message);
                 collector.onMessage(PerformanceCollector.Status.FAILED, cost);
             }
         };

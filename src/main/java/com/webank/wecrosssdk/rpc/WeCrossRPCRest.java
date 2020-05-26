@@ -34,6 +34,13 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<Response> test() {
+        @SuppressWarnings("unchecked")
+        Request<String> request = new Request("", "", "test", null);
+        return new RemoteCall<>(weCrossService, Response.class, request);
+    }
+
+    @Override
     public RemoteCall<StubResponse> supportedStubs() {
         @SuppressWarnings("unchecked")
         Request<?> request = new Request("", "", "supportedStubs", null);

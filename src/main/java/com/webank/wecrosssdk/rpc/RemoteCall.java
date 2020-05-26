@@ -1,10 +1,9 @@
 package com.webank.wecrosssdk.rpc;
 
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
-import org.apache.http.HttpResponse;
-import org.apache.http.concurrent.FutureCallback;
 
 public class RemoteCall<T extends Response> {
 
@@ -22,8 +21,8 @@ public class RemoteCall<T extends Response> {
         return weCrossService.send(request, responseType);
     }
 
-    public void asyncSend(FutureCallback<HttpResponse> callback) throws Exception {
-        weCrossService.asyncSend(request, callback);
+    public void asyncSend(Callback<T> callback) throws Exception {
+        weCrossService.asyncSend(request, responseType, callback);
     }
 
     public WeCrossService getWeCrossService() {

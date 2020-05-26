@@ -11,6 +11,8 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 
 public interface WeCrossRPC {
 
+    RemoteCall<Response> test();
+
     RemoteCall<StubResponse> supportedStubs();
 
     RemoteCall<AccountResponse> listAccounts();
