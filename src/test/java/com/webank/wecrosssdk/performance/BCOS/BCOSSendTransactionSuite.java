@@ -45,12 +45,12 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback) {
         try {
             resource.getWeCrossRPC()
-                    .sendTransaction(resource.getPath(), resource.getAccountName(), "get", null)
+                    .sendTransaction(resource.getPath(), resource.getAccountName(), "set", data)
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override
                                 public void onSuccess(TransactionResponse response) {
-                                    if (response.getReceipt().getResult()[0].equals(data)) {
+                                    if (response.getReceipt().getErrorCode() == 0) {
                                         callback.onSuccess(data);
                                     } else {
                                         callback.onFailed("transaction execution failed");
