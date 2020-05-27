@@ -44,7 +44,6 @@ public class FabricCallSuite implements PerformanceSuite {
                             new Callback<TransactionResponse>() {
                                 @Override
                                 public void onSuccess(TransactionResponse response) {
-                                    System.out.println(response.getReceipt().toString());
                                     if (response.getReceipt().getErrorCode() == 0) {
                                         callback.onSuccess("success");
                                     } else {
