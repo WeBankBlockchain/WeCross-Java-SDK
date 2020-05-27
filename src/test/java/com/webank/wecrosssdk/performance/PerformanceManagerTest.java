@@ -19,9 +19,9 @@ public class PerformanceManagerTest {
                 Assert.assertTrue(false);
             } finally {
                 if (System.currentTimeMillis() % 10 != 0) {
-                    callback.onSuccess("Success");
+                    callback.onSuccess("Ok: Success happen");
                 } else {
-                    callback.onFailed("Failed");
+                    callback.onFailed("Ok: Failed happen");
                 }
             }
         }
