@@ -6,6 +6,7 @@ import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.common.Resources;
 import com.webank.wecrosssdk.rpc.common.Stubs;
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
@@ -18,9 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
-import org.apache.http.HttpResponse;
-import org.apache.http.concurrent.FutureCallback;
 
 public class MockWeCrossService implements WeCrossService {
     private Map<String, String> datas = new HashMap<>();
@@ -51,9 +49,9 @@ public class MockWeCrossService implements WeCrossService {
     }
 
     @Override
-    public Future<HttpResponse> asyncSend(Request<?> request, FutureCallback<HttpResponse> callback)
-            throws Exception {
-        return null;
+    public <T extends Response> void asyncSend(
+            Request<?> request, Class<T> responseType, Callback<T> callback) {
+        return;
     }
 
     public Response handleStatus(Request request) {

@@ -2,6 +2,7 @@ package com.webank.wecrosssdk.performance;
 
 import com.google.common.util.concurrent.RateLimiter;
 import java.math.BigInteger;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,10 @@ public class PerformanceManager {
     private RateLimiter limiter;
     private Integer area;
 
+    private static int poolSize = 16;
+    private int maxConcurrentNumber = 800;
+    private transient Semaphore concurrentLimiter = new Semaphore(maxConcurrentNumber, true);
+
     public PerformanceManager(PerformanceSuite suite, String count, String qps) {
         this(suite, new BigInteger(count), new BigInteger(qps), 200);
     }
@@ -29,11 +34,14 @@ public class PerformanceManager {
     }
 
     public PerformanceManager(
-            PerformanceSuite suite, BigInteger count, BigInteger qps, int poolSize) {
+            PerformanceSuite suite, BigInteger count, BigInteger qps, int maxConcurrentNumber) {
         if (count.compareTo(new BigInteger(String.valueOf(10))) < 0) {
             System.out.println("Require: count >= 10");
             System.exit(1);
         }
+
+        this.maxConcurrentNumber = maxConcurrentNumber;
+        this.concurrentLimiter = new Semaphore(this.maxConcurrentNumber, true);
 
         this.suite = suite;
         this.count = count;
@@ -66,10 +74,9 @@ public class PerformanceManager {
                         new Runnable() {
                             @Override
                             public void run() {
-                                limiter.acquire();
                                 PerformanceSuiteCallback callback = buildCallback(collector);
+                                limiter.acquire();
                                 suite.call(callback);
-
                                 int current = sended.incrementAndGet();
 
                                 if (current >= area && ((current % area) == 0)) {
@@ -106,6 +113,12 @@ public class PerformanceManager {
     }
 
     private PerformanceSuiteCallback buildCallback(PerformanceCollector collector) {
+        try {
+            concurrentLimiter.acquire(1);
+        } catch (Exception e) {
+            System.out.println("Error: concurrentLimiter could not acquire: " + e);
+            System.exit(1);
+        }
         return new PerformanceSuiteCallback() {
             private Long startTimestamp = System.currentTimeMillis();
 
@@ -113,13 +126,15 @@ public class PerformanceManager {
             public void onSuccess(String message) {
                 Long cost = System.currentTimeMillis() - this.startTimestamp;
                 collector.onMessage(PerformanceCollector.Status.SUCCESS, cost);
+                concurrentLimiter.release(1);
             }
 
             @Override
             public void onFailed(String message) {
                 Long cost = System.currentTimeMillis() - this.startTimestamp;
-                System.out.println("Error message: " + message);
+                System.out.println("On failed: " + message);
                 collector.onMessage(PerformanceCollector.Status.FAILED, cost);
+                concurrentLimiter.release(1);
             }
         };
     }

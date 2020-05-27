@@ -7,10 +7,8 @@ import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.util.EntityUtils;
 
 public class BCOSSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
@@ -49,37 +47,24 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
             resource.getWeCrossRPC()
                     .sendTransaction(resource.getPath(), resource.getAccountName(), "get", null)
                     .asyncSend(
-                            new FutureCallback<HttpResponse>() {
+                            new Callback<TransactionResponse>() {
                                 @Override
-                                public void completed(HttpResponse result) {
-                                    try {
-                                        TransactionResponse response =
-                                                (TransactionResponse)
-                                                        objectMapper.readValue(
-                                                                EntityUtils.toString(
-                                                                        result.getEntity()),
-                                                                typeReference);
-                                        if (response.getReceipt().getResult()[0].equals(data)) {
-                                            callback.onSuccess(data);
-                                        } else {
-                                            callback.onFailed("failed");
-                                        }
-                                    } catch (Exception e) {
-                                        callback.onFailed(e.getMessage());
+                                public void onSuccess(TransactionResponse response) {
+                                    if (response.getReceipt().getResult()[0].equals(data)) {
+                                        callback.onSuccess(data);
+                                    } else {
+                                        callback.onFailed("transaction execution failed");
                                     }
                                 }
 
                                 @Override
-                                public void failed(Exception e) {
+                                public void onFailed(WeCrossSDKException e) {
                                     callback.onFailed(e.getMessage());
                                 }
-
-                                @Override
-                                public void cancelled() {}
                             });
 
         } catch (Exception e) {
-            callback.onFailed(e.getMessage());
+            callback.onFailed("sendTransaction exception: " + e.getMessage());
         }
     }
 }
