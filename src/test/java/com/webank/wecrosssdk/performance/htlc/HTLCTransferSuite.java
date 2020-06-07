@@ -53,7 +53,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
     }
 
     @Override
-    public void call(PerformanceSuiteCallback callback) {
+    public void call(PerformanceSuiteCallback callback, int index) {
         try {
             lock.writeLock().lock();
             long now = System.currentTimeMillis() / 1000;

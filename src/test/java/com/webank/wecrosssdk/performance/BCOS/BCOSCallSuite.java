@@ -36,7 +36,7 @@ public class BCOSCallSuite implements PerformanceSuite {
     }
 
     @Override
-    public void call(PerformanceSuiteCallback callback) {
+    public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
                     .call(resource.getPath(), resource.getAccountName(), "get", null)
