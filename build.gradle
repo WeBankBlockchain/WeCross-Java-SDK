@@ -13,7 +13,7 @@ apply plugin: 'jacoco'
 group = 'com.webank'
 version = '1.0.0-rc2'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc3-05270-SNAPSHOT'
+version = '1.0.0-rc3-0614-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
