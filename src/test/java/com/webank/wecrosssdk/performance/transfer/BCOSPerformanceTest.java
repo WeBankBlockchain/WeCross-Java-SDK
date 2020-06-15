@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.performance.Fabric;
+package com.webank.wecrosssdk.performance.transfer;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
@@ -12,36 +12,31 @@ import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FabricPerformanceTest {
-    private static Logger logger = LoggerFactory.getLogger(FabricPerformanceTest.class);
+public class BCOSPerformanceTest {
+    private static Logger logger = LoggerFactory.getLogger(BCOSPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] call [count] [qps] [poolSize]");
-        System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize] [userFile]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 call 100 10 2000");
-        System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 sendTransaction 100 10 500");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest bcos_user1 sendTransaction 100 10 500 ./user");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
-                        + "IPath: \tpayment.fabric.sacc\n"
-                        + "Config dir: \tchains/fabric/stub.toml\n"
+                        + "IPath: \tpayment.bcos.HelloWeCross\n"
+                        + "Config dir: \tchains/bcos/stub.toml\n"
                         + "[[resources]]\n"
-                        + "    name = 'sacc'\n"
-                        + "    type = 'FABRIC_CONTRACT'\n"
-                        + "    chainCodeName = 'sacc'\n"
-                        + "    chainLanguage = \"go\"\n"
-                        + "    peers=['org1']");
+                        + "    # name cannot be repeated\n"
+                        + "    name = 'HelloWeCross'\n"
+                        + "    type = 'BCOS_CONTRACT'\n"
+                        + "    contractAddress = '0x_the_address_you_deploy_HelloWeCross.sol_'");
         exit();
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5) {
+        if (args.length != 6) {
             usage();
         }
 
@@ -50,40 +45,42 @@ public class FabricPerformanceTest {
         BigInteger count = new BigInteger(args[2]);
         BigInteger qps = new BigInteger(args[3]);
         int poolSize = Integer.parseInt(args[4]);
+        String file = args[5];
 
         System.out.println(
-                "FabricPerformanceTest: command is "
+                "BCOSPerformanceTest: command is "
                         + command
                         + ", count is "
                         + count
                         + ", qps is "
-                        + qps);
+                        + qps
+                        + ", file is "
+                        + file);
 
         switch (command) {
-            case "call":
-                callTest(accountName, count, qps, poolSize);
-                exit();
             case "sendTransaction":
-                sendTransactionTest(accountName, count, qps, poolSize);
+                sendTransactionTest(accountName, count, qps, poolSize, file);
+                exit();
+            case "status":
+                statusTest(accountName, count, qps, poolSize);
                 exit();
             default:
                 usage();
         }
     }
 
-    public static void callTest(
-            String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.sacc", accountName);
-        if (resource == null) {
-            logger.warn("Default to payment.fabric.sacc");
-            resource = loadResource("payment.fabric.sacc", accountName);
-        }
-
+    public static void sendTransactionTest(
+            String accountName, BigInteger count, BigInteger qps, int poolSize, String file) {
+        Resource resource = loadResource("payment.bcos.transfer", accountName);
         if (resource != null) {
             try {
-                PerformanceSuite suite = new FabricCallSuite(resource);
+                DagUserMgr dagUserMgr = new DagUserMgr(file);
+                dagUserMgr.loadDagTransferUser();
+                BCOSSendTransactionSuite bcosSendTransactionSuite =
+                        new BCOSSendTransactionSuite(resource);
+                bcosSendTransactionSuite.setDagUserMgr(dagUserMgr);
                 PerformanceManager performanceManager =
-                        new PerformanceManager(suite, count, qps, poolSize);
+                        new PerformanceManager(bcosSendTransactionSuite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {
@@ -92,17 +89,12 @@ public class FabricPerformanceTest {
         }
     }
 
-    public static void sendTransactionTest(
+    public static void statusTest(
             String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.sacc", accountName);
-        if (resource == null) {
-            logger.warn("Default to payment.fabric.sacc");
-            resource = loadResource("payment.fabric.sacc", accountName);
-        }
-
+        Resource resource = loadResource("payment.bcos.transfer", accountName);
         if (resource != null) {
             try {
-                PerformanceSuite suite = new FabricSendTransactionSuite(resource);
+                PerformanceSuite suite = new StatusSuite(resource);
                 PerformanceManager performanceManager =
                         new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();

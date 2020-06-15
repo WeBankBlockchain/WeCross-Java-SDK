@@ -1,13 +1,19 @@
 package com.webank.wecrosssdk.performance.BCOS;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
+import com.webank.wecrosssdk.rpc.methods.Callback;
+import com.webank.wecrosssdk.rpc.methods.Response;
 
 public class StatusSuite implements PerformanceSuite {
     private Resource resource;
+    private TypeReference<?> typeReference = new TypeReference<Response>() {};
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public StatusSuite(Resource resource) throws Exception {
         if (!resource.isActive()) {
@@ -30,16 +36,28 @@ public class StatusSuite implements PerformanceSuite {
     }
 
     @Override
-    public void call(PerformanceSuiteCallback callback) {
+    public void call(PerformanceSuiteCallback callback, int index) {
         try {
-            String ret = resource.status();
-            if (ret.equals("exists")) {
-                callback.onSuccess(ret);
-            } else {
-                callback.onFailed(ret);
-            }
+            resource.getWeCrossRPC()
+                    .status(resource.getPath())
+                    .asyncSend(
+                            new Callback<Response>() {
+                                @Override
+                                public void onSuccess(Response response) {
+                                    if (response.getData().equals("exists")) {
+                                        callback.onSuccess("success");
+                                    } else {
+                                        callback.onFailed("failed");
+                                    }
+                                }
 
-        } catch (WeCrossSDKException e) {
+                                @Override
+                                public void onFailed(WeCrossSDKException e) {
+                                    callback.onFailed(e.getMessage());
+                                }
+                            });
+
+        } catch (Exception e) {
             callback.onFailed(e.getMessage());
         }
     }

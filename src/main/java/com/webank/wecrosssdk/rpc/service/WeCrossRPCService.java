@@ -1,56 +1,52 @@
 package com.webank.wecrosssdk.rpc.service;
 
+import static org.asynchttpclient.Dsl.asyncHttpClient;
+import static org.asynchttpclient.Dsl.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.ConfigDefault;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.utils.ConfigUtils;
-import com.webank.wecrosssdk.utils.KeyCertLoader;
 import com.webank.wecrosssdk.utils.RPCUtils;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import org.asynchttpclient.AsyncCompletionHandler;
+import org.asynchttpclient.AsyncHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 public class WeCrossRPCService implements WeCrossService {
     private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
 
     private String server;
-    private RestTemplate restTemplate;
+    private AsyncHttpClient httpClient;
+    private ObjectMapper objectMapper = new ObjectMapper();
+
+    private static int httpClientTimeOut = 100000; // ms
 
     public void init() throws WeCrossSDKException {
         Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
         logger.info(connection.toString());
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
-        restTemplate = getRestTemplate(connection);
+        httpClient = getHttpAsyncClient(connection);
     }
 
     private void checkRequest(Request<?> request) throws WeCrossSDKException {
@@ -77,19 +73,108 @@ public class WeCrossRPCService implements WeCrossService {
         logger.info("request: {}; url: {}", request.toString(), url);
 
         checkRequest(request);
+        CompletableFuture<T> responseFuture = new CompletableFuture<>();
+        CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        asyncSend(
+                request,
+                responseType,
+                new Callback<T>() {
+                    @Override
+                    public void onSuccess(T response) {
+                        responseFuture.complete(response);
+                        exceptionFuture.complete(null);
+                    }
 
-        HttpEntity<Request> httpRequest = new HttpEntity<>(request, headers);
-        ResponseEntity<T> httpResponse =
-                restTemplate.exchange(url, HttpMethod.POST, httpRequest, responseType);
+                    @Override
+                    public void onFailed(WeCrossSDKException e) {
+                        logger.warn("send onFailed: " + e.getMessage());
+                        responseFuture.complete(null);
+                        exceptionFuture.complete(e);
+                    }
+                });
 
-        checkResponse(httpResponse);
-        T response = httpResponse.getBody();
-        logger.info("response: {}", response.toString());
+        try {
+            T response = responseFuture.get(20, TimeUnit.SECONDS);
+            WeCrossSDKException exception = exceptionFuture.get(20, TimeUnit.SECONDS);
 
-        return response;
+            logger.info("response: {}", response);
+
+            if (exception != null) {
+                throw exception;
+            }
+
+            return response;
+        } catch (Exception e) {
+            String errorMsg = "send exception: " + e.getMessage();
+            logger.warn(errorMsg);
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, errorMsg);
+        }
+    }
+
+    @Override
+    public <T extends Response> void asyncSend(
+            Request<?> request, Class<T> responseType, Callback<T> callback) {
+        try {
+            String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
+            logger.info("request: {}; url: {}", request.toString(), url);
+            checkRequest(request);
+            httpClient
+                    .preparePost(url)
+                    .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                    .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .setBody(objectMapper.writeValueAsString(request))
+                    .execute(
+                            new AsyncCompletionHandler<Object>() {
+                                @Override
+                                public Object onCompleted(org.asynchttpclient.Response httpResponse)
+                                        throws Exception {
+                                    try {
+                                        if (httpResponse.getStatusCode() != 200) {
+                                            callback.callOnFailed(
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.RPC_ERROR,
+                                                            "AsyncSend status: "
+                                                                    + httpResponse.getStatusCode()
+                                                                    + " message: "
+                                                                    + httpResponse
+                                                                            .getStatusText()));
+                                            return null;
+                                        } else {
+                                            String content = httpResponse.getResponseBody();
+                                            T response =
+                                                    (T)
+                                                            objectMapper.readValue(
+                                                                    content, responseType);
+                                            callback.callOnSuccess(response);
+                                            return response;
+                                        }
+                                    } catch (Exception e) {
+                                        callback.callOnFailed(
+                                                new WeCrossSDKException(
+                                                        ErrorCode.INTERNAL_ERROR,
+                                                        "handle response failed: " + e.toString()));
+                                        return null;
+                                    }
+                                }
+
+                                @Override
+                                public void onThrowable(Throwable t) {
+                                    callback.callOnFailed(
+                                            new WeCrossSDKException(
+                                                    ErrorCode.RPC_ERROR,
+                                                    "AsyncSend exception: "
+                                                            + t.getCause().toString()));
+                                }
+                            });
+
+        } catch (Exception e) {
+            logger.error("Encode json error when async sending: {}", e);
+            callback.callOnFailed(
+                    new WeCrossSDKException(
+                            ErrorCode.INTERNAL_ERROR,
+                            "Encode json error when async sending: " + e));
+        }
     }
 
     private Connection getConnection(String config) throws WeCrossSDKException {
@@ -111,6 +196,7 @@ public class WeCrossRPCService implements WeCrossService {
                     "Something wrong with parsing [connection.server], please check configuration";
             throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
         }
+
         return server;
     }
 
@@ -144,72 +230,43 @@ public class WeCrossRPCService implements WeCrossService {
         return caCert;
     }
 
-    private RestTemplate getRestTemplate(Connection connection) throws WeCrossSDKException {
+    private SslContext getSslContext(Connection connection) throws IOException {
+
+        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
+                new PathMatchingResourcePatternResolver();
+        Resource sslKey = pathMatchingResourcePatternResolver.getResource(connection.getSSLKey());
+        Resource sslCert = pathMatchingResourcePatternResolver.getResource(connection.getSSLCert());
+        Resource caCert = pathMatchingResourcePatternResolver.getResource(connection.getCaCert());
+
+        return SslContextBuilder.forClient()
+                .trustManager(caCert.getInputStream())
+                .keyManager(sslCert.getInputStream(), sslKey.getInputStream())
+                .sslProvider(SslProvider.JDK)
+                .clientAuth(ClientAuth.REQUIRE)
+                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                .build();
+    }
+
+    private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
-            PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
-                    new PathMatchingResourcePatternResolver();
-            Resource sslKey =
-                    pathMatchingResourcePatternResolver.getResource(connection.getSSLKey());
-            Resource sslCert =
-                    pathMatchingResourcePatternResolver.getResource(connection.getSSLCert());
-            Resource caCert =
-                    pathMatchingResourcePatternResolver.getResource(connection.getCaCert());
+            return asyncHttpClient(
+                    config().setSslContext(getSslContext(connection))
+                            .setConnectTimeout(httpClientTimeOut)
+                            .setRequestTimeout(httpClientTimeOut)
+                            .setReadTimeout(httpClientTimeOut)
+                            .setHandshakeTimeout(httpClientTimeOut)
+                            .setShutdownTimeout(httpClientTimeOut)
+                            .setSslSessionTimeout(httpClientTimeOut)
+                            .setPooledConnectionIdleTimeout(httpClientTimeOut)
+                            .setAcquireFreeChannelTimeout(httpClientTimeOut)
+                            .setConnectionPoolCleanerPeriod(httpClientTimeOut)
+                            // .setMaxConnections(connection.getMaxTotal())
+                            // .setMaxConnectionsPerHost(connection.getMaxPerRoute())
+                            .setKeepAlive(true));
 
-            KeyCertLoader keyCertLoader = new KeyCertLoader();
-
-            KeyStore keystore = KeyStore.getInstance("pkcs12");
-            keystore.load(null);
-
-            PrivateKey privateKey = keyCertLoader.toPrivateKey(sslKey.getInputStream(), null);
-            X509Certificate[] certificates =
-                    keyCertLoader.toX509Certificates(sslCert.getInputStream());
-            keystore.setKeyEntry("mykey", privateKey, "".toCharArray(), certificates);
-
-            KeyManagerFactory factory =
-                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            factory.init(keystore, "".toCharArray());
-            KeyManager[] keyManagers = factory.getKeyManagers();
-
-            KeyStore truststore = KeyStore.getInstance("pkcs12");
-            truststore.load(null);
-
-            X509Certificate[] caCertificates =
-                    keyCertLoader.toX509Certificates(caCert.getInputStream());
-            truststore.setCertificateEntry("mykey", caCertificates[0]);
-
-            TrustManagerFactory trustFactory =
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustFactory.init(truststore);
-            TrustManager[] trustManagers = trustFactory.getTrustManagers();
-
-            SSLContext context = SSLContext.getInstance(ConfigDefault.SSL_TYPE);
-            context.init(keyManagers, trustManagers, new SecureRandom());
-
-            SSLConnectionSocketFactory csf =
-                    new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
-
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register("https", csf)
-                            .build();
-            PoolingHttpClientConnectionManager poolingHttpClientConnectionManager =
-                    new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            poolingHttpClientConnectionManager.setMaxTotal(connection.getMaxTotal());
-            poolingHttpClientConnectionManager.setDefaultMaxPerRoute(connection.getMaxPerRoute());
-            CloseableHttpClient httpClient =
-                    HttpClients.custom()
-                            .setConnectionManager(poolingHttpClientConnectionManager)
-                            .build();
-            // CloseableHttpClient httpClient =
-            // HttpClients.custom().setSSLSocketFactory(csf).build();
-            HttpComponentsClientHttpRequestFactory requestFactory =
-                    new HttpComponentsClientHttpRequestFactory();
-            requestFactory.setHttpClient(httpClient);
-            return new RestTemplate(requestFactory);
         } catch (Exception e) {
-            logger.error("Init rest template error: {}", e);
-            throw new WeCrossSDKException(
-                    ErrorCode.INTERNAL_ERROR, "Init rest template error: " + e);
+            logger.error("Init http client error: {}", e);
+            throw new WeCrossSDKException(ErrorCode.INTERNAL_ERROR, "Init http client error: " + e);
         }
     }
 }

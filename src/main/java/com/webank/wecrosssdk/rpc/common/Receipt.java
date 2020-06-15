@@ -1,11 +1,13 @@
 package com.webank.wecrosssdk.rpc.common;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Receipt {
     private int errorCode = -1;
     private String errorMessage;
     private String hash;
+    private List<String> extraHashes;
     private long blockNumber;
     private String[] result;
 
@@ -31,6 +33,14 @@ public class Receipt {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public List<String> getExtraHashes() {
+        return extraHashes;
+    }
+
+    public void setExtraHashes(List<String> extraHashes) {
+        this.extraHashes = extraHashes;
     }
 
     public long getBlockNumber() {
@@ -60,6 +70,8 @@ public class Receipt {
                 + ", hash='"
                 + hash
                 + '\''
+                + ", extraHashes="
+                + extraHashes
                 + ", blockNumber="
                 + blockNumber
                 + ", result="

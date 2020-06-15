@@ -1,4 +1,4 @@
-package com.webank.wecrosssdk.performance.BCOS;
+package com.webank.wecrosssdk.performance.transfer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,10 +9,11 @@ import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import java.math.BigInteger;
 
 public class BCOSSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
-    private String data = "aa";
+    private DagUserMgr dagUserMgr = null;
     private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -21,8 +22,9 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_INACTIVE, "Resource inactive");
         }
 
+        /*
         try {
-            resource.sendTransaction("set", data);
+            resource.sendTransaction("transfer", data);
         } catch (WeCrossSDKException e) {
             System.out.println("Invalid contract or user or db: " + e.getMessage());
             System.out.println(
@@ -32,6 +34,7 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
                     "\tBlocklimit failed: check the router is syncing or couldn't be the next block");
             throw new WeCrossSDKException(ErrorCode.INVALID_CONTRACT, "Init contract failed");
         }
+        */
 
         this.resource = resource;
     }
@@ -45,13 +48,19 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .sendTransaction(resource.getPath(), resource.getAccountName(), "set", data)
+                    .sendTransaction(
+                            resource.getPath(),
+                            resource.getAccountName(),
+                            "transfer",
+                            dagUserMgr.getFrom(index).getUser(),
+                            dagUserMgr.getTo(index).getUser(),
+                            BigInteger.valueOf(1).toString(10))
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override
                                 public void onSuccess(TransactionResponse response) {
                                     if (response.getReceipt().getErrorCode() == 0) {
-                                        callback.onSuccess(data);
+                                        callback.onSuccess("");
                                     } else {
                                         callback.onFailed("transaction execution failed");
                                     }
@@ -66,5 +75,13 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
         } catch (Exception e) {
             callback.onFailed("sendTransaction exception: " + e.getMessage());
         }
+    }
+
+    public DagUserMgr getDagUserMgr() {
+        return dagUserMgr;
+    }
+
+    public void setDagUserMgr(DagUserMgr dagUserMgr) {
+        this.dagUserMgr = dagUserMgr;
     }
 }

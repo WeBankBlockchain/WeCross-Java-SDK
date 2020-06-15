@@ -6,6 +6,7 @@ import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.common.Resources;
 import com.webank.wecrosssdk.rpc.common.Stubs;
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
@@ -45,6 +46,12 @@ public class MockWeCrossService implements WeCrossService {
             default:
                 return handleMethodNotFound(request, responseType);
         }
+    }
+
+    @Override
+    public <T extends Response> void asyncSend(
+            Request<?> request, Class<T> responseType, Callback<T> callback) {
+        return;
     }
 
     public Response handleStatus(Request request) {

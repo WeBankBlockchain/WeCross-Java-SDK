@@ -12,16 +12,16 @@ public class PerformanceManagerTest {
         }
 
         @Override
-        public void call(PerformanceSuiteCallback callback) {
+        public void call(PerformanceSuiteCallback callback, int index) {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
                 Assert.assertTrue(false);
             } finally {
                 if (System.currentTimeMillis() % 10 != 0) {
-                    callback.onSuccess("Success");
+                    callback.onSuccess("Ok: Success happen");
                 } else {
-                    callback.onFailed("Failed");
+                    callback.onFailed("Ok: Failed happen");
                 }
             }
         }

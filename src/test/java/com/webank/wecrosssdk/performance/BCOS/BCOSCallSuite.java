@@ -1,22 +1,27 @@
 package com.webank.wecrosssdk.performance.BCOS;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.resource.Resource;
+import com.webank.wecrosssdk.rpc.methods.Callback;
+import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 
 public class BCOSCallSuite implements PerformanceSuite {
     private Resource resource;
     private String data = "aa";
+    private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public BCOSCallSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_INACTIVE, "Resource inactive");
         }
-
         try {
-            String[] ret = resource.sendTransaction("set", data);
+            resource.sendTransaction("set", data);
         } catch (WeCrossSDKException e) {
             throw new WeCrossSDKException(
                     ErrorCode.INVALID_CONTRACT, "Invalid contract or user: " + e.getMessage());
@@ -31,16 +36,28 @@ public class BCOSCallSuite implements PerformanceSuite {
     }
 
     @Override
-    public void call(PerformanceSuiteCallback callback) {
+    public void call(PerformanceSuiteCallback callback, int index) {
         try {
-            String[] ret = resource.call("get");
-            if (ret[0].equals(data)) {
-                callback.onSuccess(ret[0]);
-            } else {
-                callback.onFailed(ret[0]);
-            }
+            resource.getWeCrossRPC()
+                    .call(resource.getPath(), resource.getAccountName(), "get", null)
+                    .asyncSend(
+                            new Callback<TransactionResponse>() {
+                                @Override
+                                public void onSuccess(TransactionResponse response) {
+                                    if (response.getReceipt().getResult()[0].equals(data)) {
+                                        callback.onSuccess(data);
+                                    } else {
+                                        callback.onFailed("failed");
+                                    }
+                                }
 
-        } catch (WeCrossSDKException e) {
+                                @Override
+                                public void onFailed(WeCrossSDKException e) {
+                                    callback.onFailed(e.getMessage());
+                                }
+                            });
+
+        } catch (Exception e) {
             callback.onFailed(e.getMessage());
         }
     }

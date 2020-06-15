@@ -1,3 +1,16 @@
+### v1.0.0-rc3
+
+(2020-06-16)
+
+**新增**
+
+* 新增异步请求API
+* 新增多种场景的压测程序
+
+**更新**
+
+* 将spring-boot async client更换为基于netty的async-http-client
+
 ### v1.0.0-rc2
 
 (2020-05-12)
