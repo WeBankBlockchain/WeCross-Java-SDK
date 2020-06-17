@@ -73,7 +73,8 @@ public class WeCrossRPCService implements WeCrossService {
         logger.info("request: {}; url: {}", request.toString(), url);
 
         checkRequest(request);
-        CompletableFuture<T> future = new CompletableFuture<>();
+        CompletableFuture<T> responseFuture = new CompletableFuture<>();
+        CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
         asyncSend(
                 request,
@@ -81,22 +82,33 @@ public class WeCrossRPCService implements WeCrossService {
                 new Callback<T>() {
                     @Override
                     public void onSuccess(T response) {
-                        future.complete(response);
+                        responseFuture.complete(response);
+                        exceptionFuture.complete(null);
                     }
 
                     @Override
                     public void onFailed(WeCrossSDKException e) {
                         logger.warn("send onFailed: " + e.getMessage());
-                        future.complete(null);
+                        responseFuture.complete(null);
+                        exceptionFuture.complete(e);
                     }
                 });
 
         try {
-            logger.info("response: {}", future.get());
-            return future.get(20, TimeUnit.SECONDS);
+            T response = responseFuture.get(20, TimeUnit.SECONDS);
+            WeCrossSDKException exception = exceptionFuture.get(20, TimeUnit.SECONDS);
+
+            logger.info("response: {}", response);
+
+            if (exception != null) {
+                throw exception;
+            }
+
+            return response;
         } catch (Exception e) {
-            logger.warn("send exception: " + e.getMessage());
-            return null;
+            String errorMsg = "send exception: " + e.getMessage();
+            logger.warn(errorMsg);
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, errorMsg);
         }
     }
 

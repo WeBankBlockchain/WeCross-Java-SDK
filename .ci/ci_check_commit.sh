@@ -3,7 +3,7 @@
 set -e
 
 scan_code_script="cobra/cobra.py -f json -o /tmp/report.json -t"
-ignore_files=(HTLCPerformanceTest.java)
+ignore_files=(HTLCPerformanceTest.java DagTransfer)
 
 LOG_ERROR() {
     content=${1}

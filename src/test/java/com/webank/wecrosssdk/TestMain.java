@@ -7,6 +7,8 @@ public class TestMain {
         System.out.println(
                 "BCOS:\tjava -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.BCOS.BCOSPerformanceTest");
         System.out.println(
+                "BCOS:\tjava -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest");
+        System.out.println(
                 "Fabric:\tjava -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest");
         System.out.println(
                 "HTLC:\tjava -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.htlc.HTLCPerformanceTest");

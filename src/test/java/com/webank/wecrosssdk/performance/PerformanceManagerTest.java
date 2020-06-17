@@ -12,7 +12,7 @@ public class PerformanceManagerTest {
         }
 
         @Override
-        public void call(PerformanceSuiteCallback callback) {
+        public void call(PerformanceSuiteCallback callback, int index) {
             try {
                 Thread.sleep(100);
             } catch (Exception e) {

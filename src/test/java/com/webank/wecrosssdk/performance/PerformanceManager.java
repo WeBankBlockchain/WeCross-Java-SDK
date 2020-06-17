@@ -70,13 +70,14 @@ public class PerformanceManager {
 
             for (Integer i = 0; i < count.intValue(); ++i) {
                 final int index = i;
+                Integer finalI = i;
                 threadPool.execute(
                         new Runnable() {
                             @Override
                             public void run() {
                                 PerformanceSuiteCallback callback = buildCallback(collector);
                                 limiter.acquire();
-                                suite.call(callback);
+                                suite.call(callback, finalI);
                                 int current = sended.incrementAndGet();
 
                                 if (current >= area && ((current % area) == 0)) {
