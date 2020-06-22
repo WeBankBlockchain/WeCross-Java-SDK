@@ -1,25 +1,31 @@
 package com.webank.wecrosssdk.rpc.methods.request;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class TransactionRequest {
-    private int seq = 0;
+    private String path;
     private String method;
     private String[] args;
 
+    // Optional args
+    // transactionID, peers, etc...
+    private Map<String, Object> options;
+
     public TransactionRequest() {}
 
-    public TransactionRequest(String method, String[] args) {
+    public TransactionRequest(String path, String method, String[] args) {
+        this.path = path;
         this.method = method;
         this.args = args;
     }
 
-    public int getSeq() {
-        return seq;
+    public String getPath() {
+        return path;
     }
 
-    public void setSeq(int seq) {
-        this.seq = seq;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getMethod() {
@@ -38,12 +44,20 @@ public class TransactionRequest {
         this.args = args;
     }
 
+    public Map<String, Object> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Map<String, Object> options) {
+        this.options = options;
+    }
+
     @Override
     public String toString() {
         return "TransactionRequest{"
-                + "seq="
-                + seq
-                + ", method='"
+                + "path='"
+                + path
+                + "', method='"
                 + method
                 + '\''
                 + ", args="
