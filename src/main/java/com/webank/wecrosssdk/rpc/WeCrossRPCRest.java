@@ -72,7 +72,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> call(
             String path, String accountName, String method, String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
@@ -90,7 +90,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> sendTransaction(
             String path, String accountName, String method, String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
