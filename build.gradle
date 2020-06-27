@@ -12,7 +12,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc4-06170-SNAPSHOT'
+version = '1.0.0-rc4-06260-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -68,7 +68,6 @@ sourceSets {
 dependencies {
     compile 'com.moandjiezana.toml:toml4j:0.7.2'
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.13.RELEASE'
-    compile 'org.springframework.boot:spring-boot-starter-log4j2:2.1.13.RELEASE'
     compile 'org.asynchttpclient:async-http-client:2.12.0'
     compile 'io.netty:netty-buffer:4.1.47.Final'
     compile 'io.netty:netty-handler:4.1.47.Final'

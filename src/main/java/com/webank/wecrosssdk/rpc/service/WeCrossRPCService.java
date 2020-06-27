@@ -5,7 +5,7 @@ import static org.asynchttpclient.Dsl.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moandjiezana.toml.Toml;
-import com.webank.wecrosssdk.common.ConfigDefault;
+import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.methods.Callback;
@@ -33,7 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class WeCrossRPCService implements WeCrossService {
-    private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
+    private Logger logger = LoggerFactory.getLogger(WeCrossRPCService.class);
 
     private String server;
     private AsyncHttpClient httpClient;
@@ -41,8 +41,9 @@ public class WeCrossRPCService implements WeCrossService {
 
     private static int httpClientTimeOut = 100000; // ms
 
+    @Override
     public void init() throws WeCrossSDKException {
-        Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        Connection connection = getConnection(Constant.APPLICATION_CONFIG_FILE);
         logger.info(connection.toString());
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();

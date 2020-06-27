@@ -39,7 +39,7 @@ public class BCOSCallSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .call(resource.getPath(), resource.getAccountName(), "get", null)
+                    .call(resource.getPath(), resource.getAccount(), "get", null)
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override

@@ -20,19 +20,19 @@ public class Resource {
     private Logger logger = LoggerFactory.getLogger(Resource.class);
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String accountName;
+    private String account;
 
     // Use given account to send transaction
-    Resource(WeCrossRPC weCrossRPC, String path, String accountName) {
+    Resource(WeCrossRPC weCrossRPC, String path, String account) {
         this.weCrossRPC = weCrossRPC;
         this.path = path;
-        this.accountName = accountName;
+        this.account = account;
     }
 
     public void check() throws WeCrossSDKException {
         checkWeCrossRPC(this.weCrossRPC);
         checkIPath(this.path);
-        checkAccountName(this.accountName);
+        checkAccountName(this.account);
     }
 
     public boolean isActive() {
@@ -68,8 +68,7 @@ public class Resource {
 
     public String[] call(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
-                (TransactionResponse)
-                        mustOkRequest(weCrossRPC.call(path, accountName, method, args));
+                (TransactionResponse) mustOkRequest(weCrossRPC.call(path, account, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -90,7 +89,7 @@ public class Resource {
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
                 (TransactionResponse)
-                        mustOkRequest(weCrossRPC.sendTransaction(path, accountName, method, args));
+                        mustOkRequest(weCrossRPC.sendTransaction(path, account, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -148,11 +147,11 @@ public class Resource {
         this.path = path;
     }
 
-    public String getAccountName() {
-        return accountName;
+    public String getAccount() {
+        return account;
     }
 
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
+    public void setAccount(String account) {
+        this.account = account;
     }
 }

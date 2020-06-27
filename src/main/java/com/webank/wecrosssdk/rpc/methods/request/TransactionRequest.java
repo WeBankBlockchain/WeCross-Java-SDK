@@ -1,6 +1,7 @@
 package com.webank.wecrosssdk.rpc.methods.request;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class TransactionRequest {
@@ -10,7 +11,7 @@ public class TransactionRequest {
 
     // Optional args
     // transactionID, peers, etc...
-    private Map<String, Object> options;
+    private Map<String, Object> options = new HashMap<>();
 
     public TransactionRequest() {}
 
@@ -52,16 +53,23 @@ public class TransactionRequest {
         this.options = options;
     }
 
+    public void addOption(String key, Object value) {
+        options.put(key, value);
+    }
+
     @Override
     public String toString() {
         return "TransactionRequest{"
                 + "path='"
                 + path
-                + "', method='"
+                + '\''
+                + ", method='"
                 + method
                 + '\''
                 + ", args="
                 + Arrays.toString(args)
+                + ", options="
+                + options
                 + '}';
     }
 }
