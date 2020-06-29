@@ -50,7 +50,7 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
             resource.getWeCrossRPC()
                     .sendTransaction(
                             resource.getPath(),
-                            resource.getAccountName(),
+                            resource.getAccount(),
                             "transfer",
                             dagUserMgr.getFrom(index).getUser(),
                             dagUserMgr.getTo(index).getUser(),

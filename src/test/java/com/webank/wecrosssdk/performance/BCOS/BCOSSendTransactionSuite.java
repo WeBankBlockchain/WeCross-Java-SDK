@@ -45,7 +45,7 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .sendTransaction(resource.getPath(), resource.getAccountName(), "set", data)
+                    .sendTransaction(resource.getPath(), resource.getAccount(), "set", data)
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override

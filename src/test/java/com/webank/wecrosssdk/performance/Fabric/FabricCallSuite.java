@@ -39,7 +39,7 @@ public class FabricCallSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .call(resource.getPath(), resource.getAccountName(), "query", "a")
+                    .call(resource.getPath(), resource.getAccount(), "query", "a")
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override

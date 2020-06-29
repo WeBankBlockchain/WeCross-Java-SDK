@@ -9,11 +9,7 @@ import com.webank.wecrosssdk.rpc.common.Stubs;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.response.AccountResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
-import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
-import com.webank.wecrosssdk.rpc.methods.response.StubResponse;
-import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +39,16 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleCall(request);
             case "sendTransaction":
                 return (T) handleSendTransaction(request);
+            case "startTransaction":
+                return (T) handleStartTransaction(request);
+            case "commitTransaction":
+                return (T) handleCommitTransaction(request);
+            case "rollbackTransaction":
+                return (T) handleRollbackTransaction(request);
+            case "getTransactionInfo":
+                return (T) handleGetTransactionInfo(request);
+            case "customCommand":
+                return (T) handleCustomCommand(request);
             default:
                 return handleMethodNotFound(request, responseType);
         }
@@ -112,6 +118,41 @@ public class MockWeCrossService implements WeCrossService {
         Receipt receipt = new Receipt();
         receipt.setErrorCode(0);
         response.setData(receipt);
+        return response; // Use Mockito to define handler
+    }
+
+    public RoutineResponse handleStartTransaction(Request request) {
+        RoutineResponse response = new RoutineResponse();
+        response.setErrorCode(0);
+        response.setResult(0);
+        return response; // Use Mockito to define handler
+    }
+
+    public RoutineResponse handleCommitTransaction(Request request) {
+        RoutineResponse response = new RoutineResponse();
+        response.setErrorCode(0);
+        response.setResult(0);
+        return response; // Use Mockito to define handler
+    }
+
+    public RoutineResponse handleRollbackTransaction(Request request) {
+        RoutineResponse response = new RoutineResponse();
+        response.setErrorCode(0);
+        response.setResult(0);
+        return response; // Use Mockito to define handler
+    }
+
+    public RoutineInfoResponse handleGetTransactionInfo(Request request) {
+        RoutineInfoResponse response = new RoutineInfoResponse();
+        response.setErrorCode(0);
+        response.setInfo("success");
+        return response; // Use Mockito to define handler
+    }
+
+    public CommandResponse handleCustomCommand(Request request) {
+        CommandResponse response = new CommandResponse();
+        response.setErrorCode(0);
+        response.setResult("success");
         return response; // Use Mockito to define handler
     }
 

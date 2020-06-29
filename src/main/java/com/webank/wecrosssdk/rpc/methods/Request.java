@@ -8,16 +8,16 @@ public class Request<T> {
     private String version = Version.CurrentVersion;
     private String path;
     private String method;
-    private String accountName;
+    private String account;
     private T data;
 
     @JsonIgnore private WeCrossCallback callback;
 
     public Request() {}
 
-    public Request(String path, String accountName, String method, T data) {
+    public Request(String path, String account, String method, T data) {
         this.path = path;
-        this.accountName = accountName;
+        this.account = account;
         this.method = method;
         this.data = data;
     }
@@ -46,12 +46,12 @@ public class Request<T> {
         this.method = method;
     }
 
-    public String getAccountName() {
-        return accountName;
+    public String getAccount() {
+        return account;
     }
 
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     public T getData() {
@@ -83,7 +83,7 @@ public class Request<T> {
                 + method
                 + '\''
                 + ", accountName='"
-                + accountName
+                + account
                 + '\''
                 + ", data="
                 + data
