@@ -4,21 +4,11 @@ import java.util.Arrays;
 
 public class CommandRequest {
     private String command;
-    private String path;
     private Object[] args;
 
-    public CommandRequest(String command, String path, Object[] args) {
+    public CommandRequest(String command, Object[] args) {
         this.command = command;
-        this.path = path;
         this.args = args;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
     public String getCommand() {
@@ -42,9 +32,6 @@ public class CommandRequest {
         return "CommandRequest{"
                 + "command='"
                 + command
-                + '\''
-                + ", path='"
-                + path
                 + '\''
                 + ", args="
                 + Arrays.toString(args)

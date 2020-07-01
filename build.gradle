@@ -77,7 +77,7 @@ dependencies {
 
 jar {
     destinationDir file('dist/apps')
-    archiveName project.name + '.jar'
+    archiveName project.name + "-" + project.version + '.jar'
     exclude '**/*.xml'
     exclude '**/*.toml'
     exclude '**/*.properties'

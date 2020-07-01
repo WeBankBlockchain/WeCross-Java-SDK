@@ -182,7 +182,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<CommandResponse> customCommand(
             String command, String path, String account, Object... args) {
-        CommandRequest commandRequest = new CommandRequest(command, path, args);
+        CommandRequest commandRequest = new CommandRequest(command, args);
 
         @SuppressWarnings("unchecked")
         Request<CommandRequest> request = new Request(path, null, "customCommand", commandRequest);
