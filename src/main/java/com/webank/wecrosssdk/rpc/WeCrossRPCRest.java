@@ -71,7 +71,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> call(
             String path, String account, String method, String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
@@ -89,7 +89,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> sendTransaction(
             String path, String account, String method, String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(method, args);
 
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
@@ -101,7 +101,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<TransactionResponse> callTransaction(
             String transactionID, String path, String account, String method, String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(method, args);
         transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
 
         @SuppressWarnings("unchecked")
@@ -119,7 +119,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
             String account,
             String method,
             String... args) {
-        TransactionRequest transactionRequest = new TransactionRequest(path, method, args);
+        TransactionRequest transactionRequest = new TransactionRequest(method, args);
         transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
         transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
 
@@ -182,7 +182,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<CommandResponse> customCommand(
             String command, String path, String account, Object... args) {
-        CommandRequest commandRequest = new CommandRequest(command, path, args);
+        CommandRequest commandRequest = new CommandRequest(command, args);
 
         @SuppressWarnings("unchecked")
         Request<CommandRequest> request =
