@@ -185,7 +185,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
         CommandRequest commandRequest = new CommandRequest(command, path, args);
 
         @SuppressWarnings("unchecked")
-        Request<CommandRequest> request = new Request(path, null, "customCommand", commandRequest);
+        Request<CommandRequest> request =
+                new Request(path, account, "customCommand", commandRequest);
 
         return new RemoteCall<CommandResponse>(weCrossService, CommandResponse.class, request);
     }
