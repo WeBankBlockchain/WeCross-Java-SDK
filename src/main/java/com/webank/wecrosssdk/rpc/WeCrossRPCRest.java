@@ -9,8 +9,12 @@ import com.webank.wecrosssdk.rpc.methods.request.RoutineRequest;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WeCrossRPCRest implements WeCrossRPC {
+
+    private Logger logger = LoggerFactory.getLogger(WeCrossRPCRest.class);
 
     private WeCrossService weCrossService;
 
@@ -136,8 +140,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
 
         @SuppressWarnings("unchecked")
-        Request<RoutineRequest> request =
-                new Request(null, null, "startTransaction", routineRequest);
+        Request<RoutineRequest> request = new Request("", "", "startTransaction", routineRequest);
 
         return new RemoteCall<RoutineResponse>(weCrossService, RoutineResponse.class, request);
     }
@@ -148,8 +151,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
 
         @SuppressWarnings("unchecked")
-        Request<RoutineRequest> request =
-                new Request(null, null, "commitTransaction", routineRequest);
+        Request<RoutineRequest> request = new Request("", "", "commitTransaction", routineRequest);
 
         return new RemoteCall<RoutineResponse>(weCrossService, RoutineResponse.class, request);
     }
@@ -161,7 +163,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request =
-                new Request(null, null, "rollbackTransaction", routineRequest);
+                new Request("", "", "rollbackTransaction", routineRequest);
 
         return new RemoteCall<RoutineResponse>(weCrossService, RoutineResponse.class, request);
     }
