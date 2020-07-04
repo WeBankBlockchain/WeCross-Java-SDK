@@ -137,7 +137,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<RoutineResponse> startTransaction(
             String transactionID, String[] accounts, String[] paths) {
-        logger.info("startTransaction {} {}", accounts, paths);
+        // logger.info("startTransaction {} {}", accounts, paths);
 
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
 
