@@ -174,8 +174,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
 
         @SuppressWarnings("unchecked")
-        Request<RoutineRequest> request =
-                new Request(null, null, "getTransactionInfo", routineRequest);
+        Request<RoutineRequest> request = new Request("", "", "getTransactionInfo", routineRequest);
 
         return new RemoteCall<RoutineInfoResponse>(
                 weCrossService, RoutineInfoResponse.class, request);
