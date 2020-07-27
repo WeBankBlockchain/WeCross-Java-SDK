@@ -3,10 +3,7 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.request.CommandRequest;
-import com.webank.wecrosssdk.rpc.methods.request.ResourceRequest;
-import com.webank.wecrosssdk.rpc.methods.request.RoutineRequest;
-import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
+import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.slf4j.Logger;
@@ -190,6 +187,17 @@ public class WeCrossRPCRest implements WeCrossRPC {
                 new Request(path, account, "customCommand", commandRequest);
 
         return new RemoteCall<CommandResponse>(weCrossService, CommandResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account) {
+        RoutineIDRequest routineIDRequest = new RoutineIDRequest(path, account);
+
+        @SuppressWarnings("unchecked")
+        Request<RoutineIDRequest> request =
+                new Request("", "", "getTransactionIDs", routineIDRequest);
+
+        return new RemoteCall<RoutineIDResponse>(weCrossService, RoutineIDResponse.class, request);
     }
 
     public WeCrossService getWeCrossService() {

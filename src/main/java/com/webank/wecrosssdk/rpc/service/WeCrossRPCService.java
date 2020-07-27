@@ -21,6 +21,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.slf4j.Logger;
@@ -106,10 +107,12 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             return response;
+        } catch (TimeoutException e) {
+            logger.warn("http request timeout");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request timeout");
         } catch (Exception e) {
-            String errorMsg = "send exception: " + e.getMessage();
-            logger.warn(errorMsg);
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, errorMsg);
+            logger.warn("send exception", e);
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request failed");
         }
     }
 
