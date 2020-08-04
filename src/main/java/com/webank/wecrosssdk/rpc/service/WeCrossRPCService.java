@@ -72,7 +72,9 @@ public class WeCrossRPCService implements WeCrossService {
     public <T extends Response> T send(Request request, Class<T> responseType)
             throws WeCrossSDKException {
         String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
-        logger.info("request: {}; url: {}", request.toString(), url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("request: {}; url: {}", request.toString(), url);
+        }
 
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
@@ -100,7 +102,9 @@ public class WeCrossRPCService implements WeCrossService {
             T response = responseFuture.get(20, TimeUnit.SECONDS);
             WeCrossSDKException exception = exceptionFuture.get(20, TimeUnit.SECONDS);
 
-            logger.info("response: {}", response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("response: {}", response);
+            }
 
             if (exception != null) {
                 throw exception;
@@ -121,7 +125,10 @@ public class WeCrossRPCService implements WeCrossService {
             Request<?> request, Class<T> responseType, Callback<T> callback) {
         try {
             String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
-            logger.info("request: {}; url: {}", request.toString(), url);
+            if (logger.isDebugEnabled()) {
+                logger.debug("request: {}; url: {}", request.toString(), url);
+            }
+
             checkRequest(request);
             httpClient
                     .preparePost(url)
