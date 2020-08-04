@@ -190,8 +190,9 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account) {
-        RoutineIDRequest routineIDRequest = new RoutineIDRequest(path, account);
+    public RemoteCall<RoutineIDResponse> getTransactionIDs(
+            String path, String account, int option) {
+        RoutineIDRequest routineIDRequest = new RoutineIDRequest(path, account, option);
 
         @SuppressWarnings("unchecked")
         Request<RoutineIDRequest> request =
