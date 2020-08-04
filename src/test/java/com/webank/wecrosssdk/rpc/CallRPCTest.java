@@ -131,7 +131,7 @@ public class CallRPCTest {
     @Test
     public void getTransactionIDsTest() throws Exception {
         RoutineIDResponse routineIDResponse =
-                weCrossRPC.getTransactionIDs("test.test.test", "test").send();
+                weCrossRPC.getTransactionIDs("test.test.test", "test", 0).send();
         Assert.assertEquals(new String[] {"001"}, routineIDResponse.getIDs());
     }
 }

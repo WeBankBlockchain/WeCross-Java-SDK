@@ -55,5 +55,5 @@ public interface WeCrossRPC {
     RemoteCall<CommandResponse> customCommand(
             String command, String path, String account, Object... args);
 
-    RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account);
+    RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account, int option);
 }

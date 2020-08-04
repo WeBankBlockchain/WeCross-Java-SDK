@@ -4,12 +4,14 @@ public class RoutineIDRequest {
 
     private String path;
     private String account;
+    private int option = 0;
 
     public RoutineIDRequest() {}
 
-    public RoutineIDRequest(String path, String account) {
+    public RoutineIDRequest(String path, String account, int option) {
         this.path = path;
         this.account = account;
+        this.option = option;
     }
 
     public String getPath() {
@@ -28,8 +30,25 @@ public class RoutineIDRequest {
         this.account = account;
     }
 
+    public int getOption() {
+        return option;
+    }
+
+    public void setOption(int option) {
+        this.option = option;
+    }
+
     @Override
     public String toString() {
-        return "RoutineIDRequest{" + "path='" + path + '\'' + ", account='" + account + '\'' + '}';
+        return "RoutineIDRequest{"
+                + "path='"
+                + path
+                + '\''
+                + ", account='"
+                + account
+                + '\''
+                + ", option="
+                + option
+                + '}';
     }
 }
