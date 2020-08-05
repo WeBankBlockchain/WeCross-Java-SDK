@@ -1,3 +1,19 @@
+### v1.0.0-rc4
+
+(2020-08-18)
+
+**新增**
+
+* 新增调用router的customCommand接口
+* 新增调用router的2PC事务接口
+  * startTransaction、execTransaction、commitTransaction、rollbackTransaction
+  * getTransactionInfo、getTransactionIDs
+* 新增2PC的压测程序
+
+**更新**
+
+* 压测程序适配 v1.0.0-rc4的压测方式
+
 ### v1.0.0-rc3
 
 (2020-06-16)
