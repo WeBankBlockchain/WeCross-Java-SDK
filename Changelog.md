@@ -6,7 +6,7 @@
 
 * 新增调用router的customCommand接口
 * 新增调用router的2PC事务接口
-  * startTransaction、execTransaction、commitTransaction、rollbackTransaction
+  * startTransaction、execTransaction、callTransaction、commitTransaction、rollbackTransaction
   * getTransactionInfo、getTransactionIDs
 * 新增2PC的压测程序
 
