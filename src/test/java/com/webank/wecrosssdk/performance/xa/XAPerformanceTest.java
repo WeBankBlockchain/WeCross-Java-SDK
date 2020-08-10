@@ -16,31 +16,42 @@ public class XAPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest [path] [account] [count] [qps] [poolSize]");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest [type] [path] [account] [count] [qps] [poolSize]");
         System.out.println(
-                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest payment.bcos.xa bcos_user1 1000 100 1000");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest bcos payment.bcos.Evidence bcos_user1 1000 100 1000");
+        System.out.println(
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest fabric payment.fabric.Evidence fabric_user1 10 1 1");
         exit();
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5) {
+        if (args.length != 6) {
             usage();
         }
 
-        String path = args[0];
-        String account = args[1];
-        BigInteger count = new BigInteger(args[2]);
-        BigInteger qps = new BigInteger(args[3]);
-        int poolSize = Integer.parseInt(args[4]);
+        String type = args[0];
+        String path = args[1];
+        String account = args[2];
+        BigInteger count = new BigInteger(args[3]);
+        BigInteger qps = new BigInteger(args[4]);
+        int poolSize = Integer.parseInt(args[5]);
 
         try {
             WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
 
-            PerformanceSuite suite = new XASuite(weCrossRPC, account, path);
+            PerformanceSuite suite = null;
+            if ("bcos".equals(type)) {
+                suite = new BCOSXASuite(weCrossRPC, account, path);
+            } else if ("fabric".equals(type)) {
+                suite = new FabricXASuite(weCrossRPC, account, path);
+            } else {
+                exit();
+            }
             PerformanceManager performanceManager =
                     new PerformanceManager(suite, count, qps, poolSize);
             performanceManager.run();
+
         } catch (WeCrossSDKException e) {
             System.out.println(e.getMessage());
         }
