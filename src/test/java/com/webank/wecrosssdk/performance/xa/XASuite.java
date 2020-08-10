@@ -7,12 +7,13 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class XASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
     private String account;
-    private String id;
+    private AtomicLong id;
     private String[] accounts;
 
     public XASuite(WeCrossRPC weCrossRPC, String account, String path) {
@@ -20,7 +21,7 @@ public class XASuite implements PerformanceSuite {
         this.path = path;
         this.accounts = new String[] {account};
         this.weCrossRPC = weCrossRPC;
-        this.id = String.valueOf(System.currentTimeMillis());
+        this.id = new AtomicLong(System.currentTimeMillis());
     }
 
     @Override
@@ -30,25 +31,28 @@ public class XASuite implements PerformanceSuite {
 
     @Override
     public void call(PerformanceSuiteCallback callback, int index) {
+        String sIndex = String.valueOf(id.incrementAndGet());
+        String iPath = path + '_' + index;
         try {
             weCrossRPC
                     .startTransaction(
-                            id + index,
+                            sIndex,
                             accounts,
                             new String[] {
-                                path + '_' + index,
+                                iPath,
                             })
                     .asyncSend(
                             new Callback<RoutineResponse>() {
                                 @Override
                                 public void onSuccess(RoutineResponse response) {
                                     if (response.getErrorCode() == 0 && response.getResult() == 0) {
+                                        callback.releaseLimiter();
                                         try {
                                             weCrossRPC
                                                     .execTransaction(
-                                                            id + index,
+                                                            sIndex,
                                                             "1",
-                                                            path + '_' + index,
+                                                            iPath,
                                                             account,
                                                             "newEvidence",
                                                             "a",
@@ -69,14 +73,11 @@ public class XASuite implements PerformanceSuite {
                                                                         try {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
-                                                                                            id
-                                                                                                    + index,
+                                                                                            sIndex,
                                                                                             accounts,
                                                                                             new String
                                                                                                     [] {
-                                                                                                path
-                                                                                                        + '_'
-                                                                                                        + index,
+                                                                                                iPath,
                                                                                             })
                                                                                     .asyncSend(
                                                                                             new Callback<
@@ -94,7 +95,7 @@ public class XASuite implements PerformanceSuite {
                                                                                                                             .getResult()
                                                                                                                     == 0) {
                                                                                                         callback
-                                                                                                                .onSuccess(
+                                                                                                                .onSuccessWithoutRelease(
                                                                                                                         "success");
                                                                                                     } else {
                                                                                                         System
@@ -103,7 +104,7 @@ public class XASuite implements PerformanceSuite {
                                                                                                                         response
                                                                                                                                 .toString());
                                                                                                         callback
-                                                                                                                .onFailed(
+                                                                                                                .onFailedWithoutRelease(
                                                                                                                         "commitTransaction failed");
                                                                                                     }
                                                                                                 }
@@ -115,33 +116,36 @@ public class XASuite implements PerformanceSuite {
                                                                                                                 WeCrossSDKException
                                                                                                                         e) {
                                                                                                     callback
-                                                                                                            .onFailed(
+                                                                                                            .onFailedWithoutRelease(
                                                                                                                     e
                                                                                                                             .getMessage());
                                                                                                 }
                                                                                             });
                                                                         } catch (Exception e) {
-                                                                            callback.onFailed(
-                                                                                    e.getMessage());
+                                                                            callback
+                                                                                    .onFailedWithoutRelease(
+                                                                                            e
+                                                                                                    .getMessage());
                                                                         }
                                                                     } else {
                                                                         System.out.println(
                                                                                 response
                                                                                         .toString());
-                                                                        callback.onFailed(
-                                                                                "execTransaction failed");
+                                                                        callback
+                                                                                .onFailedWithoutRelease(
+                                                                                        "execTransaction failed");
                                                                     }
                                                                 }
 
                                                                 @Override
                                                                 public void onFailed(
                                                                         WeCrossSDKException e) {
-                                                                    callback.onFailed(
+                                                                    callback.onFailedWithoutRelease(
                                                                             e.getMessage());
                                                                 }
                                                             });
                                         } catch (Exception e) {
-                                            callback.onFailed(e.getMessage());
+                                            callback.onFailedWithoutRelease(e.getMessage());
                                         }
 
                                     } else {

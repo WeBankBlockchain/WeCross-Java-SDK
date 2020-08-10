@@ -69,7 +69,6 @@ public class PerformanceManager {
             AtomicInteger sended = new AtomicInteger(0);
 
             for (Integer i = 0; i < count.intValue(); ++i) {
-                final int index = i;
                 Integer finalI = i;
                 threadPool.execute(
                         new Runnable() {
@@ -136,6 +135,24 @@ public class PerformanceManager {
                 System.out.println("On failed: " + message);
                 collector.onMessage(PerformanceCollector.Status.FAILED, cost);
                 concurrentLimiter.release(1);
+            }
+
+            @Override
+            public void releaseLimiter() {
+                concurrentLimiter.release(1);
+            }
+
+            @Override
+            public void onSuccessWithoutRelease(String message) {
+                Long cost = System.currentTimeMillis() - this.startTimestamp;
+                collector.onMessage(PerformanceCollector.Status.SUCCESS, cost);
+            }
+
+            @Override
+            public void onFailedWithoutRelease(String message) {
+                Long cost = System.currentTimeMillis() - this.startTimestamp;
+                System.out.println("On failed: " + message);
+                collector.onMessage(PerformanceCollector.Status.FAILED, cost);
             }
         };
     }
