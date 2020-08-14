@@ -9,14 +9,14 @@ import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class XASuite implements PerformanceSuite {
+public class BCOSXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
     private String account;
     private AtomicLong id;
     private String[] accounts;
 
-    public XASuite(WeCrossRPC weCrossRPC, String account, String path) {
+    public BCOSXASuite(WeCrossRPC weCrossRPC, String account, String path) {
         this.account = account;
         this.path = path;
         this.accounts = new String[] {account};
@@ -26,7 +26,7 @@ public class XASuite implements PerformanceSuite {
 
     @Override
     public String getName() {
-        return "XA Suite";
+        return "BCOS XA Suite";
     }
 
     @Override
