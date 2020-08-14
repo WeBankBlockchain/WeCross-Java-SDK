@@ -48,7 +48,7 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
             resource.getWeCrossRPC()
                     .sendTransaction(
                             resource.getPath(),
-                            resource.getAccountName(),
+                            resource.getAccount(),
                             "set",
                             String.valueOf(rand.nextInt(BOUND)),
                             String.valueOf(rand.nextInt(BOUND)))

@@ -5,7 +5,7 @@ import static org.asynchttpclient.Dsl.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moandjiezana.toml.Toml;
-import com.webank.wecrosssdk.common.ConfigDefault;
+import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.methods.Callback;
@@ -21,6 +21,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class WeCrossRPCService implements WeCrossService {
-    private Logger logger = LoggerFactory.getLogger(WeCrossService.class);
+    private Logger logger = LoggerFactory.getLogger(WeCrossRPCService.class);
 
     private String server;
     private AsyncHttpClient httpClient;
@@ -41,8 +42,9 @@ public class WeCrossRPCService implements WeCrossService {
 
     private static int httpClientTimeOut = 100000; // ms
 
+    @Override
     public void init() throws WeCrossSDKException {
-        Connection connection = getConnection(ConfigDefault.APPLICATION_CONFIG_FILE);
+        Connection connection = getConnection(Constant.APPLICATION_CONFIG_FILE);
         logger.info(connection.toString());
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
@@ -70,7 +72,9 @@ public class WeCrossRPCService implements WeCrossService {
     public <T extends Response> T send(Request request, Class<T> responseType)
             throws WeCrossSDKException {
         String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
-        logger.info("request: {}; url: {}", request.toString(), url);
+        if (logger.isDebugEnabled()) {
+            logger.debug("request: {}; url: {}", request.toString(), url);
+        }
 
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
@@ -98,17 +102,21 @@ public class WeCrossRPCService implements WeCrossService {
             T response = responseFuture.get(20, TimeUnit.SECONDS);
             WeCrossSDKException exception = exceptionFuture.get(20, TimeUnit.SECONDS);
 
-            logger.info("response: {}", response);
+            if (logger.isDebugEnabled()) {
+                logger.debug("response: {}", response);
+            }
 
             if (exception != null) {
                 throw exception;
             }
 
             return response;
+        } catch (TimeoutException e) {
+            logger.warn("http request timeout");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request timeout");
         } catch (Exception e) {
-            String errorMsg = "send exception: " + e.getMessage();
-            logger.warn(errorMsg);
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, errorMsg);
+            logger.warn("send exception", e);
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request failed");
         }
     }
 
@@ -117,7 +125,10 @@ public class WeCrossRPCService implements WeCrossService {
             Request<?> request, Class<T> responseType, Callback<T> callback) {
         try {
             String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
-            logger.info("request: {}; url: {}", request.toString(), url);
+            if (logger.isDebugEnabled()) {
+                logger.debug("request: {}; url: {}", request.toString(), url);
+            }
+
             checkRequest(request);
             httpClient
                     .preparePost(url)
