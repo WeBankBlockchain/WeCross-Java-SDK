@@ -12,7 +12,7 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 
 public class BCOSSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
-    private String data = "aa";
+    private String data = "[\"HelloWorld" + System.currentTimeMillis() + "\"]";
     private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -45,7 +45,7 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .sendTransaction(resource.getPath(), resource.getAccountName(), "set", data)
+                    .sendTransaction(resource.getPath(), resource.getAccount(), "set", data)
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override

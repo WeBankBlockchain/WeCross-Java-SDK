@@ -12,7 +12,6 @@ matrix:
             cache:
             before_install:
             script: |
-                bash .ci/ci_check_commit.sh
 
         -   language: java
             jdk: openjdk8
