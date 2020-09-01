@@ -7,7 +7,6 @@ import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
-
 import java.util.Arrays;
 
 public class CallMethodBuilder {
@@ -16,8 +15,7 @@ public class CallMethodBuilder {
     private String method;
     private String[] args;
 
-    public CallMethodBuilder() {
-    }
+    public CallMethodBuilder() {}
 
     public CallMethodBuilder(String path, String account, String method, String[] args) {
         this.path = path;
@@ -59,6 +57,7 @@ public class CallMethodBuilder {
         }
         return weCrossRPC.call(this.path, this.account, this.method, this.args).send();
     }
+
     public String getPath() {
         return path;
     }
@@ -93,11 +92,18 @@ public class CallMethodBuilder {
 
     @Override
     public String toString() {
-        return "CallMethodBuilder{" +
-                "path='" + path + '\'' +
-                ", account='" + account + '\'' +
-                ", method='" + method + '\'' +
-                ", args=" + Arrays.toString(args) +
-                '}';
+        return "CallMethodBuilder{"
+                + "path='"
+                + path
+                + '\''
+                + ", account='"
+                + account
+                + '\''
+                + ", method='"
+                + method
+                + '\''
+                + ", args="
+                + Arrays.toString(args)
+                + '}';
     }
 }
