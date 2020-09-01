@@ -1,16 +1,15 @@
 package com.webank.wecrosssdk.rpc.annotation;
 
+import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -39,8 +38,6 @@ public class TransactionalAopHandler {
         setTransactionID();
         initWeCrossRPC();
         logger.info("TransactionProceed:{}", transactionID);
-        TransactionContext.txThreadLocal.set(transactionID);
-        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
 
         setAccountsAndPathsFromAnnotation(pjp);
         if (accounts.length == 0 || paths.length == 0) {
@@ -64,15 +61,12 @@ public class TransactionalAopHandler {
         } catch (Throwable throwable) {
             completeTransactionAfterThrowing(throwable);
             throw throwable;
-        } finally {
-            TransactionContext.txThreadLocal.remove();
-            TransactionContext.seqThreadLocal.remove();
         }
         doCommit();
         return result;
     }
 
-    private void doRollBack() {
+    private void doRollback() throws WeCrossSDKException {
         try {
             if (weCrossRPC == null) {
                 initWeCrossRPC();
@@ -88,14 +82,18 @@ public class TransactionalAopHandler {
                     "Transactional rollback transaction, errorCode:{} and errorMessage:{}",
                     e.getErrorCode(),
                     e.getMessage());
+            throw new WeCrossSDKException(e.getErrorCode(), "Transactional rollback occurs error!");
         } catch (Exception e) {
             logger.error(
                     "Something error occurs in Transactional.doRollback, errorMessage:{}",
                     e.getMessage());
+            throw new WeCrossSDKException(
+                    ErrorCode.INTERNAL_ERROR,
+                    "Something error occurs in Transactional.doRollback.");
         }
     }
 
-    private void doCommit() {
+    private void doCommit() throws WeCrossSDKException {
         try {
             if (weCrossRPC == null) {
                 initWeCrossRPC();
@@ -116,19 +114,22 @@ public class TransactionalAopHandler {
                     "Transactional commit transaction, errorCode:{} and errorMessage:{}",
                     e.getErrorCode(),
                     e.getMessage());
+            throw new WeCrossSDKException(e.getErrorCode(), "Transactional commit occurs error!");
         } catch (Exception e) {
             logger.error(
                     "Something error occurs in Transactional.doCommit, errorMessage:{}",
                     e.getMessage());
+            throw new WeCrossSDKException(
+                    ErrorCode.INTERNAL_ERROR, "Something error occurs in Transactional.doCommit.");
         }
     }
 
-    private void completeTransactionAfterThrowing(Throwable throwable) {
+    private void completeTransactionAfterThrowing(Throwable throwable) throws WeCrossSDKException {
         if (es != null && es.length > 0) {
             for (Class<? extends Throwable> e : es) {
                 if (e.isAssignableFrom(throwable.getClass())) {
                     logger.info("Error occurs and did rollback, this error is {}", e.toString());
-                    doRollBack();
+                    doRollback();
                 } else {
                     logger.info(
                             "Error occurs but did not rollback, this error is {}", e.toString());
@@ -167,7 +168,7 @@ public class TransactionalAopHandler {
         }
     }
 
-    private void setTransactionalRollbackFor(JoinPoint jp) throws NoSuchMethodException {
+    private void setTransactionalRollbackFor(JoinPoint jp) throws Exception {
         String methodName = jp.getSignature().getName();
         Class<?> classTarget = jp.getTarget().getClass();
         Class<?>[] par = ((MethodSignature) jp.getSignature()).getParameterTypes();
@@ -176,7 +177,9 @@ public class TransactionalAopHandler {
         if (transactional != null) {
             es = transactional.rollbackFor();
         } else {
-            logger.warn("");
+            logger.warn("Can't get Transactional annotation value!");
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING, "Can't get Transactional annotation value.");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.webank.wecrosssdk.rpc.common;
 
+import com.webank.wecrosssdk.exception.ErrorCode;
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransactionContext implements AutoCloseable {
@@ -14,7 +16,11 @@ public class TransactionContext implements AutoCloseable {
         return txThreadLocal.get();
     }
 
-    public static String currentSeq() {
+    public static String currentSeq() throws WeCrossSDKException {
+        if (seqThreadLocal.get() == null) {
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING, "Transaction Seq is null, please check again.");
+        }
         return String.valueOf(seqThreadLocal.get().getAndIncrement());
     }
 

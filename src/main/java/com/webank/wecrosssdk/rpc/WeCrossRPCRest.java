@@ -1,11 +1,14 @@
 package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.common.Constant;
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +76,12 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<TransactionResponse> call(
             String path, String account, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-
+        String txID = TransactionContext.currentTXID();
+        if (txID != null) {
+            transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
+            logger.info(
+                    "call: TransactionID exist, turn to callTransaction, TransactionID is{}", txID);
+        }
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
                 new Request(path, account, "call", transactionRequest);
@@ -89,9 +97,25 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<TransactionResponse> sendTransaction(
-            String path, String account, String method, String... args) {
+            String path, String account, String method, String... args) throws WeCrossSDKException {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-
+        String txID = TransactionContext.currentTXID();
+        if (txID != null) {
+            try {
+                transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
+                String seq = TransactionContext.currentSeq();
+                transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
+                logger.info(
+                        "sendTransaction: TransactionID exist, turn to execTransaction, TransactionID is {}, Seq is{}",
+                        txID,
+                        seq);
+            } catch (WeCrossSDKException e) {
+                logger.error("sendTransaction: can not get current Seq.");
+                throw new WeCrossSDKException(
+                        e.getErrorCode(),
+                        "sendTransaction TransactionContext.currentSeq() can not get current Seq.");
+            }
+        }
         @SuppressWarnings("unchecked")
         Request<TransactionRequest> request =
                 new Request(path, account, "sendTransaction", transactionRequest);
@@ -135,6 +159,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<RoutineResponse> startTransaction(
             String transactionID, String[] accounts, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+        TransactionContext.txThreadLocal.set(transactionID);
+        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request = new Request("", "", "startTransaction", routineRequest);
@@ -146,6 +172,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<RoutineResponse> commitTransaction(
             String transactionID, String[] accounts, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+        TransactionContext.txThreadLocal.remove();
+        TransactionContext.seqThreadLocal.remove();
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request = new Request("", "", "commitTransaction", routineRequest);
@@ -157,6 +185,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<RoutineResponse> rollbackTransaction(
             String transactionID, String[] accounts, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+        TransactionContext.txThreadLocal.remove();
+        TransactionContext.seqThreadLocal.remove();
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request =
