@@ -48,9 +48,6 @@ public class TransactionalAopHandler {
 
         RoutineResponse response =
                 weCrossRPC.startTransaction(transactionID, accounts, paths).send();
-        System.out.println("transactionID: " + transactionID);
-        System.out.println("Transactional.startTransaction: " + response.getMessage());
-
         if (response.getErrorCode() != 0) {
             logger.error(
                     "Transactional.startTransaction fail, errorCode:{}", response.getErrorCode());
@@ -100,11 +97,6 @@ public class TransactionalAopHandler {
             }
             RoutineResponse response =
                     weCrossRPC.commitTransaction(transactionID, accounts, paths).send();
-            System.out.println(
-                    "Transactions committed, transactionID is"
-                            + transactionID
-                            + ",response:"
-                            + response.toString());
             logger.info(
                     "Transactions committed, transactionID is {},response: {}",
                     transactionID,
