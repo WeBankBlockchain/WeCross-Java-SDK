@@ -35,9 +35,10 @@ public class TransactionalAopHandler {
     public Object TransactionProceed(ProceedingJoinPoint pjp) throws Throwable {
         Object result;
 
-        setTransactionID();
+        transactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+
         initWeCrossRPC();
-        logger.info("TransactionProceed:{}", transactionID);
+        logger.info("TransactionProceed transactionID: {}", transactionID);
 
         setAccountsAndPathsFromAnnotation(pjp);
         if (accounts.length == 0 || paths.length == 0) {
@@ -173,9 +174,5 @@ public class TransactionalAopHandler {
             throw new WeCrossSDKException(
                     ErrorCode.FIELD_MISSING, "Can't get Transactional annotation value.");
         }
-    }
-
-    public void setTransactionID() {
-        transactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
     }
 }

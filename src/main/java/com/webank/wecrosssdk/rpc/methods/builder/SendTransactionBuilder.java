@@ -3,13 +3,11 @@ package com.webank.wecrosssdk.rpc.methods.builder;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
-import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.Arrays;
 
 public class SendTransactionBuilder {
+
     private String path;
     private String account;
     private String method;
@@ -48,9 +46,12 @@ public class SendTransactionBuilder {
         return this;
     }
 
-    public TransactionResponse send() throws Exception {
-        WeCrossService weCrossService = new WeCrossRPCService();
-        WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossService);
+    public TransactionResponse send(WeCrossRPC weCrossRPC) throws Exception {
+        if (weCrossRPC == null) {
+            throw new WeCrossSDKException(
+                    ErrorCode.REMOTECALL_ERROR,
+                    "SendTransactionBuilder: RPC in send(WeCrossRPC) is null");
+        }
         if (this.account == null || this.path == null || this.method == null || this.args == null) {
             throw new WeCrossSDKException(
                     ErrorCode.FIELD_MISSING, "Some field(s) in ExecTransactionBuilder is null!");
