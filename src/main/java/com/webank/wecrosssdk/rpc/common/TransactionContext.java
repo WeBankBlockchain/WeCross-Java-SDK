@@ -24,9 +24,8 @@ public class TransactionContext implements AutoCloseable {
     }
 
     public static boolean isPathInTransaction(String path) throws WeCrossSDKException {
-        if (txThreadLocal.get() == null) {
-            return false;
-        } else {
+        if (txThreadLocal.get() == null) return false;
+        else {
             List<String> paths = pathInTransactionThreadLocal.get();
             if (paths == null) {
                 throw new WeCrossSDKException(
