@@ -3,13 +3,11 @@ package com.webank.wecrosssdk.rpc.annotation;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
-import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.UUID;
+import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -24,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class TransactionalAopHandler {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionalAopHandler.class);
-    private WeCrossRPC weCrossRPC;
+    @Resource private WeCrossRPC weCrossRPC;
     private Class<? extends Throwable>[] es;
 
     private String transactionID;
@@ -37,7 +35,6 @@ public class TransactionalAopHandler {
 
         transactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
 
-        initWeCrossRPC();
         logger.info("TransactionProceed transactionID: {}", transactionID);
 
         setAccountsAndPathsFromAnnotation(pjp);
@@ -66,9 +63,6 @@ public class TransactionalAopHandler {
 
     private void doRollback() throws WeCrossSDKException {
         try {
-            if (weCrossRPC == null) {
-                initWeCrossRPC();
-            }
             RoutineResponse response =
                     weCrossRPC.rollbackTransaction(transactionID, accounts, paths).send();
             logger.info(
@@ -93,9 +87,6 @@ public class TransactionalAopHandler {
 
     private void doCommit() throws WeCrossSDKException {
         try {
-            if (weCrossRPC == null) {
-                initWeCrossRPC();
-            }
             RoutineResponse response =
                     weCrossRPC.commitTransaction(transactionID, accounts, paths).send();
             logger.info(
@@ -130,11 +121,6 @@ public class TransactionalAopHandler {
                 }
             }
         }
-    }
-
-    private void initWeCrossRPC() throws WeCrossSDKException {
-        WeCrossService weCrossService = new WeCrossRPCService();
-        weCrossRPC = WeCrossRPCFactory.build(weCrossService);
     }
 
     private void setAccountsAndPathsFromAnnotation(ProceedingJoinPoint pjp) {
