@@ -8,6 +8,8 @@ import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,10 +99,22 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<TransactionResponse> sendTransaction(
+            String path, String account, String method, String... args) {
+        TransactionRequest transactionRequest = new TransactionRequest(method, args);
+
+        @SuppressWarnings("unchecked")
+        Request<TransactionRequest> request =
+                new Request(path, account, "sendTransaction", transactionRequest);
+        return new RemoteCall<TransactionResponse>(
+                weCrossService, TransactionResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<TransactionResponse> invoke(
             String path, String account, String method, String... args) throws WeCrossSDKException {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String txID = TransactionContext.currentTXID();
-        if (txID != null) {
+        if (txID != null && TransactionContext.isPathInTransaction(path)) {
             try {
                 transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
                 String seq = TransactionContext.currentSeq();
@@ -161,6 +175,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
         TransactionContext.txThreadLocal.set(transactionID);
         TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
+        List<String> pathInTransaction = Arrays.asList(paths);
+        TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request = new Request("", "", "startTransaction", routineRequest);
@@ -174,6 +190,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
+        TransactionContext.pathInTransactionThreadLocal.remove();
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request = new Request("", "", "commitTransaction", routineRequest);
@@ -187,6 +204,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
+        TransactionContext.pathInTransactionThreadLocal.remove();
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request =

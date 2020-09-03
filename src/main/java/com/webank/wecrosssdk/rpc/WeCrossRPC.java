@@ -28,6 +28,9 @@ public interface WeCrossRPC {
     RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request);
 
     RemoteCall<TransactionResponse> sendTransaction(
+            String path, String account, String method, String... args);
+
+    RemoteCall<TransactionResponse> invoke(
             String path, String account, String method, String... args) throws WeCrossSDKException;
 
     RemoteCall<TransactionResponse> callTransaction(
