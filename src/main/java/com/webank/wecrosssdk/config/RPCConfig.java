@@ -7,16 +7,16 @@ import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.*;
 
-@Component
 @Configuration
+@EnableAspectJAutoProxy
+@ComponentScan("com.webank.wecrosssdk")
 public class RPCConfig {
     private Logger logger = LoggerFactory.getLogger(RPCConfig.class);
 
     @Bean
+    @Scope(value = "prototype")
     public WeCrossRPC getWeCrossRPC() throws WeCrossSDKException {
         WeCrossRPC weCrossRPC;
         WeCrossService weCrossService = new WeCrossRPCService();
