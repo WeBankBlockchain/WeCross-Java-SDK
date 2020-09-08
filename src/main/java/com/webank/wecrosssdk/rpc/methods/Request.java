@@ -22,6 +22,12 @@ public class Request<T> {
         this.data = data;
     }
 
+    public Request(String path, String method, T data) {
+        this.path = path;
+        this.method = method;
+        this.data = data;
+    }
+
     public String getVersion() {
         return version;
     }

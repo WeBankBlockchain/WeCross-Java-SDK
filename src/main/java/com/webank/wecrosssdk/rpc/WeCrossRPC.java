@@ -1,6 +1,7 @@
 package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
@@ -60,4 +61,14 @@ public interface WeCrossRPC {
             String command, String path, String account, Object... args);
 
     RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account, int option);
+
+    RemoteCall<UAResponse> register(String name, String password);
+
+    RemoteCall<UAResponse> login(String name, String password);
+
+    RemoteCall<UAResponse> logout(String name, String password);
+
+    RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount);
+
+    RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount);
 }

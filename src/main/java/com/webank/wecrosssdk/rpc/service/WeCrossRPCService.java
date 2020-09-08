@@ -8,9 +8,12 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.common.CommandList;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.request.UARequest;
+import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import com.webank.wecrosssdk.utils.RPCUtils;
 import io.netty.handler.ssl.ClientAuth;
@@ -24,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.BoundRequestBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -110,13 +114,23 @@ public class WeCrossRPCService implements WeCrossService {
                 throw exception;
             }
 
+            if(response instanceof UAResponse && request.getMethod().equals("login")){
+                UARequest uaRequest = (UARequest) request.getData();
+                String token = ((UAResponse) response).getUAReceipt().getToken();
+
+                logger.info("CurrentUser: {}",uaRequest.getUsername());
+                if(token==null){
+                    logger.warn("Token in UAResponse is null!");
+                }
+                AuthenticationManager.setCurrentUser(uaRequest.getUsername(), token);
+            }
             return response;
         } catch (TimeoutException e) {
             logger.warn("http request timeout");
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request timeout");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request timeout, caused by: "+e.getMessage());
         } catch (Exception e) {
             logger.warn("send exception", e);
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request failed");
+            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request failed, caused by: "+e.getMessage());
         }
     }
 
@@ -130,8 +144,13 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             checkRequest(request);
-            httpClient
-                    .preparePost(url)
+            BoundRequestBuilder builder = httpClient.preparePost(url);
+            String currentToken = AuthenticationManager.getCurrentUserCredential();
+            if(CommandList.authRequiredCommands.contains(request.getMethod())&&
+                    currentToken!=null){
+                builder.setHeader(HttpHeaders.AUTHORIZATION,currentToken);
+            }
+            builder
                     .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .setBody(objectMapper.writeValueAsString(request))
@@ -141,10 +160,17 @@ public class WeCrossRPCService implements WeCrossService {
                                 public Object onCompleted(org.asynchttpclient.Response httpResponse)
                                         throws Exception {
                                     try {
+                                        if(httpResponse.getStatusCode() == 401){
+                                            callback.callOnFailed(
+                                                    new WeCrossSDKException(ErrorCode.RPC_ERROR,
+                                                            "AsyncSend status: 401."+
+                                                            "Lack of authentication, please check current user's credential.")
+                                            );
+                                            return null;
+                                        }
                                         if (httpResponse.getStatusCode() != 200) {
                                             callback.callOnFailed(
-                                                    new WeCrossSDKException(
-                                                            ErrorCode.RPC_ERROR,
+                                                    new WeCrossSDKException(ErrorCode.RPC_ERROR,
                                                             "AsyncSend status: "
                                                                     + httpResponse.getStatusCode()
                                                                     + " message: "
@@ -153,10 +179,7 @@ public class WeCrossRPCService implements WeCrossService {
                                             return null;
                                         } else {
                                             String content = httpResponse.getResponseBody();
-                                            T response =
-                                                    (T)
-                                                            objectMapper.readValue(
-                                                                    content, responseType);
+                                            T response = (T) objectMapper.readValue(content, responseType);
                                             callback.callOnSuccess(response);
                                             return response;
                                         }
@@ -180,11 +203,11 @@ public class WeCrossRPCService implements WeCrossService {
                             });
 
         } catch (Exception e) {
-            logger.error("Encode json error when async sending: {}", e);
+            logger.error("Encode json error when async sending: {}", e.getMessage());
             callback.callOnFailed(
                     new WeCrossSDKException(
                             ErrorCode.INTERNAL_ERROR,
-                            "Encode json error when async sending: " + e));
+                            "Encode json error when async sending: " + e.getMessage()));
         }
     }
 
@@ -261,7 +284,8 @@ public class WeCrossRPCService implements WeCrossService {
     private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
             return asyncHttpClient(
-                    config().setSslContext(getSslContext(connection))
+                    config()
+                            .setSslContext(getSslContext(connection))
                             .setConnectTimeout(httpClientTimeOut)
                             .setRequestTimeout(httpClientTimeOut)
                             .setReadTimeout(httpClientTimeOut)
@@ -276,7 +300,7 @@ public class WeCrossRPCService implements WeCrossService {
                             .setKeepAlive(true));
 
         } catch (Exception e) {
-            logger.error("Init http client error: {}", e);
+            logger.error("Init http client error: {}", e.getMessage());
             throw new WeCrossSDKException(ErrorCode.INTERNAL_ERROR, "Init http client error: " + e);
         }
     }

@@ -3,10 +3,14 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
+import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
+import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
+import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
+import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.Arrays;
 import java.util.List;
@@ -247,6 +251,51 @@ public class WeCrossRPCRest implements WeCrossRPC {
                 new Request("", "", "getTransactionIDs", routineIDRequest);
 
         return new RemoteCall<RoutineIDResponse>(weCrossService, RoutineIDResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> register(String name, String password) {
+        UARequest uaRequest = new UARequest(name, password);
+
+        Request<UARequest> request = new Request<>("auth", "register", uaRequest);
+
+        return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> login(String name, String password) {
+        UARequest uaRequest = new UARequest(name, password);
+
+        Request<UARequest> request = new Request<>("auth", "login", uaRequest);
+
+        return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> logout(String name, String password) {
+        UARequest uaRequest = new UARequest(name, password);
+
+        Request<UARequest> request = new Request<>("auth", "logout", uaRequest);
+
+        return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount) {
+        UARequest uaRequest = new UARequest(type,chainAccount);
+
+        Request<UARequest> request = new Request<>("auth","addChainAccount",uaRequest);
+
+        return new RemoteCall<UAResponse>(weCrossService,UAResponse.class,request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount) {
+        UARequest uaRequest = new UARequest(type,chainAccount);
+
+        Request<UARequest> request = new Request<>("auth","setDefaultAccount",uaRequest);
+
+        return new RemoteCall<UAResponse>(weCrossService,UAResponse.class,request);
     }
 
     public WeCrossService getWeCrossService() {
