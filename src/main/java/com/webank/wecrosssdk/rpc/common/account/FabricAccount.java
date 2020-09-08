@@ -6,13 +6,13 @@ public class FabricAccount extends ChainAccount {
 
     private String cert;
 
+    public FabricAccount() {
+        super();
+    }
+
     public FabricAccount(String type, String UAProof, boolean isDefault, String cert) {
         super(type, UAProof, isDefault);
         this.cert = cert;
-    }
-
-    public FabricAccount() {
-        super();
     }
 
     public FabricAccount(ChainAccount chainAccount) {

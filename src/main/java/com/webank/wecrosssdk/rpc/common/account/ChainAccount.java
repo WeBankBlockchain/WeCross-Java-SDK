@@ -1,17 +1,26 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
-public abstract class ChainAccount {
-    protected String type;
-    protected String UAProof;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type",visible = true)
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
+        @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
+        @JsonSubTypes.Type(value = FabricAccount.class,name = "Fabric1.4")
+})
+public class ChainAccount {
+    public String type;
+    public String UAProof;
     public boolean isDefault = false;
+
+    public ChainAccount() {}
 
     public ChainAccount(String type, String UAProof, boolean isDefault) {
         this.type = type;
         this.UAProof = UAProof;
         this.isDefault = isDefault;
     }
-
-    public ChainAccount() {}
 
     public String getType() {
         return type;

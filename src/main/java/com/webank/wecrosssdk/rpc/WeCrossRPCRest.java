@@ -55,9 +55,9 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<AccountResponse> listAccounts() {
+    public RemoteCall<AccountResponse> listAccount() {
         @SuppressWarnings("unchecked")
-        Request<?> request = new Request("", "", "listAccounts", null);
+        Request<?> request = new Request("auth", "listAccount", null);
         return new RemoteCall<AccountResponse>(weCrossService, AccountResponse.class, request);
     }
 

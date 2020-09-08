@@ -27,9 +27,9 @@ public class CallRPCTest {
 
     @Test
     public void listAccountsTest() throws Exception {
-        AccountResponse accountResponse = weCrossRPC.listAccounts().send();
+        AccountResponse accountResponse = weCrossRPC.listAccount().send();
         Assert.assertEquals(accountResponse.getErrorCode(), 0);
-        Assert.assertNotNull(accountResponse.getAccounts());
+        Assert.assertNotNull(accountResponse.getAccount());
     }
 
     @Test

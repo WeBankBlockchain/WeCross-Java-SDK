@@ -8,6 +8,10 @@ public class BCOSAccount extends ChainAccount {
     private String secKey;
     private String address;
 
+    public BCOSAccount() {
+        super();
+    }
+
     public BCOSAccount(
             String pubKey,
             String secKey,
@@ -21,9 +25,6 @@ public class BCOSAccount extends ChainAccount {
         this.address = address;
     }
 
-    public BCOSAccount() {
-        super();
-    }
 
     public BCOSAccount(ChainAccount chainAccount) {
         super(chainAccount.type, chainAccount.UAProof, chainAccount.isDefault);

@@ -6,6 +6,9 @@ import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.common.Resources;
 import com.webank.wecrosssdk.rpc.common.Stubs;
+import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
+import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
+import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
@@ -87,12 +90,13 @@ public class MockWeCrossService implements WeCrossService {
 
     public AccountResponse handleListAccounts(Request request) {
         AccountResponse response = new AccountResponse();
-        Accounts accounts = new Accounts();
-        List<Map<String, String>> accountInfos = new ArrayList<>();
-        accountInfos.add((Map<String, String>) new HashMap<>().put("name", "bcos"));
-        accounts.setAccountInfos(accountInfos);
+        UniversalAccount account = new UniversalAccount();
+        List<ChainAccount> list =new ArrayList<>();
+        ChainAccount chainAccount = new BCOSAccount("XXX", "XXX", "XXX", "BCOS2.0", "XXX", true);
+        list.add(chainAccount);
+        account.setChainAccounts(list);
         response.setErrorCode(0);
-        response.setAccounts(accounts);
+        response.setAccounts(account);
         return response;
     }
 

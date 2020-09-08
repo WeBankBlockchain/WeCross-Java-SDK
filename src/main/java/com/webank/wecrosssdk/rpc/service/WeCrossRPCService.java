@@ -289,7 +289,8 @@ public class WeCrossRPCService implements WeCrossService {
     private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
             return asyncHttpClient(
-                    config().setSslContext(getSslContext(connection))
+                    config()
+                            .setSslContext(getSslContext(connection))
                             .setConnectTimeout(httpClientTimeOut)
                             .setRequestTimeout(httpClientTimeOut)
                             .setReadTimeout(httpClientTimeOut)

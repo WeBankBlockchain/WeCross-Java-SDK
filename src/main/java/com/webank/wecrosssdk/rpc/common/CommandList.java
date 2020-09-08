@@ -20,7 +20,8 @@ public class CommandList {
                     "listAccounts",
                     "customCommand",
                     "addChainAccount",
-                    "setDefaultAccount");
+                    "setDefaultAccount",
+                    "listAccount");
 
     public static final List<String> normalCommands =
             Arrays.asList(

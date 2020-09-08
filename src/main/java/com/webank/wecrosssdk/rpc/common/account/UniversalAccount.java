@@ -5,11 +5,12 @@ import java.util.List;
 
 public class UniversalAccount {
 
+    // TODO: 确定名字
     private String name;
     private String password;
     private String pubKey;
     private String secKey;
-    private String uaID;
+    private String uaid;
     private List<ChainAccount> chainAccounts;
 
     public UniversalAccount(
@@ -17,13 +18,13 @@ public class UniversalAccount {
             String password,
             String pubKey,
             String secKey,
-            String uaID,
+            String uaid,
             List<ChainAccount> chainAccounts) {
         this.name = name;
         this.password = password;
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.uaID = uaID;
+        this.uaid = uaid;
         this.chainAccounts = chainAccounts;
     }
 
@@ -49,12 +50,12 @@ public class UniversalAccount {
         return secKey;
     }
 
-    public String getUaID() {
-        return uaID;
+    public String getUaid() {
+        return uaid;
     }
 
-    public void setUaID(String uaID) {
-        this.uaID = uaID;
+    public void setUaid(String uaid) {
+        this.uaid = uaid;
     }
 
     public List<ChainAccount> getChainAccounts() {
@@ -72,7 +73,7 @@ public class UniversalAccount {
         UniversalAccount that = (UniversalAccount) o;
         return Objects.equal(name, that.name)
                 && Objects.equal(pubKey, that.pubKey)
-                && Objects.equal(uaID, that.uaID);
+                && Objects.equal(uaid, that.uaid);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class UniversalAccount {
                 + secKey
                 + '\''
                 + ", uaID='"
-                + uaID
+                + uaid
                 + '\''
                 + ", chainAccounts="
                 + chainAccounts

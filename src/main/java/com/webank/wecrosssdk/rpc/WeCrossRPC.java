@@ -13,7 +13,7 @@ public interface WeCrossRPC {
 
     RemoteCall<StubResponse> supportedStubs();
 
-    RemoteCall<AccountResponse> listAccounts();
+    RemoteCall<AccountResponse> listAccount();
 
     RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote);
 
