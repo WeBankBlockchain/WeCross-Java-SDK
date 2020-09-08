@@ -33,7 +33,7 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleDetail(request);
             case "supportedStubs":
                 return (T) handleSupportedStubs(request);
-            case "listAccounts":
+            case "listAccount":
                 return (T) handleListAccounts(request);
             case "listResources":
                 return (T) handleListResources(request);

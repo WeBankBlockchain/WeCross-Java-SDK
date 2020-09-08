@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.rpc;
 
+import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
@@ -10,6 +11,7 @@ import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import com.webank.wecrosssdk.utils.ConfigUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -267,6 +269,18 @@ public class WeCrossRPCRest implements WeCrossRPC {
         Request<UARequest> request = new Request<>("auth", "login", uaRequest);
 
         return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> login() throws WeCrossSDKException {
+        Toml toml = ConfigUtils.getToml(Constant.APPLICATION_CONFIG_FILE);
+        String account = toml.getString("login.account");
+        String password = toml.getString("login.password");
+        if (account == null || password == null) {
+            logger.error(
+                    "loginWithoutArgs: TOML file did not config login message, can not auto-login.");
+        }
+        return login(account, password);
     }
 
     @Override

@@ -66,6 +66,8 @@ public interface WeCrossRPC {
 
     RemoteCall<UAResponse> login(String name, String password);
 
+    RemoteCall<UAResponse> login() throws WeCrossSDKException;
+
     RemoteCall<UAResponse> logout(String name, String password);
 
     RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount);

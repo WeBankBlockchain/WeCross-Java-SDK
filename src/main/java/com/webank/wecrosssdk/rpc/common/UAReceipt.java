@@ -63,6 +63,6 @@ public class UAReceipt {
                 + '\''
                 + ", token='"
                 + token
-                + '}';
+                + "'}";
     }
 }

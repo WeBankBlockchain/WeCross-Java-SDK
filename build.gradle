@@ -1,5 +1,7 @@
 plugins {
     id 'com.github.sherter.google-java-format' version '0.8'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'maven-publish'
 }
 
 apply plugin: 'maven'
@@ -176,4 +178,33 @@ jacocoTestReport {
         xml.enabled true
         html.enabled false
     }
+}
+
+shadowJar {
+    destinationDir file('dist/apps')
+    archiveName project.name + "-" + project.version + '.jar'
+
+    manifest {
+        attributes(
+                'Main-Class': 'com.webank.wecrosssdk',
+                'version': project.version,
+        )
+    }
+
+    doLast {
+        copy {
+            from file('src/main/resources/')
+            into 'dist/conf'
+        }
+        copy {
+            from file('.').listFiles().findAll { File f -> (f.name.endsWith('.sh') || f.name.endsWith('.env')) }
+            into 'dist'
+        }
+        copy {
+            from file('scripts/')
+            into 'dist'
+        }
+    }
+
+//     minimize() // Enable this leads to tcnative core
 }
