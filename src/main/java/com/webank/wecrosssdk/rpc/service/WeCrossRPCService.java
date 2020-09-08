@@ -114,12 +114,12 @@ public class WeCrossRPCService implements WeCrossService {
                 throw exception;
             }
 
-            if(response instanceof UAResponse && request.getMethod().equals("login")){
+            if (response instanceof UAResponse && request.getMethod().equals("login")) {
                 UARequest uaRequest = (UARequest) request.getData();
                 String token = ((UAResponse) response).getUAReceipt().getToken();
 
-                logger.info("CurrentUser: {}",uaRequest.getUsername());
-                if(token==null){
+                logger.info("CurrentUser: {}", uaRequest.getUsername());
+                if (token == null) {
                     logger.warn("Token in UAResponse is null!");
                 }
                 AuthenticationManager.setCurrentUser(uaRequest.getUsername(), token);
@@ -127,10 +127,12 @@ public class WeCrossRPCService implements WeCrossService {
             return response;
         } catch (TimeoutException e) {
             logger.warn("http request timeout");
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request timeout, caused by: "+e.getMessage());
+            throw new WeCrossSDKException(
+                    ErrorCode.RPC_ERROR, "http request timeout, caused by: " + e.getMessage());
         } catch (Exception e) {
             logger.warn("send exception", e);
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "http request failed, caused by: "+e.getMessage());
+            throw new WeCrossSDKException(
+                    ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
         }
     }
 
@@ -146,12 +148,11 @@ public class WeCrossRPCService implements WeCrossService {
             checkRequest(request);
             BoundRequestBuilder builder = httpClient.preparePost(url);
             String currentToken = AuthenticationManager.getCurrentUserCredential();
-            if(CommandList.authRequiredCommands.contains(request.getMethod())&&
-                    currentToken!=null){
-                builder.setHeader(HttpHeaders.AUTHORIZATION,currentToken);
+            if (CommandList.authRequiredCommands.contains(request.getMethod())
+                    && currentToken != null) {
+                builder.setHeader(HttpHeaders.AUTHORIZATION, currentToken);
             }
-            builder
-                    .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            builder.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .setBody(objectMapper.writeValueAsString(request))
                     .execute(
@@ -160,17 +161,18 @@ public class WeCrossRPCService implements WeCrossService {
                                 public Object onCompleted(org.asynchttpclient.Response httpResponse)
                                         throws Exception {
                                     try {
-                                        if(httpResponse.getStatusCode() == 401){
+                                        if (httpResponse.getStatusCode() == 401) {
                                             callback.callOnFailed(
-                                                    new WeCrossSDKException(ErrorCode.RPC_ERROR,
-                                                            "AsyncSend status: 401."+
-                                                            "Lack of authentication, please check current user's credential.")
-                                            );
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.RPC_ERROR,
+                                                            "AsyncSend status: 401."
+                                                                    + "Lack of authentication, please check current user's credential."));
                                             return null;
                                         }
                                         if (httpResponse.getStatusCode() != 200) {
                                             callback.callOnFailed(
-                                                    new WeCrossSDKException(ErrorCode.RPC_ERROR,
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.RPC_ERROR,
                                                             "AsyncSend status: "
                                                                     + httpResponse.getStatusCode()
                                                                     + " message: "
@@ -179,7 +181,10 @@ public class WeCrossRPCService implements WeCrossService {
                                             return null;
                                         } else {
                                             String content = httpResponse.getResponseBody();
-                                            T response = (T) objectMapper.readValue(content, responseType);
+                                            T response =
+                                                    (T)
+                                                            objectMapper.readValue(
+                                                                    content, responseType);
                                             callback.callOnSuccess(response);
                                             return response;
                                         }
@@ -284,8 +289,7 @@ public class WeCrossRPCService implements WeCrossService {
     private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
             return asyncHttpClient(
-                    config()
-                            .setSslContext(getSslContext(connection))
+                    config().setSslContext(getSslContext(connection))
                             .setConnectTimeout(httpClientTimeOut)
                             .setRequestTimeout(httpClientTimeOut)
                             .setReadTimeout(httpClientTimeOut)

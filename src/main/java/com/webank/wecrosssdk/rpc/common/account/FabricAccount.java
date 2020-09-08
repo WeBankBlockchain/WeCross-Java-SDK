@@ -15,7 +15,7 @@ public class FabricAccount extends ChainAccount {
         super();
     }
 
-    public FabricAccount(ChainAccount chainAccount){
+    public FabricAccount(ChainAccount chainAccount) {
         super(chainAccount.type, chainAccount.UAProof, chainAccount.isDefault);
     }
 

@@ -14,8 +14,7 @@ public class UARequest {
     private String authCode = "";
     private ChainAccount chainAccount;
 
-    @JsonIgnore
-    private Logger logger = LoggerFactory.getLogger(UARequest.class);
+    @JsonIgnore private Logger logger = LoggerFactory.getLogger(UARequest.class);
 
     public UARequest(String username, String password, ChainAccount chainAccount) {
         this.username = username;
@@ -28,21 +27,23 @@ public class UARequest {
         this.password = password;
     }
 
-    public UARequest ( String Type, ChainAccount chainAccount){
-        switch (Type){
-            case "BCOS2.0": {
-                this.chainAccount = new BCOSAccount(chainAccount);
-                logger.debug("this.chainAccount is {}", this.chainAccount.toString());
-            }
-            case "Fabric1.4": {
-                this.chainAccount = new FabricAccount(chainAccount);
-                logger.debug("this.chainAccount is {}", this.chainAccount.toString());
-            }
-            default:{
-                logger.warn("Type {} is not support now!",Type);
-            }
+    public UARequest(String Type, ChainAccount chainAccount) {
+        switch (Type) {
+            case "BCOS2.0":
+                {
+                    this.chainAccount = new BCOSAccount(chainAccount);
+                    logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                }
+            case "Fabric1.4":
+                {
+                    this.chainAccount = new FabricAccount(chainAccount);
+                    logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                }
+            default:
+                {
+                    logger.warn("Type {} is not support now!", Type);
+                }
         }
-
     }
 
     public UARequest() {}
