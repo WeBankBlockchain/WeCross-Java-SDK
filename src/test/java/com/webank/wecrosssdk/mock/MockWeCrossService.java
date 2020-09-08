@@ -1,7 +1,6 @@
 package com.webank.wecrosssdk.mock;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
-import com.webank.wecrosssdk.rpc.common.Accounts;
 import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.common.Resources;
@@ -91,7 +90,7 @@ public class MockWeCrossService implements WeCrossService {
     public AccountResponse handleListAccounts(Request request) {
         AccountResponse response = new AccountResponse();
         UniversalAccount account = new UniversalAccount();
-        List<ChainAccount> list =new ArrayList<>();
+        List<ChainAccount> list = new ArrayList<>();
         ChainAccount chainAccount = new BCOSAccount("XXX", "XXX", "XXX", "BCOS2.0", "XXX", true);
         list.add(chainAccount);
         account.setChainAccounts(list);

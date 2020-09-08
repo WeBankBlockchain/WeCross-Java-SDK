@@ -75,7 +75,8 @@ public class WeCrossRPCService implements WeCrossService {
     @Override
     public <T extends Response> T send(Request request, Class<T> responseType)
             throws WeCrossSDKException {
-        String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
+        String url =
+                RPCUtils.pathToUrl("https", server, request.getPath()) + "/" + request.getMethod();
         if (logger.isDebugEnabled()) {
             logger.debug("request: {}; url: {}", request.toString(), url);
         }
@@ -140,7 +141,10 @@ public class WeCrossRPCService implements WeCrossService {
     public <T extends Response> void asyncSend(
             Request<?> request, Class<T> responseType, Callback<T> callback) {
         try {
-            String url = RPCUtils.pathToUrl(server, request.getPath()) + "/" + request.getMethod();
+            String url =
+                    RPCUtils.pathToUrl("https", server, request.getPath())
+                            + "/"
+                            + request.getMethod();
             if (logger.isDebugEnabled()) {
                 logger.debug("request: {}; url: {}", request.toString(), url);
             }
@@ -289,8 +293,7 @@ public class WeCrossRPCService implements WeCrossService {
     private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
             return asyncHttpClient(
-                    config()
-                            .setSslContext(getSslContext(connection))
+                    config().setSslContext(getSslContext(connection))
                             .setConnectTimeout(httpClientTimeOut)
                             .setRequestTimeout(httpClientTimeOut)
                             .setReadTimeout(httpClientTimeOut)

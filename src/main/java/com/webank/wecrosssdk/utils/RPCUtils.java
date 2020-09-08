@@ -21,10 +21,10 @@ public class RPCUtils {
         }
     }
 
-    public static String pathToUrl(String prefix, String path) {
+    public static String pathToUrl(String protocol, String prefix, String path) {
         if (path.isEmpty()) {
-            return "https://" + prefix;
+            return protocol + "://" + prefix;
         }
-        return "https://" + prefix + "/" + path.replace('.', '/');
+        return protocol + "://" + prefix + "/" + path.replace('.', '/');
     }
 }

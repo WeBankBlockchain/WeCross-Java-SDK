@@ -1,6 +1,5 @@
 package com.webank.wecrosssdk.rpc.methods.response;
 
-import com.webank.wecrosssdk.rpc.common.Accounts;
 import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
 import com.webank.wecrosssdk.rpc.methods.Response;
 

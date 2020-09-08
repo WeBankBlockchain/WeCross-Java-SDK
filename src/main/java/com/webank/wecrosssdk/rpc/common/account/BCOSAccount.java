@@ -25,7 +25,6 @@ public class BCOSAccount extends ChainAccount {
         this.address = address;
     }
 
-
     public BCOSAccount(ChainAccount chainAccount) {
         super(chainAccount.type, chainAccount.UAProof, chainAccount.isDefault);
     }

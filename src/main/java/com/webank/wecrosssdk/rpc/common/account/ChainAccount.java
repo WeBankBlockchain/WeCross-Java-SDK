@@ -3,12 +3,13 @@ package com.webank.wecrosssdk.rpc.common.account;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type",visible = true)
-@JsonSubTypes(value = {
-        @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
-        @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
-        @JsonSubTypes.Type(value = FabricAccount.class,name = "Fabric1.4")
-})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonSubTypes(
+        value = {
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
+            @JsonSubTypes.Type(value = FabricAccount.class, name = "Fabric1.4")
+        })
 public class ChainAccount {
     public String type;
     public String UAProof;
