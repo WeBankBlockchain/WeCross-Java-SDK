@@ -93,7 +93,9 @@ public class DagUserMgr {
             bw = new BufferedWriter(new FileWriter(new File(file)));
             for (int i = 0; i < userList.size(); i++) {
                 bw.write(userList.get(i).getUser() + "\n");
-                logger.trace(" write user , user is {}", userList.get(i).getUser());
+                if (logger.isTraceEnabled()) {
+                    logger.trace(" write user , user is {}", userList.get(i).getUser());
+                }
             }
 
             bw.flush();
