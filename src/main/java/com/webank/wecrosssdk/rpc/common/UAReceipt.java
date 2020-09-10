@@ -6,7 +6,7 @@ public class UAReceipt {
     private int errorCode = -1;
     private String message;
     private String token;
-    private UniversalAccount ua;
+    private UniversalAccount universalAccount;
 
     public UAReceipt(int errorCode, String message, String token) {
         this.errorCode = errorCode;
@@ -45,24 +45,25 @@ public class UAReceipt {
         this.token = token;
     }
 
-    public UniversalAccount getUa() {
-        return ua;
+    public UniversalAccount getUniversalAccount() {
+        return universalAccount;
     }
 
-    public void setUa(UniversalAccount ua) {
-        this.ua = ua;
+    public void setUniversalAccount(UniversalAccount universalAccount) {
+        this.universalAccount = universalAccount;
     }
 
     @Override
     public String toString() {
-        return "UAReceipt{"
-                + "errorCode="
-                + errorCode
-                + ", errorMessage='"
-                + message
-                + '\''
-                + ", token='"
-                + token
-                + "'}";
+
+        String result =
+                "UAReceipt{" + "errorCode=" + errorCode + ", errorMessage='" + message + "'";
+        result += token == null ? "" : ", token = '" + token + "'";
+        result +=
+                universalAccount == null
+                        ? ""
+                        : ", UniversalAccount = '" + universalAccount.toString() + "'";
+        result += "}";
+        return result;
     }
 }

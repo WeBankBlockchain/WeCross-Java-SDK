@@ -5,36 +5,42 @@ import java.util.List;
 
 public class UniversalAccount {
 
-    private String name;
+    private String username;
     private String password;
     private String pubKey;
     private String secKey;
-    private String uaId;
+    private String uaID;
     private List<ChainAccount> chainAccounts;
 
     public UniversalAccount(
-            String name,
+            String username,
             String password,
             String pubKey,
             String secKey,
-            String uaId,
+            String uaID,
             List<ChainAccount> chainAccounts) {
-        this.name = name;
+        this.username = username;
         this.password = password;
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.uaId = uaId;
+        this.uaID = uaID;
+        this.chainAccounts = chainAccounts;
+    }
+
+    public UniversalAccount(String username, String password, List<ChainAccount> chainAccounts) {
+        this.username = username;
+        this.password = password;
         this.chainAccounts = chainAccounts;
     }
 
     public UniversalAccount() {}
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -49,12 +55,12 @@ public class UniversalAccount {
         return secKey;
     }
 
-    public String getUaId() {
-        return uaId;
+    public String getUaID() {
+        return uaID;
     }
 
-    public void setUaId(String uaId) {
-        this.uaId = uaId;
+    public void setUaID(String uaID) {
+        this.uaID = uaID;
     }
 
     public List<ChainAccount> getChainAccounts() {
@@ -70,31 +76,50 @@ public class UniversalAccount {
         if (this == o) return true;
         if (!(o instanceof UniversalAccount)) return false;
         UniversalAccount that = (UniversalAccount) o;
-        return Objects.equal(name, that.name)
+        return Objects.equal(username, that.username)
                 && Objects.equal(pubKey, that.pubKey)
-                && Objects.equal(uaId, that.uaId);
+                && Objects.equal(uaID, that.uaID);
     }
 
     @Override
     public String toString() {
-        return "UniversalAccount{"
-                + "name='"
-                + name
-                + '\''
-                + ", password='"
-                + password
-                + '\''
-                + ", pubKey='"
-                + pubKey
-                + '\''
-                + ", secKey='"
-                + secKey
-                + '\''
-                + ", uaID='"
-                + uaId
-                + '\''
-                + ", chainAccounts="
-                + chainAccounts
-                + '}';
+        StringBuilder result =
+                new StringBuilder(
+                        "{"
+                                + "\"name\":\""
+                                + username
+                                + "\""
+                                + ", \"pubKey\":\""
+                                + pubKey
+                                + "\""
+                                + ", \"uaId\":\""
+                                + uaID
+                                + "\"");
+
+        if (chainAccounts != null && chainAccounts.size() != 0) {
+            result.append(", \"chainAccounts\": [");
+            for (ChainAccount chainAccount : chainAccounts) {
+                result.append(chainAccount.toString()).append(",");
+            }
+            result.deleteCharAt(result.lastIndexOf(","));
+            result.append("]");
+        }
+        result.append("}");
+        return result.toString();
+    }
+
+    public String toFormatString() {
+        StringBuilder result = new StringBuilder("Universal Account:\n");
+        result.append("name  : ").append(username).append("\n");
+        result.append("pubKey: ").append(pubKey).append("\n");
+        result.append("uaId  : ").append(uaID).append("\n");
+        if (chainAccounts != null && chainAccounts.size() != 0) {
+            result.append("chainAccounts: [\n");
+            for (ChainAccount chainAccount : chainAccounts) {
+                result.append(chainAccount.toFormatString());
+            }
+            result.append("]");
+        }
+        return result.toString();
     }
 }

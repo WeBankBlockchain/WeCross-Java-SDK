@@ -23,6 +23,11 @@ public class ChainAccount {
         this.isDefault = isDefault;
     }
 
+    public ChainAccount(String type, boolean isDefault) {
+        this.type = type;
+        this.isDefault = isDefault;
+    }
+
     public String getType() {
         return type;
     }
@@ -59,5 +64,9 @@ public class ChainAccount {
                 + ", isDefault="
                 + isDefault
                 + '}';
+    }
+
+    public String toFormatString() {
+        return "ChainAccount\n" + "\ttype: " + type + "\n" + "\tisDefault: " + isDefault + "\n";
     }
 }

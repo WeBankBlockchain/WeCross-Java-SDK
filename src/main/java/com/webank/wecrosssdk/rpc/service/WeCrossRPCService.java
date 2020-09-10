@@ -115,15 +115,24 @@ public class WeCrossRPCService implements WeCrossService {
                 throw exception;
             }
 
-            if (response instanceof UAResponse && request.getMethod().equals("login")) {
-                UARequest uaRequest = (UARequest) request.getData();
-                String token = ((UAResponse) response).getUAReceipt().getToken();
+            if (response instanceof UAResponse) {
+                if (request.getMethod().equals("login")) {
+                    UARequest uaRequest = (UARequest) request.getData();
+                    String token = ((UAResponse) response).getUAReceipt().getToken();
 
-                logger.info("CurrentUser: {}", uaRequest.getUsername());
-                if (token == null) {
-                    logger.warn("Token in UAResponse is null!");
+                    logger.info("CurrentUser: {}", uaRequest.getUsername());
+                    if (token == null) {
+                        logger.error("Token in UAResponse is null!");
+                        throw new WeCrossSDKException(
+                                ErrorCode.RPC_ERROR, "Login error: Token in UAResponse is null!");
+                    }
+
+                    AuthenticationManager.setCurrentUser(uaRequest.getUsername(), token);
                 }
-                AuthenticationManager.setCurrentUser(uaRequest.getUsername(), token);
+                if (request.getMethod().equals("logout")) {
+                    logger.info("CurrentUser: {} logout.", AuthenticationManager.getCurrentUser());
+                    AuthenticationManager.clearCurrentUser();
+                }
             }
             return response;
         } catch (TimeoutException e) {

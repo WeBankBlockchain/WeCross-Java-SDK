@@ -13,16 +13,22 @@ public class BCOSAccount extends ChainAccount {
     }
 
     public BCOSAccount(
+            String type,
             String pubKey,
             String secKey,
             String address,
-            String type,
             String UAProof,
             boolean isDefault) {
         super(type, UAProof, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
         this.address = address;
+    }
+
+    public BCOSAccount(String type, String pubKey, String secKey, boolean isDefault) {
+        super(type, isDefault);
+        this.pubKey = pubKey;
+        this.secKey = secKey;
     }
 
     public BCOSAccount(ChainAccount chainAccount) {
@@ -56,24 +62,34 @@ public class BCOSAccount extends ChainAccount {
 
     @Override
     public String toString() {
-        return "BCOSAccount{"
-                + "pubKey='"
-                + pubKey
-                + '\''
-                + ", secKey='"
-                + secKey
-                + '\''
-                + ", address='"
-                + address
-                + '\''
-                + ", type='"
+        return "{"
+                + "\"type\":\""
                 + type
-                + '\''
-                + ", UAProof='"
-                + UAProof
-                + '\''
-                + ", isDefault="
+                + "\""
+                + ", \"pubKey\":\""
+                + pubKey
+                + "\""
+                + ", \"address\":\""
+                + address
+                + "\""
+                + ", \"isDefault\":\""
                 + isDefault
-                + '}';
+                + "\"}";
+    }
+
+    public String toFormatString() {
+        return "BCOSAccount:\n"
+                + "\ttype  : "
+                + type
+                + "\n"
+                + "\tpubKey: "
+                + pubKey
+                + "\n"
+                + "\tkey   : "
+                + address
+                + "\n"
+                + "\tisDefault: "
+                + isDefault
+                + "\n";
     }
 }
