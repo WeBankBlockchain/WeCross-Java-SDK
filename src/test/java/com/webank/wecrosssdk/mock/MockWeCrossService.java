@@ -91,11 +91,11 @@ public class MockWeCrossService implements WeCrossService {
         AccountResponse response = new AccountResponse();
         UniversalAccount account = new UniversalAccount();
         List<ChainAccount> list = new ArrayList<>();
-        ChainAccount chainAccount = new BCOSAccount("BCOS2.0", "XXX", "XXX", "XXX", "XXX", true);
+        ChainAccount chainAccount = new BCOSAccount(1, "BCOS2.0", "XXX", "XXX", "XXX", true);
         list.add(chainAccount);
         account.setChainAccounts(list);
         response.setErrorCode(0);
-        response.setAccounts(account);
+        response.setAccount(account);
         return response;
     }
 

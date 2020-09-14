@@ -27,22 +27,24 @@ public class UARequest {
         this.password = password;
     }
 
-    public UARequest(String Type, ChainAccount chainAccount) {
-        switch (Type) {
+    public UARequest(String type, ChainAccount chainAccount) {
+        switch (type) {
             case "GM_BCOS2.0":
             case "BCOS2.0":
                 {
                     this.chainAccount = new BCOSAccount(chainAccount);
                     logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                    break;
                 }
             case "Fabric1.4":
                 {
                     this.chainAccount = new FabricAccount(chainAccount);
                     logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                    break;
                 }
             default:
                 {
-                    logger.warn("Type {} is not support now!", Type);
+                    logger.warn("type {} is not support now!", type);
                 }
         }
     }
@@ -91,22 +93,24 @@ public class UARequest {
 
     @Override
     public String toString() {
-        return "UARequest{"
-                + "name='"
-                + username
-                + '\''
-                + ", password='"
-                + password
-                + '\''
-                + ", clientType='"
-                + clientType
-                + '\''
-                + ", authCode='"
-                + authCode
-                + '\''
-                + ", chainAccount= '"
-                + chainAccount.toString()
-                + '\''
-                + '}';
+        String result =
+                "UARequest{"
+                        + "username='"
+                        + username
+                        + '\''
+                        + ", password='"
+                        + password
+                        + '\''
+                        + ", clientType='"
+                        + clientType
+                        + '\''
+                        + ", authCode='"
+                        + authCode
+                        + '\'';
+
+        result +=
+                (chainAccount == null) ? "" : ", chainAccount= '" + chainAccount.toString() + '\'';
+        result += "}";
+        return result;
     }
 }

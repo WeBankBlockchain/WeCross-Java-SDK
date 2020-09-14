@@ -5,13 +5,13 @@ import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
 public class UAReceipt {
     private int errorCode = -1;
     private String message;
-    private String token;
+    private String credential;
     private UniversalAccount universalAccount;
 
-    public UAReceipt(int errorCode, String message, String token) {
+    public UAReceipt(int errorCode, String message, String credential) {
         this.errorCode = errorCode;
         this.message = message;
-        this.token = token;
+        this.credential = credential;
     }
 
     public UAReceipt(int errorCode, String message) {
@@ -37,12 +37,12 @@ public class UAReceipt {
         this.message = message;
     }
 
-    public String getToken() {
-        return token;
+    public String getCredential() {
+        return credential;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setCredential(String credential) {
+        this.credential = credential;
     }
 
     public UniversalAccount getUniversalAccount() {
@@ -58,7 +58,7 @@ public class UAReceipt {
 
         String result =
                 "UAReceipt{" + "errorCode=" + errorCode + ", errorMessage='" + message + "'";
-        result += token == null ? "" : ", token = '" + token + "'";
+        result += credential == null ? "" : ", credential = '" + credential + "'";
         result +=
                 universalAccount == null
                         ? ""

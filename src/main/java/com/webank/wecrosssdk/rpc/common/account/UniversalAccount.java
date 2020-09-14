@@ -86,40 +86,41 @@ public class UniversalAccount {
         StringBuilder result =
                 new StringBuilder(
                         "{"
-                                + "\"name\":\""
+                                + "\"username\":\""
                                 + username
                                 + "\""
                                 + ", \"pubKey\":\""
                                 + pubKey
                                 + "\""
-                                + ", \"uaId\":\""
+                                + ", \"uaID\":\""
                                 + uaID
                                 + "\"");
 
+        result.append(", \"chainAccounts\": [");
         if (chainAccounts != null && chainAccounts.size() != 0) {
-            result.append(", \"chainAccounts\": [");
             for (ChainAccount chainAccount : chainAccounts) {
                 result.append(chainAccount.toString()).append(",");
             }
             result.deleteCharAt(result.lastIndexOf(","));
-            result.append("]");
         }
+        result.append("]");
         result.append("}");
         return result.toString();
     }
 
     public String toFormatString() {
         StringBuilder result = new StringBuilder("Universal Account:\n");
-        result.append("name  : ").append(username).append("\n");
+        result.append("username: ").append(username).append("\n");
         result.append("pubKey: ").append(pubKey).append("\n");
-        result.append("uaId  : ").append(uaID).append("\n");
+        result.append("uaID  : ").append(uaID).append("\n");
+        result.append("chainAccounts: [");
         if (chainAccounts != null && chainAccounts.size() != 0) {
-            result.append("chainAccounts: [\n");
+            System.out.println('\n');
             for (ChainAccount chainAccount : chainAccounts) {
                 result.append(chainAccount.toFormatString());
             }
-            result.append("]");
         }
+        result.append("]");
         return result.toString();
     }
 }

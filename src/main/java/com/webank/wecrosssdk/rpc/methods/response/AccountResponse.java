@@ -13,7 +13,7 @@ public class AccountResponse extends Response<UniversalAccount> {
         return getData();
     }
 
-    public void setAccounts(UniversalAccount uaAccounts) {
-        setData(uaAccounts);
+    public void setAccount(UniversalAccount universalAccount) {
+        setData(universalAccount);
     }
 }

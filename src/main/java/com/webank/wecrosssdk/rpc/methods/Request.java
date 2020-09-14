@@ -78,21 +78,22 @@ public class Request<T> {
 
     @Override
     public String toString() {
-        return "Request{"
-                + "version='"
-                + version
-                + '\''
-                + ", path='"
-                + path
-                + '\''
-                + ", method='"
-                + method
-                + '\''
-                + ", accountName='"
-                + account
-                + '\''
-                + ", data="
-                + data
-                + '}';
+        String result =
+                "Request{"
+                        + "version='"
+                        + version
+                        + '\''
+                        + ", path='"
+                        + path
+                        + '\''
+                        + ", method='"
+                        + method
+                        + '\''
+                        + ", account='"
+                        + account
+                        + '\'';
+        result += (data == null) ? "" : ", data=" + data;
+        result += '}';
+        return result;
     }
 }

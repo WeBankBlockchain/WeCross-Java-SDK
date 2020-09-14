@@ -4,15 +4,15 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
-import com.webank.wecrosssdk.rpc.common.UAReceipt;
 import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
-import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
+import com.webank.wecrosssdk.rpc.common.account.FabricAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
+import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import com.webank.wecrosssdk.utils.ConfigUtils;
@@ -285,14 +285,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
                     "loginWithoutArgs: TOML file did not config login message, can not auto-login.");
             return null;
         }
-        UAResponse uaResponse = login(username,password).send();
-        if (uaResponse != null){
-            UAReceipt uaReceipt = uaResponse.getUAReceipt();
-            UniversalAccount universalAccount = new UniversalAccount(username, password, null);
-            uaReceipt.setUniversalAccount(universalAccount);
-            uaResponse.setUAReceipt(uaReceipt);
-        }
-        return uaResponse;
+        return login(username, password).send();
     }
 
     @Override
@@ -306,18 +299,24 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount) {
-        UARequest uaRequest = new UARequest(type, chainAccount);
 
-        Request<UARequest> request = new Request<>("auth", "addChainAccount", uaRequest);
+        Request<ChainAccount> request = new Request<>("auth", "addChainAccount", chainAccount);
 
         return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount) {
-        UARequest uaRequest = new UARequest(type, chainAccount);
 
-        Request<UARequest> request = new Request<>("auth", "setDefaultAccount", uaRequest);
+        Request<ChainAccount> request = new Request<>("auth", "setDefaultAccount", chainAccount);
+
+        return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> setDefaultAccount(String type, Integer keyID) {
+        ChainAccount chainAccount = new ChainAccount(keyID, type, true);
+        Request<ChainAccount> request = new Request<>("auth", "setDefaultAccount", chainAccount);
 
         return new RemoteCall<UAResponse>(weCrossService, UAResponse.class, request);
     }
@@ -334,23 +333,48 @@ public class WeCrossRPCRest implements WeCrossRPC {
         WeCrossService weCrossService = new WeCrossRPCService();
         WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossService);
 
-        UAResponse uaResponse1 = weCrossRPC.register("Tom", "123456").send();
+        UAResponse uaResponse1 = weCrossRPC.register("Kyonkk2k", "123456").send();
         System.out.println(uaResponse1.toString());
 
-        UAResponse uaResponse = weCrossRPC.login();
-        System.out.println(uaResponse.getUAReceipt().toString());
+        System.out.println("login Kyon:");
+        UAResponse uaResponse = weCrossRPC.login("Kyonkk2k", "123456").send();
+        System.out.println(uaResponse.toString());
+        System.out.println(uaResponse.getUAReceipt().getUniversalAccount().toFormatString());
+        System.out.println(AuthenticationManager.getCurrentUserCredential());
 
+        System.out.println("=================================================");
+        System.out.println("login Tom:");
+        UAResponse uaResponse0 = weCrossRPC.login();
+        System.out.println(uaResponse0.toString());
+
+        System.out.println(uaResponse0.getUAReceipt().getUniversalAccount().toFormatString());
+        System.out.println(AuthenticationManager.getCurrentUserCredential());
+
+        System.out.println("=================================================");
+        System.out.println("addBCOSChainAccount");
         ChainAccount chainAccount = new BCOSAccount("BCOS2.0", "XXX", "XXX", true);
         UAResponse uaResponse3 = weCrossRPC.addChainAccount("BCOS2.0", chainAccount).send();
-        System.out.println(uaResponse3.getUAReceipt().toString());
+        System.out.println(uaResponse3.toString());
 
-        UAResponse uaResponse4 = weCrossRPC.setDefaultAccount("BCOS2.0", chainAccount).send();
-        System.out.println(uaResponse4.getUAReceipt().toString());
+        System.out.println("=================================================");
+        System.out.println("addFabricChainAccount");
+        ChainAccount chainAccount2 = new FabricAccount("Fabric1.4", "XXX", "XXX", true);
+        UAResponse uaResponse31 = weCrossRPC.addChainAccount("Fabric1.4", chainAccount2).send();
+        System.out.println(uaResponse31.toString());
 
+        System.out.println("=================================================");
+        System.out.println("setDefaultAccount");
+        UAResponse uaResponse4 = weCrossRPC.setDefaultAccount("BCOS2.0", 0).send();
+        System.out.println(uaResponse4.toString());
+
+        System.out.println("=================================================");
+        System.out.println("listAccount");
         AccountResponse accountResponse = weCrossRPC.listAccount().send();
-        System.out.println(accountResponse.getAccount().toString());
+        System.out.println(accountResponse.toString());
 
+        System.out.println("=================================================");
+        System.out.println("logout");
         UAResponse uaResponse2 = weCrossRPC.logout().send();
-        System.out.println(uaResponse2.getUAReceipt().toString());
+        System.out.println(uaResponse2.toString());
     }
 }

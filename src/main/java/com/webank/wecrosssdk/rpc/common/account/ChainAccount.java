@@ -1,9 +1,15 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "type",
+        visible = true,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes(
         value = {
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
@@ -11,21 +17,29 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
             @JsonSubTypes.Type(value = FabricAccount.class, name = "Fabric1.4")
         })
 public class ChainAccount {
+    public Integer keyID;
     public String type;
-    public String UAProof;
     public boolean isDefault = false;
 
     public ChainAccount() {}
 
-    public ChainAccount(String type, String UAProof, boolean isDefault) {
+    public ChainAccount(Integer keyID, String type, boolean isDefault) {
+        this.keyID = keyID;
         this.type = type;
-        this.UAProof = UAProof;
         this.isDefault = isDefault;
     }
 
     public ChainAccount(String type, boolean isDefault) {
         this.type = type;
         this.isDefault = isDefault;
+    }
+
+    public Integer getKeyID() {
+        return keyID;
+    }
+
+    public void setKeyID(Integer keyID) {
+        this.keyID = keyID;
     }
 
     public String getType() {
@@ -36,30 +50,24 @@ public class ChainAccount {
         this.type = type;
     }
 
-    public String getUAProof() {
-        return UAProof;
-    }
-
-    protected void setUAProof(String UAProof) {
-        this.UAProof = UAProof;
-    }
-
+    @JsonGetter("isDefault")
     public boolean isDefault() {
         return isDefault;
     }
 
+    @JsonSetter("isDefault")
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
     }
 
     @Override
     public String toString() {
-        return "ChainAccount{"
-                + "type='"
-                + type
+        return "{"
+                + "keyID='"
+                + keyID
                 + '\''
-                + ", UAProof='"
-                + UAProof
+                + ", type='"
+                + type
                 + '\''
                 + ", isDefault="
                 + isDefault
@@ -67,6 +75,15 @@ public class ChainAccount {
     }
 
     public String toFormatString() {
-        return "ChainAccount\n" + "\ttype: " + type + "\n" + "\tisDefault: " + isDefault + "\n";
+        return "ChainAccount\n"
+                + "\tkeyID: "
+                + keyID
+                + "\n"
+                + "\ttype: "
+                + type
+                + "\n"
+                + "\tisDefault: "
+                + isDefault
+                + "\n";
     }
 }

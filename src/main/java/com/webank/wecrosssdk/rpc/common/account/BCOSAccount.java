@@ -13,13 +13,13 @@ public class BCOSAccount extends ChainAccount {
     }
 
     public BCOSAccount(
+            Integer keyID,
             String type,
             String pubKey,
             String secKey,
             String address,
-            String UAProof,
             boolean isDefault) {
-        super(type, UAProof, isDefault);
+        super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
         this.address = address;
@@ -31,8 +31,12 @@ public class BCOSAccount extends ChainAccount {
         this.secKey = secKey;
     }
 
+    public BCOSAccount(Integer keyID, String type, boolean isDefault) {
+        super(keyID, type, isDefault);
+    }
+
     public BCOSAccount(ChainAccount chainAccount) {
-        super(chainAccount.type, chainAccount.UAProof, chainAccount.isDefault);
+        super(chainAccount.keyID, chainAccount.type, chainAccount.isDefault);
     }
 
     public String getPubKey() {
@@ -63,7 +67,10 @@ public class BCOSAccount extends ChainAccount {
     @Override
     public String toString() {
         return "{"
-                + "\"type\":\""
+                + "\"keyID\":\""
+                + keyID
+                + "\""
+                + ", \"type\":\""
                 + type
                 + "\""
                 + ", \"pubKey\":\""
@@ -78,7 +85,11 @@ public class BCOSAccount extends ChainAccount {
     }
 
     public String toFormatString() {
-        return "BCOSAccount:\n"
+        return type
+                + "Account:\n"
+                + "\tkeyID  : "
+                + keyID
+                + "\n"
                 + "\ttype  : "
                 + type
                 + "\n"

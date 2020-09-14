@@ -63,7 +63,7 @@ public class Resource {
     }
 
     public String[] call(String method) throws WeCrossSDKException {
-        return call(method, null);
+        return call(method, (String) null);
     }
 
     public String[] call(String method, String... args) throws WeCrossSDKException {
@@ -83,7 +83,7 @@ public class Resource {
     }
 
     public String[] sendTransaction(String method) throws WeCrossSDKException {
-        return sendTransaction(method, null);
+        return sendTransaction(method, (String) null);
     }
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {

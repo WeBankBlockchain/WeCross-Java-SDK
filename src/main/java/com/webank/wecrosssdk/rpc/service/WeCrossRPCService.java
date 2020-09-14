@@ -116,23 +116,7 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             if (response instanceof UAResponse) {
-                if (request.getMethod().equals("login")) {
-                    UARequest uaRequest = (UARequest) request.getData();
-                    String token = ((UAResponse) response).getUAReceipt().getToken();
-
-                    logger.info("CurrentUser: {}", uaRequest.getUsername());
-                    if (token == null) {
-                        logger.error("Token in UAResponse is null!");
-                        throw new WeCrossSDKException(
-                                ErrorCode.RPC_ERROR, "Login error: Token in UAResponse is null!");
-                    }
-
-                    AuthenticationManager.setCurrentUser(uaRequest.getUsername(), token);
-                }
-                if (request.getMethod().equals("logout")) {
-                    logger.info("CurrentUser: {} logout.", AuthenticationManager.getCurrentUser());
-                    AuthenticationManager.clearCurrentUser();
-                }
+                getUAResponseInfo(request, (UAResponse) response);
             }
             return response;
         } catch (TimeoutException e) {
@@ -143,6 +127,32 @@ public class WeCrossRPCService implements WeCrossService {
             logger.warn("send exception", e);
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
+        }
+    }
+
+    public void getUAResponseInfo(Request request, UAResponse response) throws WeCrossSDKException {
+        if (request.getMethod().equals("login")) {
+            UARequest uaRequest = (UARequest) request.getData();
+            String credential = response.getUAReceipt().getCredential();
+
+            logger.info("CurrentUser: {}", uaRequest.getUsername());
+            if (credential == null) {
+                logger.error("Credential in UAResponse is null!");
+                throw new WeCrossSDKException(
+                        ErrorCode.RPC_ERROR, "Login error: Credential in UAResponse is null!");
+            }
+            int firstIndexOfSpace = credential.trim().indexOf(' ');
+
+            if (firstIndexOfSpace != -1) {
+                String authenticationType = credential.substring(0, firstIndexOfSpace);
+                AuthenticationManager.runtimeAuthType.set(authenticationType);
+                credential = credential.substring(firstIndexOfSpace);
+            }
+            AuthenticationManager.setCurrentUser(uaRequest.getUsername(), credential);
+        }
+        if (request.getMethod().equals("logout")) {
+            logger.info("CurrentUser: {} logout.", AuthenticationManager.getCurrentUser());
+            AuthenticationManager.clearCurrentUser();
         }
     }
 
@@ -163,6 +173,10 @@ public class WeCrossRPCService implements WeCrossService {
             String currentToken = AuthenticationManager.getCurrentUserCredential();
             if (CommandList.authRequiredCommands.contains(request.getMethod())
                     && currentToken != null) {
+                String runtimeAuthType = AuthenticationManager.runtimeAuthType.get();
+                if (runtimeAuthType != null) {
+                    currentToken = runtimeAuthType + " " + currentToken;
+                }
                 builder.setHeader(HttpHeaders.AUTHORIZATION, currentToken);
             }
             builder.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)

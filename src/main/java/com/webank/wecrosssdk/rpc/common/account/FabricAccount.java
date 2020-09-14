@@ -1,34 +1,49 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.base.Objects;
 
 public class FabricAccount extends ChainAccount {
 
-    private String cert;
-    private String key;
+    private String pubKey;
+    private String secKey;
 
     public FabricAccount() {
         super();
     }
 
-    public FabricAccount(String type, String UAProof, boolean isDefault, String cert, String key) {
-        super(type, UAProof, isDefault);
-        this.cert = cert;
-        this.key = key;
+    public FabricAccount(
+            Integer keyID, String type, boolean isDefault, String pubKey, String secKey) {
+        super(keyID, type, isDefault);
+        this.pubKey = pubKey;
+        this.secKey = secKey;
     }
 
-    public FabricAccount(String type, String cert, String key, boolean isDefault) {
+    public FabricAccount(String type, String pubKey, String secKey, boolean isDefault) {
         super(type, isDefault);
-        this.cert = cert;
-        this.key = key;
+        this.pubKey = pubKey;
+        this.secKey = secKey;
+    }
+
+    public FabricAccount(Integer keyID, String type, boolean isDefault) {
+        super(keyID, type, isDefault);
     }
 
     public FabricAccount(ChainAccount chainAccount) {
-        super(chainAccount.type, chainAccount.UAProof, chainAccount.isDefault);
+        super(chainAccount.keyID, chainAccount.type, chainAccount.isDefault);
     }
 
-    public String getCert() {
-        return cert;
+    @JsonSetter(value = "cert")
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
+    }
+
+    public void setSecKey(String secKey) {
+        this.secKey = secKey;
+    }
+
+    public String getPubKey() {
+        return pubKey;
     }
 
     @Override
@@ -36,25 +51,25 @@ public class FabricAccount extends ChainAccount {
         if (this == o) return true;
         if (!(o instanceof FabricAccount)) return false;
         FabricAccount that = (FabricAccount) o;
-        return Objects.equal(cert, that.cert);
+        return Objects.equal(pubKey, that.pubKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, cert, key);
+        return Objects.hashCode(type, pubKey, secKey);
     }
 
     @Override
     public String toString() {
         return "{"
-                + "\"type\":\""
+                + "\"keyID\":\""
+                + keyID
+                + '\"'
+                + ", \"type\":\""
                 + type
                 + '\"'
                 + ", \"cert\":\""
-                + cert
-                + '\"'
-                + ", \"key\":\""
-                + key
+                + pubKey
                 + '\"'
                 + ", \"isDefault\":\""
                 + isDefault
@@ -62,15 +77,16 @@ public class FabricAccount extends ChainAccount {
     }
 
     public String toFormatString() {
-        return "FabricAccount:\n"
+        return type
+                + "Account:\n"
+                + "\tkeyID: "
+                + keyID
+                + "\n"
                 + "\ttype: "
                 + type
                 + "\n"
                 + "\tcert: "
-                + cert
-                + "\n"
-                + "\tkey : "
-                + key
+                + pubKey
                 + "\n"
                 + "\tisDefault: "
                 + isDefault

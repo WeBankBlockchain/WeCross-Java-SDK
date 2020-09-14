@@ -73,4 +73,6 @@ public interface WeCrossRPC {
     RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount);
 
     RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount);
+
+    RemoteCall<UAResponse> setDefaultAccount(String type, Integer keyID);
 }
