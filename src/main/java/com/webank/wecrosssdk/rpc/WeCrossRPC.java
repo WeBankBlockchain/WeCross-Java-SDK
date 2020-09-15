@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.rpc;
 
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
@@ -28,6 +29,9 @@ public interface WeCrossRPC {
 
     RemoteCall<TransactionResponse> sendTransaction(
             String path, String account, String method, String... args);
+
+    RemoteCall<TransactionResponse> invoke(
+            String path, String account, String method, String... args) throws WeCrossSDKException;
 
     RemoteCall<TransactionResponse> callTransaction(
             String transactionID, String path, String account, String method, String... args);
