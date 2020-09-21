@@ -13,13 +13,13 @@ public class FabricXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
     private String account;
-    private String[] accounts;
+    private String uaAccount;
     private AtomicLong id;
 
     public FabricXASuite(WeCrossRPC weCrossRPC, String account, String path) {
         this.account = account;
         this.path = path;
-        this.accounts = new String[] {account};
+        this.uaAccount = account;
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }
@@ -36,7 +36,7 @@ public class FabricXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            accounts,
+                            uaAccount,
                             new String[] {
                                 path,
                             })
@@ -73,7 +73,7 @@ public class FabricXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            accounts,
+                                                                                            uaAccount,
                                                                                             new String
                                                                                                     [] {
                                                                                                 path,

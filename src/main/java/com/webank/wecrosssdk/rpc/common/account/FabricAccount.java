@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.base.Objects;
 
@@ -7,22 +8,30 @@ public class FabricAccount extends ChainAccount {
 
     private String pubKey;
     private String secKey;
+    private String ext;
 
     public FabricAccount() {
         super();
     }
 
     public FabricAccount(
-            Integer keyID, String type, boolean isDefault, String pubKey, String secKey) {
+            Integer keyID,
+            String type,
+            boolean isDefault,
+            String pubKey,
+            String secKey,
+            String ext) {
         super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
+        this.ext = ext;
     }
 
-    public FabricAccount(String type, String pubKey, String secKey, boolean isDefault) {
+    public FabricAccount(String type, String pubKey, String secKey, String ext, boolean isDefault) {
         super(type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
+        this.ext = ext;
     }
 
     public FabricAccount(Integer keyID, String type, boolean isDefault) {
@@ -33,17 +42,29 @@ public class FabricAccount extends ChainAccount {
         super(chainAccount.keyID, chainAccount.type, chainAccount.isDefault);
     }
 
-    @JsonSetter(value = "cert")
+    @JsonSetter("cert")
     public void setPubKey(String pubKey) {
         this.pubKey = pubKey;
     }
 
-    public void setSecKey(String secKey) {
-        this.secKey = secKey;
-    }
-
+    @JsonGetter("pubKey")
     public String getPubKey() {
         return pubKey;
+    }
+
+    @JsonGetter("secKey")
+    public String getSecKey() {
+        return secKey;
+    }
+
+    @JsonGetter("ext")
+    public String getExt() {
+        return ext;
+    }
+
+    @JsonSetter("ext")
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 
     @Override
@@ -71,6 +92,9 @@ public class FabricAccount extends ChainAccount {
                 + ", \"cert\":\""
                 + pubKey
                 + '\"'
+                + ", \"ext\":\""
+                + ext
+                + '\"'
                 + ", \"isDefault\":\""
                 + isDefault
                 + "\"}";
@@ -78,15 +102,18 @@ public class FabricAccount extends ChainAccount {
 
     public String toFormatString() {
         return type
-                + "Account:\n"
-                + "\tkeyID: "
+                + " Account:\n"
+                + "\tkeyID    : "
                 + keyID
                 + "\n"
-                + "\ttype: "
+                + "\ttype     : "
                 + type
                 + "\n"
-                + "\tcert: "
+                + "\tcert     :\n"
                 + pubKey
+                + "\n"
+                + "\tMemberID : "
+                + ext
                 + "\n"
                 + "\tisDefault: "
                 + isDefault

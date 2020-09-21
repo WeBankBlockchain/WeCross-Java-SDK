@@ -3,6 +3,7 @@ package com.webank.wecrosssdk.rpc.service;
 import static org.asynchttpclient.Dsl.asyncHttpClient;
 import static org.asynchttpclient.Dsl.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
@@ -53,6 +54,7 @@ public class WeCrossRPCService implements WeCrossService {
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
         httpClient = getHttpAsyncClient(connection);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private void checkRequest(Request<?> request) throws WeCrossSDKException {

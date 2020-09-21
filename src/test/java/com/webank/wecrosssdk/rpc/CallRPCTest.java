@@ -84,20 +84,14 @@ public class CallRPCTest {
     @Test
     public void startTransactionTest() throws Exception {
         RoutineResponse routineResponse =
-                weCrossRPC
-                        .startTransaction(
-                                "001", new String[] {"test"}, new String[] {"test.test.test"})
-                        .send();
+                weCrossRPC.startTransaction("001", "test", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
 
     @Test
     public void commitTransactionTest() throws Exception {
         RoutineResponse routineResponse =
-                weCrossRPC
-                        .commitTransaction(
-                                "001", new String[] {"test"}, new String[] {"test.test.test"})
-                        .send();
+                weCrossRPC.commitTransaction("001", "test", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
 
@@ -105,8 +99,7 @@ public class CallRPCTest {
     public void rollbackTransactionTest() throws Exception {
         RoutineResponse routineResponse =
                 weCrossRPC
-                        .rollbackTransaction(
-                                "001", new String[] {"test"}, new String[] {"test.test.test"})
+                        .rollbackTransaction("001", "test", new String[] {"test.test.test"})
                         .send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
@@ -115,8 +108,7 @@ public class CallRPCTest {
     public void getTransactionInfoTest() throws Exception {
         RoutineInfoResponse routineInfoResponse =
                 weCrossRPC
-                        .getTransactionInfo(
-                                "001", new String[] {"test"}, new String[] {"test.test.test"})
+                        .getTransactionInfo("001", "test", new String[] {"test.test.test"})
                         .send();
         Assert.assertEquals(routineInfoResponse.getErrorCode(), 0);
     }

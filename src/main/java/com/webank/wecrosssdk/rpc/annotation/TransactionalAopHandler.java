@@ -26,7 +26,7 @@ public class TransactionalAopHandler {
     private Class<? extends Throwable>[] es;
 
     private String transactionID;
-    private String[] accounts;
+    private String account;
     private String[] paths;
 
     @Around("@annotation(com.webank.wecrosssdk.rpc.annotation.Transactional)")
@@ -38,14 +38,14 @@ public class TransactionalAopHandler {
         logger.info("TransactionProceed transactionID: {}", transactionID);
 
         setAccountsAndPathsFromAnnotation(pjp);
-        if (accounts.length == 0 || paths.length == 0) {
+        if (account == null || paths.length == 0) {
             logger.error("Exception: can't get Accounts or Paths from annotation.");
             return null;
         }
         setTransactionalRollbackFor(pjp);
 
         RoutineResponse response =
-                weCrossRPC.startTransaction(transactionID, accounts, paths).send();
+                weCrossRPC.startTransaction(transactionID, account, paths).send();
         if (response.getErrorCode() != 0) {
             logger.error(
                     "Transactional.startTransaction fail, errorCode:{}", response.getErrorCode());
@@ -64,7 +64,7 @@ public class TransactionalAopHandler {
     private void doRollback() throws WeCrossSDKException {
         try {
             RoutineResponse response =
-                    weCrossRPC.rollbackTransaction(transactionID, accounts, paths).send();
+                    weCrossRPC.rollbackTransaction(transactionID, account, paths).send();
             logger.info(
                     "Transactions rollback, transactionID is {},response: {}",
                     transactionID,
@@ -88,7 +88,7 @@ public class TransactionalAopHandler {
     private void doCommit() throws WeCrossSDKException {
         try {
             RoutineResponse response =
-                    weCrossRPC.commitTransaction(transactionID, accounts, paths).send();
+                    weCrossRPC.commitTransaction(transactionID, account, paths).send();
             logger.info(
                     "Transactions committed, transactionID is {},response: {}",
                     transactionID,
@@ -138,7 +138,7 @@ public class TransactionalAopHandler {
             }
             for (Annotation annotation : paramAnn) {
                 if (annotation.annotationType().equals(Account.class)) {
-                    this.accounts = (String[]) param;
+                    this.account = (String) param;
                 }
                 if (annotation.annotationType().equals(Path.class)) {
                     this.paths = (String[]) param;

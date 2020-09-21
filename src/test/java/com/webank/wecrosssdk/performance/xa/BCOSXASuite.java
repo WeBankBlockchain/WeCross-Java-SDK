@@ -14,12 +14,12 @@ public class BCOSXASuite implements PerformanceSuite {
     private String path;
     private String account;
     private AtomicLong id;
-    private String[] accounts;
+    private String uaAccount;
 
     public BCOSXASuite(WeCrossRPC weCrossRPC, String account, String path) {
         this.account = account;
         this.path = path;
-        this.accounts = new String[] {account};
+        this.uaAccount = account;
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }
@@ -37,7 +37,7 @@ public class BCOSXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            accounts,
+                            account,
                             new String[] {
                                 iPath,
                             })
@@ -74,7 +74,7 @@ public class BCOSXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            accounts,
+                                                                                            uaAccount,
                                                                                             new String
                                                                                                     [] {
                                                                                                 iPath,

@@ -78,7 +78,7 @@ dependencies {
     compile 'com.google.guava:guava:28.1-jre'
     compile 'junit:junit:4.12'
 }
-
+configurations.compile.exclude(group: 'ch.qos.logback')
 jar {
     destinationDir file('dist/apps')
     archiveName project.name + "-" + project.version + '.jar'

@@ -111,16 +111,16 @@ public class UniversalAccount {
     public String toFormatString() {
         StringBuilder result = new StringBuilder("Universal Account:\n");
         result.append("username: ").append(username).append("\n");
-        result.append("pubKey: ").append(pubKey).append("\n");
-        result.append("uaID  : ").append(uaID).append("\n");
-        result.append("chainAccounts: [");
+        result.append("pubKey  : ").append(pubKey).append("\n");
+        result.append("uaID    : ").append(uaID).append("\n");
         if (chainAccounts != null && chainAccounts.size() != 0) {
-            System.out.println('\n');
+            result.append("chainAccounts: [");
+            result.append("\n");
             for (ChainAccount chainAccount : chainAccounts) {
                 result.append(chainAccount.toFormatString());
             }
+            result.append("]");
         }
-        result.append("]");
         return result.toString();
     }
 }

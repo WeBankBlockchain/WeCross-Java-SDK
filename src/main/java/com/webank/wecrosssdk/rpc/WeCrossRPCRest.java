@@ -4,16 +4,12 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
-import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
-import com.webank.wecrosssdk.rpc.common.account.FabricAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
-import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import java.util.Arrays;
@@ -179,8 +175,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<RoutineResponse> startTransaction(
-            String transactionID, String[] accounts, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+            String transactionID, String account, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, account, paths);
         TransactionContext.txThreadLocal.set(transactionID);
         TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
         List<String> pathInTransaction = Arrays.asList(paths);
@@ -194,8 +190,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<RoutineResponse> commitTransaction(
-            String transactionID, String[] accounts, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+            String transactionID, String account, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, account, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
@@ -208,8 +204,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<RoutineResponse> rollbackTransaction(
-            String transactionID, String[] accounts, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+            String transactionID, String account, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, account, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
@@ -223,8 +219,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<RoutineInfoResponse> getTransactionInfo(
-            String transactionID, String[] accounts, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, accounts, paths);
+            String transactionID, String account, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, account, paths);
 
         @SuppressWarnings("unchecked")
         Request<RoutineRequest> request = new Request("", "", "getTransactionInfo", routineRequest);
@@ -327,54 +323,5 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     public void setWeCrossService(WeCrossService weCrossService) {
         this.weCrossService = weCrossService;
-    }
-
-    public static void main(String[] args) throws Exception {
-        WeCrossService weCrossService = new WeCrossRPCService();
-        WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossService);
-
-        UAResponse uaResponse1 = weCrossRPC.register("Kyonkk2k", "123456").send();
-        System.out.println(uaResponse1.toString());
-
-        System.out.println("login Kyon:");
-        UAResponse uaResponse = weCrossRPC.login("Kyonkk2k", "123456").send();
-        System.out.println(uaResponse.toString());
-        System.out.println(uaResponse.getUAReceipt().getUniversalAccount().toFormatString());
-        System.out.println(AuthenticationManager.getCurrentUserCredential());
-
-        System.out.println("=================================================");
-        System.out.println("login Tom:");
-        UAResponse uaResponse0 = weCrossRPC.login();
-        System.out.println(uaResponse0.toString());
-
-        System.out.println(uaResponse0.getUAReceipt().getUniversalAccount().toFormatString());
-        System.out.println(AuthenticationManager.getCurrentUserCredential());
-
-        System.out.println("=================================================");
-        System.out.println("addBCOSChainAccount");
-        ChainAccount chainAccount = new BCOSAccount("BCOS2.0", "XXX", "XXX", true);
-        UAResponse uaResponse3 = weCrossRPC.addChainAccount("BCOS2.0", chainAccount).send();
-        System.out.println(uaResponse3.toString());
-
-        System.out.println("=================================================");
-        System.out.println("addFabricChainAccount");
-        ChainAccount chainAccount2 = new FabricAccount("Fabric1.4", "XXX", "XXX", true);
-        UAResponse uaResponse31 = weCrossRPC.addChainAccount("Fabric1.4", chainAccount2).send();
-        System.out.println(uaResponse31.toString());
-
-        System.out.println("=================================================");
-        System.out.println("setDefaultAccount");
-        UAResponse uaResponse4 = weCrossRPC.setDefaultAccount("BCOS2.0", 0).send();
-        System.out.println(uaResponse4.toString());
-
-        System.out.println("=================================================");
-        System.out.println("listAccount");
-        AccountResponse accountResponse = weCrossRPC.listAccount().send();
-        System.out.println(accountResponse.toString());
-
-        System.out.println("=================================================");
-        System.out.println("logout");
-        UAResponse uaResponse2 = weCrossRPC.logout().send();
-        System.out.println(uaResponse2.toString());
     }
 }

@@ -6,7 +6,7 @@ public class BCOSAccount extends ChainAccount {
 
     private String pubKey;
     private String secKey;
-    private String address;
+    private String ext;
 
     public BCOSAccount() {
         super();
@@ -17,18 +17,19 @@ public class BCOSAccount extends ChainAccount {
             String type,
             String pubKey,
             String secKey,
-            String address,
+            String ext,
             boolean isDefault) {
         super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.address = address;
+        this.ext = ext;
     }
 
-    public BCOSAccount(String type, String pubKey, String secKey, boolean isDefault) {
+    public BCOSAccount(String type, String pubKey, String secKey, String ext, boolean isDefault) {
         super(type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
+        this.ext = ext;
     }
 
     public BCOSAccount(Integer keyID, String type, boolean isDefault) {
@@ -47,8 +48,8 @@ public class BCOSAccount extends ChainAccount {
         return secKey;
     }
 
-    public String getAddress() {
-        return address;
+    public String getExt() {
+        return ext;
     }
 
     @Override
@@ -56,12 +57,12 @@ public class BCOSAccount extends ChainAccount {
         if (this == o) return true;
         if (!(o instanceof BCOSAccount)) return false;
         BCOSAccount that = (BCOSAccount) o;
-        return Objects.equal(pubKey, that.pubKey) && Objects.equal(address, that.address);
+        return Objects.equal(pubKey, that.pubKey) && Objects.equal(ext, that.ext);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, pubKey, address);
+        return Objects.hashCode(type, pubKey, ext);
     }
 
     @Override
@@ -76,8 +77,8 @@ public class BCOSAccount extends ChainAccount {
                 + ", \"pubKey\":\""
                 + pubKey
                 + "\""
-                + ", \"address\":\""
-                + address
+                + ", \"ext\":\""
+                + ext
                 + "\""
                 + ", \"isDefault\":\""
                 + isDefault
@@ -86,18 +87,18 @@ public class BCOSAccount extends ChainAccount {
 
     public String toFormatString() {
         return type
-                + "Account:\n"
-                + "\tkeyID  : "
+                + " Account:\n"
+                + "\tkeyID    : "
                 + keyID
                 + "\n"
-                + "\ttype  : "
+                + "\ttype     : "
                 + type
                 + "\n"
-                + "\tpubKey: "
+                + "\tpubKey   :\n"
                 + pubKey
                 + "\n"
-                + "\tkey   : "
-                + address
+                + "\text  : "
+                + ext
                 + "\n"
                 + "\tisDefault: "
                 + isDefault

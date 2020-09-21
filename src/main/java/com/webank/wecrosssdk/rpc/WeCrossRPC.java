@@ -46,16 +46,16 @@ public interface WeCrossRPC {
             String... args);
 
     RemoteCall<RoutineResponse> startTransaction(
-            String transactionID, String[] accounts, String[] paths);
+            String transactionID, String account, String[] paths);
 
     RemoteCall<RoutineResponse> commitTransaction(
-            String transactionID, String[] accounts, String[] paths);
+            String transactionID, String account, String[] paths);
 
     RemoteCall<RoutineResponse> rollbackTransaction(
-            String transactionID, String[] accounts, String[] paths);
+            String transactionID, String account, String[] paths);
 
     RemoteCall<RoutineInfoResponse> getTransactionInfo(
-            String transactionID, String[] accounts, String[] paths);
+            String transactionID, String account, String[] paths);
 
     RemoteCall<CommandResponse> customCommand(
             String command, String path, String account, Object... args);
