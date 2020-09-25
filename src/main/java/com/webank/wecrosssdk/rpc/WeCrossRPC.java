@@ -24,43 +24,42 @@ public interface WeCrossRPC {
     RemoteCall<TransactionResponse> call(Request<TransactionRequest> request);
 
     RemoteCall<TransactionResponse> call(
-            String path, String account, String method, String... args);
+            String path, String method, String... args);
 
     RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request);
 
     RemoteCall<TransactionResponse> sendTransaction(
-            String path, String account, String method, String... args);
+            String path, String method, String... args);
 
     RemoteCall<TransactionResponse> invoke(
-            String path, String account, String method, String... args) throws WeCrossSDKException;
+            String path, String method, String... args) throws WeCrossSDKException;
 
     RemoteCall<TransactionResponse> callTransaction(
-            String transactionID, String path, String account, String method, String... args);
+            String transactionID, String path, String method, String... args);
 
     RemoteCall<TransactionResponse> execTransaction(
             String transactionID,
             String seq,
             String path,
-            String account,
             String method,
             String... args);
 
     RemoteCall<RoutineResponse> startTransaction(
-            String transactionID, String account, String[] paths);
+            String transactionID, String[] paths);
 
     RemoteCall<RoutineResponse> commitTransaction(
-            String transactionID, String account, String[] paths);
+            String transactionID, String[] paths);
 
     RemoteCall<RoutineResponse> rollbackTransaction(
-            String transactionID, String account, String[] paths);
+            String transactionID, String[] paths);
 
     RemoteCall<RoutineInfoResponse> getTransactionInfo(
-            String transactionID, String account, String[] paths);
+            String transactionID, String[] paths);
 
     RemoteCall<CommandResponse> customCommand(
-            String command, String path, String account, Object... args);
+            String command, String path, Object... args);
 
-    RemoteCall<RoutineIDResponse> getTransactionIDs(String path, String account, int option);
+    RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option);
 
     RemoteCall<UAResponse> register(String name, String password);
 

@@ -36,7 +36,6 @@ public class FabricXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            uaAccount,
                             new String[] {
                                 path,
                             })
@@ -52,7 +51,6 @@ public class FabricXASuite implements PerformanceSuite {
                                                             sIndex,
                                                             "1",
                                                             path,
-                                                            account,
                                                             "newEvidence",
                                                             "a",
                                                             "a")
@@ -73,7 +71,6 @@ public class FabricXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            uaAccount,
                                                                                             new String
                                                                                                     [] {
                                                                                                 path,

@@ -112,7 +112,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
         TransactionResponse response = new TransactionResponse();
         while (!done && maxRound++ < 5) {
             try {
-                response = weCrossRPC.sendTransaction(path, account, "newContract", args).send();
+                response = weCrossRPC.sendTransaction(path, "newContract", args).send();
                 Receipt receipt = response.getReceipt();
                 if (response.getErrorCode() != StatusCode.SUCCESS
                         || receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -157,7 +157,6 @@ public class HTLCTransferSuite implements PerformanceSuite {
                         weCrossRPC
                                 .sendTransaction(
                                         path,
-                                        account,
                                         "setNewContractTxInfo",
                                         hash,
                                         txHash,
@@ -196,7 +195,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
         while (!done && maxRound++ < 5) {
             try {
                 response =
-                        weCrossRPC.sendTransaction(path, account, "setSecret", hash, secret).send();
+                        weCrossRPC.sendTransaction(path, "setSecret", hash, secret).send();
 
                 Receipt receipt = response.getReceipt();
                 if (response.getErrorCode() != StatusCode.SUCCESS
@@ -236,7 +235,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
         Receipt receipt = new Receipt();
         while (!done && maxRound++ < 5) {
             try {
-                response = weCrossRPC.call(path, account, "getSelfUnlockStatus", hash).send();
+                response = weCrossRPC.call(path, "getSelfUnlockStatus", hash).send();
 
                 receipt = response.getReceipt();
                 if (response.getErrorCode() != StatusCode.SUCCESS

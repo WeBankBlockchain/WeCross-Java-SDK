@@ -55,7 +55,7 @@ public class CallMethodBuilder {
             throw new WeCrossSDKException(
                     ErrorCode.FIELD_MISSING, "Some field(s) in CallTransactionBuilder is null!");
         }
-        return weCrossRPC.call(this.path, this.account, this.method, this.args).send();
+        return weCrossRPC.call(this.path, this.method, this.args).send();
     }
 
     public String getPath() {

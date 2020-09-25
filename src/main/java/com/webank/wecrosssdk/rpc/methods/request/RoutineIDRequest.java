@@ -3,14 +3,12 @@ package com.webank.wecrosssdk.rpc.methods.request;
 public class RoutineIDRequest {
 
     private String path;
-    private String account;
     private int option = 0;
 
     public RoutineIDRequest() {}
 
-    public RoutineIDRequest(String path, String account, int option) {
+    public RoutineIDRequest(String path, int option) {
         this.path = path;
-        this.account = account;
         this.option = option;
     }
 
@@ -20,14 +18,6 @@ public class RoutineIDRequest {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public int getOption() {
@@ -43,9 +33,6 @@ public class RoutineIDRequest {
         return "RoutineIDRequest{"
                 + "path='"
                 + path
-                + '\''
-                + ", account='"
-                + account
                 + '\''
                 + ", option="
                 + option

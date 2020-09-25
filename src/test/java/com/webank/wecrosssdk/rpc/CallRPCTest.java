@@ -54,21 +54,21 @@ public class CallRPCTest {
     @Test
     public void callTest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC.call("test.test.test", "test", "test", "test").send();
+                weCrossRPC.call("test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
     @Test
     public void sendTransactionTest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC.sendTransaction("test.test.test", "test", "test", "test").send();
+                weCrossRPC.sendTransaction("test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
     @Test
     public void callTransactionTest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC.callTransaction("001", "test.test.test", "test", "test", "test").send();
+                weCrossRPC.callTransaction("001", "test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
@@ -76,7 +76,7 @@ public class CallRPCTest {
     public void execTransactionTest() throws Exception {
         TransactionResponse transactionResponse =
                 weCrossRPC
-                        .execTransaction("001", "0", "test.test.test", "test", "test", "test")
+                        .execTransaction("001", "0", "test.test.test", "test", "test")
                         .send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
@@ -84,14 +84,14 @@ public class CallRPCTest {
     @Test
     public void startTransactionTest() throws Exception {
         RoutineResponse routineResponse =
-                weCrossRPC.startTransaction("001", "test", new String[] {"test.test.test"}).send();
+                weCrossRPC.startTransaction("001", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
 
     @Test
     public void commitTransactionTest() throws Exception {
         RoutineResponse routineResponse =
-                weCrossRPC.commitTransaction("001", "test", new String[] {"test.test.test"}).send();
+                weCrossRPC.commitTransaction("001", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
 
@@ -99,7 +99,7 @@ public class CallRPCTest {
     public void rollbackTransactionTest() throws Exception {
         RoutineResponse routineResponse =
                 weCrossRPC
-                        .rollbackTransaction("001", "test", new String[] {"test.test.test"})
+                        .rollbackTransaction("001", new String[] {"test.test.test"})
                         .send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
@@ -108,7 +108,7 @@ public class CallRPCTest {
     public void getTransactionInfoTest() throws Exception {
         RoutineInfoResponse routineInfoResponse =
                 weCrossRPC
-                        .getTransactionInfo("001", "test", new String[] {"test.test.test"})
+                        .getTransactionInfo("001", new String[] {"test.test.test"})
                         .send();
         Assert.assertEquals(routineInfoResponse.getErrorCode(), 0);
     }
@@ -116,14 +116,14 @@ public class CallRPCTest {
     @Test
     public void customCommandTest() throws Exception {
         CommandResponse commandResponse =
-                weCrossRPC.customCommand("test", "test.test.test", "test", "test").send();
+                weCrossRPC.customCommand("test", "test.test.test", "test").send();
         Assert.assertEquals(commandResponse.getErrorCode(), 0);
     }
 
     @Test
     public void getTransactionIDsTest() throws Exception {
         RoutineIDResponse routineIDResponse =
-                weCrossRPC.getTransactionIDs("test.test.test", "test", 0).send();
+                weCrossRPC.getTransactionIDs("test.test.test", 0).send();
         Assert.assertEquals(new String[] {"001"}, routineIDResponse.getIDs());
     }
 }

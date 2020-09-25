@@ -8,19 +8,11 @@ public class Request<T> {
     private String version = Version.CurrentVersion;
     private String path;
     private String method;
-    private String account;
     private T data;
 
     @JsonIgnore private WeCrossCallback callback;
 
     public Request() {}
-
-    public Request(String path, String account, String method, T data) {
-        this.path = path;
-        this.account = account;
-        this.method = method;
-        this.data = data;
-    }
 
     public Request(String path, String method, T data) {
         this.path = path;
@@ -52,14 +44,6 @@ public class Request<T> {
         this.method = method;
     }
 
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
     public T getData() {
         return data;
     }
@@ -88,9 +72,6 @@ public class Request<T> {
                         + '\''
                         + ", method='"
                         + method
-                        + '\''
-                        + ", account='"
-                        + account
                         + '\'';
         result += (data == null) ? "" : ", data=" + data;
         result += '}';

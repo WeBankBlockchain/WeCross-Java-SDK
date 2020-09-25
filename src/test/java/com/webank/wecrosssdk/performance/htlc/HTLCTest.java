@@ -145,7 +145,7 @@ public class HTLCTest {
     private static void newContract(String path, String account, String secret, String[] args)
             throws Exception {
         TransactionResponse response =
-                weCrossRPC.sendTransaction(path, account, "newProposal", args).send();
+                weCrossRPC.sendTransaction(path, "newProposal", args).send();
         Receipt receipt = response.getReceipt();
         if (response.getErrorCode() != StatusCode.SUCCESS
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -173,7 +173,6 @@ public class HTLCTest {
                 weCrossRPC
                         .sendTransaction(
                                 path,
-                                account,
                                 "setNewProposalTxInfo",
                                 hash,
                                 txHash,
@@ -196,7 +195,7 @@ public class HTLCTest {
     private static void setSecret(String path, String account, String hash, String secret)
             throws Exception {
         TransactionResponse response =
-                weCrossRPC.sendTransaction(path, account, "setSecret", hash, secret).send();
+                weCrossRPC.sendTransaction(path, "setSecret", hash, secret).send();
         Receipt receipt = response.getReceipt();
         if (response.getErrorCode() != StatusCode.SUCCESS
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -220,7 +219,7 @@ public class HTLCTest {
     private static int getBalance(String path, String account, String address) {
         try {
             TransactionResponse response =
-                    weCrossRPC.call(path, account, "balanceOf", address).send();
+                    weCrossRPC.call(path, "balanceOf", address).send();
             if (response.getErrorCode() != 0 || response.getReceipt().getErrorCode() != 0) {
                 return -1;
             } else {

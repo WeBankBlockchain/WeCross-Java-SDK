@@ -37,7 +37,6 @@ public class BCOSXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            account,
                             new String[] {
                                 iPath,
                             })
@@ -53,7 +52,6 @@ public class BCOSXASuite implements PerformanceSuite {
                                                             sIndex,
                                                             "1",
                                                             iPath,
-                                                            account,
                                                             "newEvidence",
                                                             "a",
                                                             "a")
@@ -74,7 +72,6 @@ public class BCOSXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            uaAccount,
                                                                                             new String
                                                                                                     [] {
                                                                                                 iPath,
