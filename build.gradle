@@ -77,6 +77,8 @@ dependencies {
     compile 'io.netty:netty-handler:4.1.47.Final'
     compile 'com.google.guava:guava:28.1-jre'
     compile 'junit:junit:4.12'
+    compile 'org.aspectj:aspectjrt:1.9.2'
+    compile 'org.aspectj:aspectjweaver:1.9.2'
 }
 configurations.compile.exclude(group: 'ch.qos.logback')
 jar {
