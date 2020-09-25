@@ -4,14 +4,12 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
-import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import java.util.Arrays;
@@ -81,8 +79,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<TransactionResponse> call(
-            String path, String method, String... args) {
+    public RemoteCall<TransactionResponse> call(String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String txID = TransactionContext.currentTXID();
         if (txID != null) {
@@ -91,8 +88,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
                     "call: TransactionID exist, turn to callTransaction, TransactionID is{}", txID);
         }
         @SuppressWarnings("unchecked")
-        Request<TransactionRequest> request =
-                new Request(path, "call", transactionRequest);
+        Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
         return new RemoteCall<TransactionResponse>(
                 weCrossService, TransactionResponse.class, request);
     }
@@ -116,8 +112,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<TransactionResponse> invoke(
-            String path, String method, String... args) throws WeCrossSDKException {
+    public RemoteCall<TransactionResponse> invoke(String path, String method, String... args)
+            throws WeCrossSDKException {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String txID = TransactionContext.currentTXID();
         if (txID != null && TransactionContext.isPathInTransaction(path)) {
@@ -150,19 +146,14 @@ public class WeCrossRPCRest implements WeCrossRPC {
         transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
 
         @SuppressWarnings("unchecked")
-        Request<TransactionRequest> request =
-                new Request(path,"call", transactionRequest);
+        Request<TransactionRequest> request = new Request(path, "call", transactionRequest);
         return new RemoteCall<TransactionResponse>(
                 weCrossService, TransactionResponse.class, request);
     }
 
     @Override
     public RemoteCall<TransactionResponse> execTransaction(
-            String transactionID,
-            String seq,
-            String path,
-            String method,
-            String... args) {
+            String transactionID, String seq, String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
         transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
@@ -175,8 +166,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<RoutineResponse> startTransaction(
-            String transactionID, String[] paths) {
+    public RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
         TransactionContext.txThreadLocal.set(transactionID);
         TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
@@ -184,15 +174,14 @@ public class WeCrossRPCRest implements WeCrossRPC {
         TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         @SuppressWarnings("unchecked")
-        Request<RoutineRequest> request = new Request("",  "startTransaction", routineRequest);
+        Request<RoutineRequest> request = new Request("", "startTransaction", routineRequest);
 
         return new RemoteCall<RoutineResponse>(weCrossService, RoutineResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineResponse> commitTransaction(
-            String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID,  paths);
+    public RemoteCall<RoutineResponse> commitTransaction(String transactionID, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
@@ -204,16 +193,14 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<RoutineResponse> rollbackTransaction(
-            String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID,  paths);
+    public RemoteCall<RoutineResponse> rollbackTransaction(String transactionID, String[] paths) {
+        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
 
         @SuppressWarnings("unchecked")
-        Request<RoutineRequest> request =
-                new Request("", "rollbackTransaction", routineRequest);
+        Request<RoutineRequest> request = new Request("", "rollbackTransaction", routineRequest);
 
         return new RemoteCall<RoutineResponse>(weCrossService, RoutineResponse.class, request);
     }
@@ -231,25 +218,21 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<CommandResponse> customCommand(
-            String command, String path, Object... args) {
+    public RemoteCall<CommandResponse> customCommand(String command, String path, Object... args) {
         CommandRequest commandRequest = new CommandRequest(command, args);
 
         @SuppressWarnings("unchecked")
-        Request<CommandRequest> request =
-                new Request(path, "customCommand", commandRequest);
+        Request<CommandRequest> request = new Request(path, "customCommand", commandRequest);
 
         return new RemoteCall<>(weCrossService, CommandResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineIDResponse> getTransactionIDs(
-            String path, int option) {
+    public RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option) {
         RoutineIDRequest routineIDRequest = new RoutineIDRequest(path, option);
 
         @SuppressWarnings("unchecked")
-        Request<RoutineIDRequest> request =
-                new Request("", "getTransactionIDs", routineIDRequest);
+        Request<RoutineIDRequest> request = new Request("", "getTransactionIDs", routineIDRequest);
 
         return new RemoteCall<>(weCrossService, RoutineIDResponse.class, request);
     }

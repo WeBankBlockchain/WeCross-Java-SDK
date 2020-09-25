@@ -194,8 +194,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
         TransactionResponse response;
         while (!done && maxRound++ < 5) {
             try {
-                response =
-                        weCrossRPC.sendTransaction(path, "setSecret", hash, secret).send();
+                response = weCrossRPC.sendTransaction(path, "setSecret", hash, secret).send();
 
                 Receipt receipt = response.getReceipt();
                 if (response.getErrorCode() != StatusCode.SUCCESS

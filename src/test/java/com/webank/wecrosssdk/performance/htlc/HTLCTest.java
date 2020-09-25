@@ -144,8 +144,7 @@ public class HTLCTest {
     */
     private static void newContract(String path, String account, String secret, String[] args)
             throws Exception {
-        TransactionResponse response =
-                weCrossRPC.sendTransaction(path, "newProposal", args).send();
+        TransactionResponse response = weCrossRPC.sendTransaction(path, "newProposal", args).send();
         Receipt receipt = response.getReceipt();
         if (response.getErrorCode() != StatusCode.SUCCESS
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -218,8 +217,7 @@ public class HTLCTest {
 
     private static int getBalance(String path, String account, String address) {
         try {
-            TransactionResponse response =
-                    weCrossRPC.call(path, "balanceOf", address).send();
+            TransactionResponse response = weCrossRPC.call(path, "balanceOf", address).send();
             if (response.getErrorCode() != 0 || response.getReceipt().getErrorCode() != 0) {
                 return -1;
             } else {

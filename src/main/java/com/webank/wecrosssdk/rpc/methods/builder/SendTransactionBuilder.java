@@ -4,12 +4,12 @@ import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.util.Arrays;
 
 public class SendTransactionBuilder {
 
     private String path;
-    private String account;
     private String method;
     private String[] args;
 
@@ -17,7 +17,6 @@ public class SendTransactionBuilder {
 
     public SendTransactionBuilder(String path, String account, String method, String[] args) {
         this.path = path;
-        this.account = account;
         this.method = method;
         this.args = args;
     }
@@ -28,11 +27,6 @@ public class SendTransactionBuilder {
 
     public SendTransactionBuilder path(String path) {
         this.path = path;
-        return this;
-    }
-
-    public SendTransactionBuilder account(String account) {
-        this.account = account;
         return this;
     }
 
@@ -52,7 +46,10 @@ public class SendTransactionBuilder {
                     ErrorCode.REMOTECALL_ERROR,
                     "SendTransactionBuilder: RPC in send(WeCrossRPC) is null");
         }
-        if (this.account == null || this.path == null || this.method == null || this.args == null) {
+        if (AuthenticationManager.getCurrentUser() == null
+                || this.path == null
+                || this.method == null
+                || this.args == null) {
             throw new WeCrossSDKException(
                     ErrorCode.FIELD_MISSING, "Some field(s) in ExecTransactionBuilder is null!");
         }
@@ -65,14 +62,6 @@ public class SendTransactionBuilder {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public String getMethod() {
@@ -96,9 +85,6 @@ public class SendTransactionBuilder {
         return "sendTransactionBuilder{"
                 + ", path='"
                 + path
-                + '\''
-                + ", account='"
-                + account
                 + '\''
                 + ", method='"
                 + method

@@ -23,41 +23,30 @@ public interface WeCrossRPC {
 
     RemoteCall<TransactionResponse> call(Request<TransactionRequest> request);
 
-    RemoteCall<TransactionResponse> call(
-            String path, String method, String... args);
+    RemoteCall<TransactionResponse> call(String path, String method, String... args);
 
     RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request);
 
-    RemoteCall<TransactionResponse> sendTransaction(
-            String path, String method, String... args);
+    RemoteCall<TransactionResponse> sendTransaction(String path, String method, String... args);
 
-    RemoteCall<TransactionResponse> invoke(
-            String path, String method, String... args) throws WeCrossSDKException;
+    RemoteCall<TransactionResponse> invoke(String path, String method, String... args)
+            throws WeCrossSDKException;
 
     RemoteCall<TransactionResponse> callTransaction(
             String transactionID, String path, String method, String... args);
 
     RemoteCall<TransactionResponse> execTransaction(
-            String transactionID,
-            String seq,
-            String path,
-            String method,
-            String... args);
+            String transactionID, String seq, String path, String method, String... args);
 
-    RemoteCall<RoutineResponse> startTransaction(
-            String transactionID, String[] paths);
+    RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineResponse> commitTransaction(
-            String transactionID, String[] paths);
+    RemoteCall<RoutineResponse> commitTransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineResponse> rollbackTransaction(
-            String transactionID, String[] paths);
+    RemoteCall<RoutineResponse> rollbackTransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineInfoResponse> getTransactionInfo(
-            String transactionID, String[] paths);
+    RemoteCall<RoutineInfoResponse> getTransactionInfo(String transactionID, String[] paths);
 
-    RemoteCall<CommandResponse> customCommand(
-            String command, String path, Object... args);
+    RemoteCall<CommandResponse> customCommand(String command, String path, Object... args);
 
     RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option);
 

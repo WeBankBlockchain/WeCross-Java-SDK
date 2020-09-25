@@ -30,12 +30,6 @@ public class RoutineIDRequest {
 
     @Override
     public String toString() {
-        return "RoutineIDRequest{"
-                + "path='"
-                + path
-                + '\''
-                + ", option="
-                + option
-                + '}';
+        return "RoutineIDRequest{" + "path='" + path + '\'' + ", option=" + option + '}';
     }
 }

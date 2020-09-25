@@ -5,9 +5,8 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 
 public class ResourceFactory {
 
-    public static Resource build(WeCrossRPC weCrossRPC, String path, String account)
-            throws WeCrossSDKException {
-        Resource resource = new Resource(weCrossRPC, path, account);
+    public static Resource build(WeCrossRPC weCrossRPC, String path) throws WeCrossSDKException {
+        Resource resource = new Resource(weCrossRPC, path);
         resource.check();
         return resource;
     }

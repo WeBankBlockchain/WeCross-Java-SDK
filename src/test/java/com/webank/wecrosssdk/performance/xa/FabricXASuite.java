@@ -12,14 +12,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class FabricXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
-    private String uaAccount;
     private AtomicLong id;
 
-    public FabricXASuite(WeCrossRPC weCrossRPC, String account, String path) {
-        this.account = account;
+    public FabricXASuite(WeCrossRPC weCrossRPC, String path) {
         this.path = path;
-        this.uaAccount = account;
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }

@@ -12,14 +12,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BCOSXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
     private AtomicLong id;
-    private String uaAccount;
 
-    public BCOSXASuite(WeCrossRPC weCrossRPC, String account, String path) {
-        this.account = account;
+    public BCOSXASuite(WeCrossRPC weCrossRPC, String path) {
         this.path = path;
-        this.uaAccount = account;
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }

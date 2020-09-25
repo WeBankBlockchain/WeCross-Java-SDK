@@ -33,6 +33,11 @@ public class UniversalAccount {
         this.chainAccounts = chainAccounts;
     }
 
+    public UniversalAccount(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public UniversalAccount() {}
 
     public String getUsername() {

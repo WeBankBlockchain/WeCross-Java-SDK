@@ -13,15 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BCOSPerformanceTest {
-    private static Logger logger = LoggerFactory.getLogger(BCOSPerformanceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BCOSPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize] [userFile]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction [count] [qps] [poolSize] [userFile]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest bcos_user1 sendTransaction 100 10 500 ./user");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction 100 10 500 ./user");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
@@ -36,16 +36,15 @@ public class BCOSPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 6) {
+        if (args.length != 5) {
             usage();
         }
 
-        String accountName = args[0];
-        String command = args[1];
-        BigInteger count = new BigInteger(args[2]);
-        BigInteger qps = new BigInteger(args[3]);
-        int poolSize = Integer.parseInt(args[4]);
-        String file = args[5];
+        String command = args[0];
+        BigInteger count = new BigInteger(args[1]);
+        BigInteger qps = new BigInteger(args[2]);
+        int poolSize = Integer.parseInt(args[3]);
+        String file = args[4];
 
         System.out.println(
                 "BCOSPerformanceTest: command is "
@@ -59,10 +58,10 @@ public class BCOSPerformanceTest {
 
         switch (command) {
             case "sendTransaction":
-                sendTransactionTest(accountName, count, qps, poolSize, file);
+                sendTransactionTest(count, qps, poolSize, file);
                 exit();
             case "status":
-                statusTest(accountName, count, qps, poolSize);
+                statusTest(count, qps, poolSize);
                 exit();
             default:
                 usage();
@@ -70,8 +69,8 @@ public class BCOSPerformanceTest {
     }
 
     public static void sendTransactionTest(
-            String accountName, BigInteger count, BigInteger qps, int poolSize, String file) {
-        Resource resource = loadResource("payment.bcos.transfer", accountName);
+            BigInteger count, BigInteger qps, int poolSize, String file) {
+        Resource resource = loadResource("payment.bcos.transfer");
         if (resource != null) {
             try {
                 DagUserMgr dagUserMgr = new DagUserMgr(file);
@@ -89,9 +88,8 @@ public class BCOSPerformanceTest {
         }
     }
 
-    public static void statusTest(
-            String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.bcos.transfer", accountName);
+    public static void statusTest(BigInteger count, BigInteger qps, int poolSize) {
+        Resource resource = loadResource("payment.bcos.transfer");
         if (resource != null) {
             try {
                 PerformanceSuite suite = new StatusSuite(resource);
@@ -105,11 +103,11 @@ public class BCOSPerformanceTest {
         }
     }
 
-    private static Resource loadResource(String path, String accountName) {
+    private static Resource loadResource(String path) {
         WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
-            Resource resource = ResourceFactory.build(weCrossRPC, path, accountName);
+            Resource resource = ResourceFactory.build(weCrossRPC, path);
             return resource;
         } catch (WeCrossSDKException e) {
             System.out.println("Error: Init wecross service failed: {}" + e);

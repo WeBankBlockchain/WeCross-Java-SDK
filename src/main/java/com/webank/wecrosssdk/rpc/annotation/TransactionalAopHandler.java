@@ -4,11 +4,11 @@ import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
+import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.UUID;
 import javax.annotation.Resource;
-import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -42,17 +42,18 @@ public class TransactionalAopHandler {
             logger.error("Exception: can't get Paths from annotation.");
             return null;
         }
-        if(AuthenticationManager.getCurrentUser()==null){
+        if (AuthenticationManager.getCurrentUser() == null) {
             logger.error("Exception: can't get getCurrentUser, please login first.");
             return null;
         }
         setTransactionalRollbackFor(pjp);
 
-        RoutineResponse response =
-                weCrossRPC.startTransaction(transactionID, paths).send();
+        RoutineResponse response = weCrossRPC.startTransaction(transactionID, paths).send();
         if (response.getErrorCode() != 0) {
             logger.error(
-                    "Transactional.startTransaction fail, errorCode:{}, errorMessage:{}", response.getErrorCode(),response.getMessage());
+                    "Transactional.startTransaction fail, errorCode:{}, errorMessage:{}",
+                    response.getErrorCode(),
+                    response.getMessage());
             return null;
         }
         try {
@@ -67,8 +68,7 @@ public class TransactionalAopHandler {
 
     private void doRollback() throws WeCrossSDKException {
         try {
-            RoutineResponse response =
-                    weCrossRPC.rollbackTransaction(transactionID, paths).send();
+            RoutineResponse response = weCrossRPC.rollbackTransaction(transactionID, paths).send();
             logger.info(
                     "Transactions rollback, transactionID is {},response: {}",
                     transactionID,
@@ -91,8 +91,7 @@ public class TransactionalAopHandler {
 
     private void doCommit() throws WeCrossSDKException {
         try {
-            RoutineResponse response =
-                    weCrossRPC.commitTransaction(transactionID, paths).send();
+            RoutineResponse response = weCrossRPC.commitTransaction(transactionID, paths).send();
             logger.info(
                     "Transactions committed, transactionID is {},response: {}",
                     transactionID,

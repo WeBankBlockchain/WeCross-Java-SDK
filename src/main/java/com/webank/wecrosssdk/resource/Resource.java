@@ -20,19 +20,15 @@ public class Resource {
     private Logger logger = LoggerFactory.getLogger(Resource.class);
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
 
-    // Use given account to send transaction
-    Resource(WeCrossRPC weCrossRPC, String path, String account) {
+    Resource(WeCrossRPC weCrossRPC, String path) {
         this.weCrossRPC = weCrossRPC;
         this.path = path;
-        this.account = account;
     }
 
     public void check() throws WeCrossSDKException {
         checkWeCrossRPC(this.weCrossRPC);
         checkIPath(this.path);
-        checkAccountName(this.account);
     }
 
     public boolean isActive() {
@@ -88,8 +84,7 @@ public class Resource {
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
-                (TransactionResponse)
-                        mustOkRequest(weCrossRPC.sendTransaction(path, method, args));
+                (TransactionResponse) mustOkRequest(weCrossRPC.sendTransaction(path, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
@@ -106,12 +101,6 @@ public class Resource {
 
     private void checkIPath(String path) throws WeCrossSDKException {
         RPCUtils.checkPath(path);
-    }
-
-    private void checkAccountName(String accountName) throws WeCrossSDKException {
-        if (accountName == null || accountName.equals("")) {
-            throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "AccountName not set");
-        }
     }
 
     private Response<?> mustOkRequest(RemoteCall<?> call) throws WeCrossSDKException {
@@ -145,13 +134,5 @@ public class Resource {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 }

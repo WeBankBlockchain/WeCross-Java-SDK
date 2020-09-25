@@ -1,6 +1,7 @@
 package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.mock.MockWeCrossService;
+import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
@@ -75,9 +76,7 @@ public class CallRPCTest {
     @Test
     public void execTransactionTest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC
-                        .execTransaction("001", "0", "test.test.test", "test", "test")
-                        .send();
+                weCrossRPC.execTransaction("001", "0", "test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
@@ -98,18 +97,14 @@ public class CallRPCTest {
     @Test
     public void rollbackTransactionTest() throws Exception {
         RoutineResponse routineResponse =
-                weCrossRPC
-                        .rollbackTransaction("001", new String[] {"test.test.test"})
-                        .send();
+                weCrossRPC.rollbackTransaction("001", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineResponse.getErrorCode(), 0);
     }
 
     @Test
     public void getTransactionInfoTest() throws Exception {
         RoutineInfoResponse routineInfoResponse =
-                weCrossRPC
-                        .getTransactionInfo("001", new String[] {"test.test.test"})
-                        .send();
+                weCrossRPC.getTransactionInfo("001", new String[] {"test.test.test"}).send();
         Assert.assertEquals(routineInfoResponse.getErrorCode(), 0);
     }
 
@@ -125,5 +120,37 @@ public class CallRPCTest {
         RoutineIDResponse routineIDResponse =
                 weCrossRPC.getTransactionIDs("test.test.test", 0).send();
         Assert.assertEquals(new String[] {"001"}, routineIDResponse.getIDs());
+    }
+
+    @Test
+    public void registerTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.register("hello", "world").send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
+    public void loginTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.login("hello", "world").send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getCredential(), "token");
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
+    public void addChainAccountTest() throws Exception {
+        BCOSAccount bcosAccount = new BCOSAccount();
+        UAResponse uaResponse = weCrossRPC.addChainAccount("BCOS2.0", bcosAccount).send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
+    public void setDefaultAccountTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.setDefaultAccount("BCOS2.0", 0).send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
+    public void logoutTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.logout().send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
     }
 }
