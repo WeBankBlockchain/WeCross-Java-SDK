@@ -2,7 +2,6 @@ package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
-import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;

@@ -126,10 +126,10 @@ public class WeCrossRPCRest implements WeCrossRPC {
                         txID,
                         seq);
             } catch (WeCrossSDKException e) {
-                logger.error("invoke: can not get current Seq.");
+                logger.error("invoke: can not get current Seq.", e);
                 throw new WeCrossSDKException(
                         e.getErrorCode(),
-                        "invoke TransactionContext.currentSeq() can not get current Seq.");
+                        "invoke TransactionContext.currentSeq(): can not get current Seq.");
             }
         }
         @SuppressWarnings("unchecked")
@@ -262,7 +262,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         String password = toml.getString("login.password");
         if (username == null || password == null) {
             logger.error(
-                    "loginWithoutArgs: TOML file did not config login message, can not auto-login.");
+                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login.");
             return null;
         }
         return login(username, password).send();

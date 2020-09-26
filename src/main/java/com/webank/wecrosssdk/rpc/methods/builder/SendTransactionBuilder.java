@@ -51,7 +51,7 @@ public class SendTransactionBuilder {
                 || this.method == null
                 || this.args == null) {
             throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING, "Some field(s) in ExecTransactionBuilder is null!");
+                    ErrorCode.FIELD_MISSING, "Some field(s) in SendTransactionBuilder is null!");
         }
         return weCrossRPC.sendTransaction(this.path, this.method, this.args).send();
     }

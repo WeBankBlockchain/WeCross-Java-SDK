@@ -39,13 +39,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 public class WeCrossRPCService implements WeCrossService {
-    private Logger logger = LoggerFactory.getLogger(WeCrossRPCService.class);
+    private final Logger logger = LoggerFactory.getLogger(WeCrossRPCService.class);
 
     private String server;
     private AsyncHttpClient httpClient;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static int httpClientTimeOut = 100000; // ms
+    private static final int HTTP_CLIENT_TIME_OUT = 100000; // ms
 
     @Override
     public void init() throws WeCrossSDKException {
@@ -80,7 +80,7 @@ public class WeCrossRPCService implements WeCrossService {
         String url =
                 RPCUtils.pathToUrl("https", server, request.getPath()) + "/" + request.getMethod();
         if (logger.isDebugEnabled()) {
-            logger.debug("request: {}; url: {}", request.toString(), url);
+            logger.debug("send-request: {}; url: {}", request.toString(), url);
         }
 
         checkRequest(request);
@@ -99,7 +99,7 @@ public class WeCrossRPCService implements WeCrossService {
 
                     @Override
                     public void onFailed(WeCrossSDKException e) {
-                        logger.warn("send onFailed: " + e.getMessage());
+                        logger.warn("send onFailed: ", e);
                         responseFuture.complete(null);
                         exceptionFuture.complete(e);
                     }
@@ -167,7 +167,7 @@ public class WeCrossRPCService implements WeCrossService {
                             + "/"
                             + request.getMethod();
             if (logger.isDebugEnabled()) {
-                logger.debug("request: {}; url: {}", request.toString(), url);
+                logger.debug("asyncSend-request: {}; url: {}", request.toString(), url);
             }
 
             checkRequest(request);
@@ -193,16 +193,15 @@ public class WeCrossRPCService implements WeCrossService {
                                         if (httpResponse.getStatusCode() == 401) {
                                             callback.callOnFailed(
                                                     new WeCrossSDKException(
-                                                            ErrorCode.RPC_ERROR,
-                                                            "AsyncSend status: 401."
-                                                                    + "Lack of authentication, please check current user's credential."));
+                                                            ErrorCode.LACK_AUTHENTICATION,
+                                                            "HTTP status code: 401-Unauthorized, have you logged in?"));
                                             return null;
                                         }
                                         if (httpResponse.getStatusCode() != 200) {
                                             callback.callOnFailed(
                                                     new WeCrossSDKException(
                                                             ErrorCode.RPC_ERROR,
-                                                            "AsyncSend status: "
+                                                            "HTTP response status: "
                                                                     + httpResponse.getStatusCode()
                                                                     + " message: "
                                                                     + httpResponse
@@ -236,8 +235,14 @@ public class WeCrossRPCService implements WeCrossService {
                                 }
                             });
 
+        } catch (WeCrossSDKException e) {
+            logger.error("Catch SDKException in asyncSend, errorMessage: {}", e.getMessage(), e);
+            callback.callOnFailed(
+                    new WeCrossSDKException(
+                            ErrorCode.INTERNAL_ERROR,
+                            "SDKException happened in asyncSend, errorMessage:" + e.getMessage()));
         } catch (Exception e) {
-            logger.error("Encode json error when async sending: {}", e.getMessage());
+            logger.error("Encode json error when async sending: ", e);
             callback.callOnFailed(
                     new WeCrossSDKException(
                             ErrorCode.INTERNAL_ERROR,
@@ -260,9 +265,9 @@ public class WeCrossRPCService implements WeCrossService {
     private String getServer(Toml toml) throws WeCrossSDKException {
         String server = toml.getString("connection.server");
         if (server == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.server], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING,
+                    "Something wrong with parsing [connection.server], please check configuration");
         }
 
         return server;
@@ -271,9 +276,9 @@ public class WeCrossRPCService implements WeCrossService {
     private String getSSLKey(Toml toml) throws WeCrossSDKException {
         String sslKey = toml.getString("connection.sslKey");
         if (sslKey == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.keyStore], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING,
+                    "Something wrong with parsing [connection.keyStore], please check configuration");
         }
         return sslKey;
     }
@@ -281,9 +286,9 @@ public class WeCrossRPCService implements WeCrossService {
     private String getSSLCert(Toml toml) throws WeCrossSDKException {
         String sslCert = toml.getString("connection.sslCert");
         if (sslCert == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.keyStore], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING,
+                    "Something wrong with parsing [connection.keyStore], please check configuration");
         }
         return sslCert;
     }
@@ -291,9 +296,9 @@ public class WeCrossRPCService implements WeCrossService {
     private String getCACert(Toml toml) throws WeCrossSDKException {
         String caCert = toml.getString("connection.caCert");
         if (caCert == null) {
-            String errorMessage =
-                    "Something wrong with parsing [connection.trustStore], please check configuration";
-            throw new WeCrossSDKException(ErrorCode.FIELD_MISSING, errorMessage);
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING,
+                    "Something wrong with parsing [connection.trustStore], please check configuration");
         }
         return caCert;
     }
@@ -319,22 +324,23 @@ public class WeCrossRPCService implements WeCrossService {
         try {
             return asyncHttpClient(
                     config().setSslContext(getSslContext(connection))
-                            .setConnectTimeout(httpClientTimeOut)
-                            .setRequestTimeout(httpClientTimeOut)
-                            .setReadTimeout(httpClientTimeOut)
-                            .setHandshakeTimeout(httpClientTimeOut)
-                            .setShutdownTimeout(httpClientTimeOut)
-                            .setSslSessionTimeout(httpClientTimeOut)
-                            .setPooledConnectionIdleTimeout(httpClientTimeOut)
-                            .setAcquireFreeChannelTimeout(httpClientTimeOut)
-                            .setConnectionPoolCleanerPeriod(httpClientTimeOut)
+                            .setConnectTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setRequestTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setReadTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setHandshakeTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setShutdownTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setSslSessionTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setPooledConnectionIdleTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setAcquireFreeChannelTimeout(HTTP_CLIENT_TIME_OUT)
+                            .setConnectionPoolCleanerPeriod(HTTP_CLIENT_TIME_OUT)
                             // .setMaxConnections(connection.getMaxTotal())
                             // .setMaxConnectionsPerHost(connection.getMaxPerRoute())
                             .setKeepAlive(true));
 
         } catch (Exception e) {
-            logger.error("Init http client error: {}", e.getMessage());
-            throw new WeCrossSDKException(ErrorCode.INTERNAL_ERROR, "Init http client error: " + e);
+            logger.error("Init http client error: ", e);
+            throw new WeCrossSDKException(
+                    ErrorCode.INTERNAL_ERROR, "Init http client error: " + e.getMessage());
         }
     }
 }

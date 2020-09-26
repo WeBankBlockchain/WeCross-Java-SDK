@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Resource {
-    private Logger logger = LoggerFactory.getLogger(Resource.class);
+    private final Logger logger = LoggerFactory.getLogger(Resource.class);
     private WeCrossRPC weCrossRPC;
     private String path;
 
@@ -68,7 +68,9 @@ public class Resource {
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
+            throw new WeCrossSDKException(
+                    ErrorCode.CALL_CONTRACT_ERROR,
+                    "Resource.call fail, receipt:" + receipt.toString());
         }
         return receipt.getResult();
     }
@@ -88,7 +90,9 @@ public class Resource {
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
+            throw new WeCrossSDKException(
+                    ErrorCode.CALL_CONTRACT_ERROR,
+                    "Resource.sendTransaction fail, receipt:" + receipt.toString());
         }
         return receipt.getResult();
     }

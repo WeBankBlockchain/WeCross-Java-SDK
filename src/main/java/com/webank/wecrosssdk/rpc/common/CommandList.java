@@ -21,9 +21,11 @@ public class CommandList {
                     "customCommand",
                     "addChainAccount",
                     "setDefaultAccount",
-                    "listAccount");
+                    "listAccount",
+                    "supportedStubs",
+                    "listResources",
+                    "status",
+                    "detail");
 
-    public static final List<String> normalCommands =
-            Arrays.asList(
-                    "register", "login", "supportedStubs", "listResources", "status", "detail");
+    public static final List<String> normalCommands = Arrays.asList("register", "login");
 }

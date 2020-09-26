@@ -7,34 +7,34 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.util.Arrays;
 
-public class CallMethodBuilder {
+public class InvokeMethodBuilder {
     private String path;
     private String method;
     private String[] args;
 
-    public CallMethodBuilder() {}
+    public InvokeMethodBuilder() {}
 
-    public CallMethodBuilder(String path, String method, String[] args) {
+    public InvokeMethodBuilder(String path, String method, String[] args) {
         this.path = path;
         this.method = method;
         this.args = args;
     }
 
-    public static CallMethodBuilder build() {
-        return new CallMethodBuilder();
+    public InvokeMethodBuilder build() {
+        return new InvokeMethodBuilder();
     }
 
-    public CallMethodBuilder path(String path) {
+    public InvokeMethodBuilder path(String path) {
         this.path = path;
         return this;
     }
 
-    public CallMethodBuilder method(String method) {
+    public InvokeMethodBuilder method(String method) {
         this.method = method;
         return this;
     }
 
-    public CallMethodBuilder args(String[] args) {
+    public InvokeMethodBuilder args(String[] args) {
         this.args = args;
         return this;
     }
@@ -43,16 +43,16 @@ public class CallMethodBuilder {
         if (weCrossRPC == null) {
             throw new WeCrossSDKException(
                     ErrorCode.REMOTECALL_ERROR,
-                    "CalMethodBuilder: RPC in send(WeCrossRPC) is null");
+                    "InvokeMethodBuilder: RPC in send(WeCrossRPC) is null");
         }
         if (AuthenticationManager.getCurrentUser() == null
                 || this.path == null
                 || this.method == null
                 || this.args == null) {
             throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING, "Some field(s) in CalMethodBuilder is null!");
+                    ErrorCode.FIELD_MISSING, "Some field(s) in InvokeMethodBuilder is null!");
         }
-        return weCrossRPC.call(this.path, this.method, this.args).send();
+        return weCrossRPC.invoke(this.path, this.method, this.args).send();
     }
 
     public String getPath() {
@@ -81,7 +81,7 @@ public class CallMethodBuilder {
 
     @Override
     public String toString() {
-        return "CallMethodBuilder{"
+        return "InvokeMethodBuilder{"
                 + "path='"
                 + path
                 + '\''
