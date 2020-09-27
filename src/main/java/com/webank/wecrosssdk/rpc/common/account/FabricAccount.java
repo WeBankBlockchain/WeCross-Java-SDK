@@ -8,7 +8,7 @@ public class FabricAccount extends ChainAccount {
 
     private String pubKey;
     private String secKey;
-    private String ext;
+    private String mspID;
 
     public FabricAccount() {
         super();
@@ -20,18 +20,19 @@ public class FabricAccount extends ChainAccount {
             boolean isDefault,
             String pubKey,
             String secKey,
-            String ext) {
+            String mspID) {
         super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.ext = ext;
+        this.mspID = mspID;
     }
 
-    public FabricAccount(String type, String pubKey, String secKey, String ext, boolean isDefault) {
+    public FabricAccount(
+            String type, String pubKey, String secKey, String mspID, boolean isDefault) {
         super(type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.ext = ext;
+        this.mspID = mspID;
     }
 
     public FabricAccount(Integer keyID, String type, boolean isDefault) {
@@ -57,14 +58,14 @@ public class FabricAccount extends ChainAccount {
         return secKey;
     }
 
-    @JsonGetter("ext")
-    public String getExt() {
-        return ext;
+    @JsonGetter("mspID")
+    public String getMspID() {
+        return mspID;
     }
 
-    @JsonSetter("ext")
-    public void setExt(String ext) {
-        this.ext = ext;
+    @JsonSetter("mspID")
+    public void setMspID(String mspID) {
+        this.mspID = mspID;
     }
 
     @Override
@@ -92,8 +93,8 @@ public class FabricAccount extends ChainAccount {
                 + ", \"cert\":\""
                 + pubKey
                 + '\"'
-                + ", \"ext\":\""
-                + ext
+                + ", \"MembershipID\":\""
+                + mspID
                 + '\"'
                 + ", \"isDefault\":\""
                 + isDefault
@@ -113,8 +114,8 @@ public class FabricAccount extends ChainAccount {
                 + "\tcert     :\n"
                 + pubKey
                 + "\n"
-                + "\tMemberID : "
-                + ext
+                + "\tMembershipID : "
+                + mspID
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
