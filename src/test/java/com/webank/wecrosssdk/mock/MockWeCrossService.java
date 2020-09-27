@@ -11,12 +11,9 @@ import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MockWeCrossService implements WeCrossService {
-    private Map<String, String> datas = new HashMap<>();
 
     @Override
     public void init() throws WeCrossSDKException {}

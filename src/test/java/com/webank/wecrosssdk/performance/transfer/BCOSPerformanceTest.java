@@ -9,11 +9,8 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BCOSPerformanceTest {
-    private static final Logger logger = LoggerFactory.getLogger(BCOSPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
@@ -60,9 +57,11 @@ public class BCOSPerformanceTest {
             case "sendTransaction":
                 sendTransactionTest(count, qps, poolSize, file);
                 exit();
+                break;
             case "status":
                 statusTest(count, qps, poolSize);
                 exit();
+                break;
             default:
                 usage();
         }
@@ -107,8 +106,7 @@ public class BCOSPerformanceTest {
         WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
-            Resource resource = ResourceFactory.build(weCrossRPC, path);
-            return resource;
+            return ResourceFactory.build(weCrossRPC, path);
         } catch (WeCrossSDKException e) {
             System.out.println("Error: Init wecross service failed: {}" + e);
             return null;

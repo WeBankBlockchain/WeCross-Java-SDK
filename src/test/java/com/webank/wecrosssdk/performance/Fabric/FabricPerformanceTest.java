@@ -62,9 +62,11 @@ public class FabricPerformanceTest {
             case "call":
                 callTest(count, qps, poolSize);
                 exit();
+                break;
             case "sendTransaction":
                 sendTransactionTest(count, qps, poolSize);
                 exit();
+                break;
             default:
                 usage();
         }
@@ -114,8 +116,7 @@ public class FabricPerformanceTest {
         WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
-            Resource resource = ResourceFactory.build(weCrossRPC, path);
-            return resource;
+            return ResourceFactory.build(weCrossRPC, path);
         } catch (WeCrossSDKException e) {
             System.out.println("Error: Init wecross service failed: {}" + e);
             return null;

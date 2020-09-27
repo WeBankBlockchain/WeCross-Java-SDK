@@ -5,7 +5,7 @@ import com.webank.wecrosssdk.rpc.common.Version;
 import com.webank.wecrosssdk.rpc.common.WeCrossCallback;
 
 public class Request<T> {
-    private String version = Version.CurrentVersion;
+    private String version = Version.CURRENT_VERSION;
     private String path;
     private String method;
     private T data;

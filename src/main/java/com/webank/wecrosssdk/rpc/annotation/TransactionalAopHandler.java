@@ -30,7 +30,7 @@ public class TransactionalAopHandler {
     private String[] paths;
 
     @Around("@annotation(com.webank.wecrosssdk.rpc.annotation.Transactional)")
-    public Object TransactionProceed(ProceedingJoinPoint pjp) throws Throwable {
+    public Object transactionProceed(ProceedingJoinPoint pjp) throws Throwable {
         Object result;
 
         transactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
@@ -77,10 +77,10 @@ public class TransactionalAopHandler {
             logger.info(
                     "Transactional rollback, transactionID is {},response: {}",
                     transactionID,
-                    response.toString());
+                    response);
         } catch (WeCrossSDKException e) {
             logger.error(
-                    "Transactional rollback transaction, errorCode:{} and errorMessage:{}",
+                    "Transactional rollback transaction, errorCode:{} and errorMessage:",
                     e.getErrorCode(),
                     e);
             throw new WeCrossSDKException(
@@ -100,10 +100,10 @@ public class TransactionalAopHandler {
             logger.info(
                     "Transactions committed, transactionID is {}, response: {}",
                     transactionID,
-                    response.toString());
+                    response);
         } catch (WeCrossSDKException e) {
             logger.error(
-                    "Transactional commit transaction, errorCode:{} and errorMessage:{}",
+                    "Transactional commit transaction, errorCode:{} and errorMessage:",
                     e.getErrorCode(),
                     e);
             throw new WeCrossSDKException(
@@ -121,11 +121,10 @@ public class TransactionalAopHandler {
         if (es != null && es.length > 0) {
             for (Class<? extends Throwable> e : es) {
                 if (e.isAssignableFrom(throwable.getClass())) {
-                    logger.info("Error occurs and did rollback, this error is {}", e.toString());
+                    logger.info("Error occurs and did rollback, this error is {}", e);
                     doRollback();
                 } else {
-                    logger.info(
-                            "Error occurs but did not rollback, this error is {}", e.toString());
+                    logger.info("Error occurs but did not rollback, this error is {}", e);
                     doCommit();
                 }
             }
@@ -153,7 +152,7 @@ public class TransactionalAopHandler {
         }
     }
 
-    private void setTransactionalRollbackFor(JoinPoint jp) throws Exception {
+    private void setTransactionalRollbackFor(JoinPoint jp) throws NoSuchMethodException {
         String methodName = jp.getSignature().getName();
         Class<?> classTarget = jp.getTarget().getClass();
         Class<?>[] par = ((MethodSignature) jp.getSignature()).getParameterTypes();

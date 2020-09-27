@@ -1,7 +1,5 @@
 package com.webank.wecrosssdk.performance.BCOS;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
@@ -18,8 +16,6 @@ public class BCOSCallSuite implements PerformanceSuite {
 
     private Resource resource;
     private String data = "[\"HelloWorld" + System.currentTimeMillis() + "\"]";
-    private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     public BCOSCallSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {

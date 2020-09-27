@@ -10,7 +10,7 @@ public class TransactionRequest {
 
     // Optional args
     // transactionID, paths, etc...
-    private Map<String, Object> options = new HashMap<String, Object>();
+    private Map<String, Object> options = new HashMap<>();
 
     public TransactionRequest() {}
 

@@ -24,7 +24,7 @@ public class RPCConfig {
             weCrossRPC = WeCrossRPCFactory.build(weCrossService);
         } catch (WeCrossSDKException e) {
             logger.error(
-                    "WeCrossRPC init error in getWeCrossRPC(), errorCode:{}, error:{}",
+                    "WeCrossRPC init error in getWeCrossRPC(), errorCode:{}, error:",
                     e.getErrorCode(),
                     e);
             throw new WeCrossSDKException(

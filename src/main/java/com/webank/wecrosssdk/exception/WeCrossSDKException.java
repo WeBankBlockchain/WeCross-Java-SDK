@@ -4,7 +4,7 @@ public class WeCrossSDKException extends java.lang.Exception {
 
     private static final long serialVersionUID = 3754251347587995515L;
 
-    private Integer errorCode;
+    private final Integer errorCode;
 
     public WeCrossSDKException(Integer code, String message) {
         super(message);

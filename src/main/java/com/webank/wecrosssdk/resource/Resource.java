@@ -35,7 +35,7 @@ public class Resource {
         try {
             return status().equals("exists");
         } catch (Exception e) {
-            logger.error("Get status exception: " + e);
+            logger.error("Get status exception: ", e);
             return false;
         }
     }
@@ -111,7 +111,7 @@ public class Resource {
         try {
             return call.send();
         } catch (Exception e) {
-            logger.error("Error in RemoteCall: {}, exception: {}", e.getMessage(), e);
+            logger.error("Error in RemoteCall: {}", e.getMessage(), e);
             throw new WeCrossSDKException(ErrorCode.REMOTECALL_ERROR, e.getMessage());
         }
     }

@@ -100,6 +100,7 @@ public class FabricAccount extends ChainAccount {
                 + "\"}";
     }
 
+    @Override
     public String toFormatString() {
         return type
                 + " Account:\n"

@@ -34,9 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 public class WeCrossRPCService implements WeCrossService {
     private final Logger logger = LoggerFactory.getLogger(WeCrossRPCService.class);
@@ -50,7 +48,7 @@ public class WeCrossRPCService implements WeCrossService {
     @Override
     public void init() throws WeCrossSDKException {
         Connection connection = getConnection(Constant.APPLICATION_CONFIG_FILE);
-        logger.info(connection.toString());
+        logger.info("RPCService init:{}", connection);
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
         server = connection.getServer();
         httpClient = getHttpAsyncClient(connection);
@@ -66,21 +64,13 @@ public class WeCrossRPCService implements WeCrossService {
         }
     }
 
-    private <T extends Response> void checkResponse(ResponseEntity<T> response)
-            throws WeCrossSDKException {
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new WeCrossSDKException(
-                    ErrorCode.RPC_ERROR, "method not exists: " + response.toString());
-        }
-    }
-
     @Override
     public <T extends Response> T send(Request request, Class<T> responseType)
             throws WeCrossSDKException {
         String url =
                 RPCUtils.pathToUrl("https", server, request.getPath()) + "/" + request.getMethod();
         if (logger.isDebugEnabled()) {
-            logger.debug("send-request: {}; url: {}", request.toString(), url);
+            logger.debug("send-request: {}; url: {}", request, url);
         }
 
         checkRequest(request);
@@ -126,7 +116,6 @@ public class WeCrossRPCService implements WeCrossService {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request timeout, caused by: " + e.getMessage());
         } catch (Exception e) {
-            logger.warn("send exception", e);
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
         }
@@ -167,13 +156,13 @@ public class WeCrossRPCService implements WeCrossService {
                             + "/"
                             + request.getMethod();
             if (logger.isDebugEnabled()) {
-                logger.debug("asyncSend-request: {}; url: {}", request.toString(), url);
+                logger.debug("asyncSend-request: {}; url: {}", request, url);
             }
 
             checkRequest(request);
             BoundRequestBuilder builder = httpClient.preparePost(url);
             String currentToken = AuthenticationManager.getCurrentUserCredential();
-            if (CommandList.authRequiredCommands.contains(request.getMethod())
+            if (CommandList.AUTH_REQUIRED_COMMANDS.contains(request.getMethod())
                     && currentToken != null) {
                 String runtimeAuthType = AuthenticationManager.runtimeAuthType.get();
                 if (runtimeAuthType != null) {
@@ -210,9 +199,7 @@ public class WeCrossRPCService implements WeCrossService {
                                         } else {
                                             String content = httpResponse.getResponseBody();
                                             T response =
-                                                    (T)
-                                                            objectMapper.readValue(
-                                                                    content, responseType);
+                                                    objectMapper.readValue(content, responseType);
                                             callback.callOnSuccess(response);
                                             return response;
                                         }

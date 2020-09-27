@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class HTLCTest {
-    private static Logger logger = LoggerFactory.getLogger(HTLCTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(HTLCTest.class);
 
     private static WeCrossRPC weCrossRPC;
     private static ThreadPoolTaskExecutor threadPool;
@@ -71,48 +71,44 @@ public class HTLCTest {
             }
             int before = getBalance(counterpartyPath, senderAccount1, receiver1);
 
-            for (Integer i = 0; i < count; ++i) {
-                Integer finalI = i;
+            for (int i = 0; i < count; ++i) {
+                int finalI = i;
                 threadPool.execute(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    // use timelock as secret
-                                    String secret = String.valueOf(now) + finalI;
-                                    Hash myHash = new Hash();
-                                    String hash = myHash.sha256(secret);
-                                    // generate timelock
-                                    long t0 = now + 5000000;
-                                    long t1 = now + 2500000;
+                        () -> {
+                            try {
+                                // use timelock as secret
+                                String secret = String.valueOf(now) + finalI;
+                                Hash myHash = new Hash();
+                                String hash = myHash.sha256(secret);
+                                // generate timelock
+                                long t0 = now + 5000000;
+                                long t1 = now + 2500000;
 
-                                    String[] proposalArgs =
-                                            new String[] {
-                                                hash,
-                                                "false",
-                                                sender0,
-                                                receiver0,
-                                                "1",
-                                                String.valueOf(t0),
-                                                sender1,
-                                                receiver1,
-                                                "1",
-                                                String.valueOf(t1)
-                                            };
+                                String[] proposalArgs =
+                                        new String[] {
+                                            hash,
+                                            "false",
+                                            sender0,
+                                            receiver0,
+                                            "1",
+                                            String.valueOf(t0),
+                                            sender1,
+                                            receiver1,
+                                            "1",
+                                            String.valueOf(t1)
+                                        };
 
-                                    // participant
-                                    newContract(
-                                            counterpartyPath, senderAccount1, "null", proposalArgs);
+                                // participant
+                                newContract(counterpartyPath, senderAccount1, "null", proposalArgs);
 
-                                    proposalArgs[1] = "true";
-                                    // initiator
-                                    newContract(selfPath, senderAccount0, secret, proposalArgs);
-                                    semaphore.release();
-                                    System.out.println("create proposal " + finalI + " done");
-                                } catch (Exception e) {
-                                    semaphore.release();
-                                    System.out.println("Error: " + e.getMessage());
-                                }
+                                proposalArgs[1] = "true";
+                                // initiator
+                                newContract(selfPath, senderAccount0, secret, proposalArgs);
+                                semaphore.release();
+                                System.out.println("create proposal " + finalI + " done");
+                            } catch (Exception e) {
+                                semaphore.release();
+                                System.out.println("Error: " + e.getMessage());
                             }
                         });
             }

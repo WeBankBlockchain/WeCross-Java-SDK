@@ -31,7 +31,7 @@ public class PerformanceCollector {
     private AtomicInteger received = new AtomicInteger(0);
 
     private AtomicInteger error = new AtomicInteger(0);
-    private AtomicInteger ret_error = new AtomicInteger(0);
+    private AtomicInteger retError = new AtomicInteger(0);
     private Long startTimestamp = System.currentTimeMillis();
 
     public boolean isEnd() {
@@ -41,7 +41,6 @@ public class PerformanceCollector {
     public void onMessage(Status status, Long cost) {
         try {
             if (!status.equals(Status.SUCCESS)) {
-                // System.out.println("receipt error! status: " + receipt.getStatus());
                 error.addAndGet(1);
             }
 
@@ -102,7 +101,7 @@ public class PerformanceCollector {
             System.out.println(
                     "Return Error rate: "
                             + String.valueOf(
-                                    ((double) ret_error.get() / (double) received.get()) * 100)
+                                    ((double) retError.get() / (double) received.get()) * 100)
                             + "%");
 
             System.out.println("Time area:");

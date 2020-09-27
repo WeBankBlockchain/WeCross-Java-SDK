@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.rpc;
 
+import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.methods.Response;
@@ -14,7 +15,7 @@ public class CallRPCTest {
     private WeCrossRPC weCrossRPC;
 
     @Before
-    public void initializer() throws Exception {
+    public void initializer() throws WeCrossSDKException {
         WeCrossService service = new MockWeCrossService();
         weCrossRPC = WeCrossRPCFactory.build(service);
     }
@@ -119,7 +120,7 @@ public class CallRPCTest {
     public void getTransactionIDsTest() throws Exception {
         RoutineIDResponse routineIDResponse =
                 weCrossRPC.getTransactionIDs("test.test.test", 0).send();
-        Assert.assertEquals(new String[] {"001"}, routineIDResponse.getIDs());
+        Assert.assertEquals("001", routineIDResponse.getIDs()[0]);
     }
 
     @Test

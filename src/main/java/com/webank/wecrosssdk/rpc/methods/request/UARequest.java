@@ -33,13 +33,13 @@ public class UARequest {
             case "BCOS2.0":
                 {
                     this.chainAccount = new BCOSAccount(chainAccount);
-                    logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                    logger.debug("this.chainAccount is {}", this.chainAccount);
                     break;
                 }
             case "Fabric1.4":
                 {
                     this.chainAccount = new FabricAccount(chainAccount);
-                    logger.debug("this.chainAccount is {}", this.chainAccount.toString());
+                    logger.debug("this.chainAccount is {}", this.chainAccount);
                     break;
                 }
             default:

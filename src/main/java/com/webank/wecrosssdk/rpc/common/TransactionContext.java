@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransactionContext implements AutoCloseable {
-    public static ThreadLocal<String> txThreadLocal = new ThreadLocal<>();
-    public static ThreadLocal<AtomicInteger> seqThreadLocal = new ThreadLocal<>();
-    public static ThreadLocal<List<String>> pathInTransactionThreadLocal = new ThreadLocal<>();
+    public static final ThreadLocal<String> txThreadLocal = new ThreadLocal<>();
+    public static final ThreadLocal<AtomicInteger> seqThreadLocal = new ThreadLocal<>();
+    public static final ThreadLocal<List<String>> pathInTransactionThreadLocal =
+            new ThreadLocal<>();
 
     public TransactionContext(String txID) {
         txThreadLocal.set(txID);

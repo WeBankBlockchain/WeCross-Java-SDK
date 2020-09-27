@@ -41,8 +41,6 @@ public class ResourceTest {
     @Test
     public void infoTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             ResourceDetail result = resource.detail();
             Assert.assertNotEquals(result, null);
@@ -54,8 +52,6 @@ public class ResourceTest {
     @Test
     public void callTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.call("test");
             Assert.assertNull(result);
@@ -72,8 +68,6 @@ public class ResourceTest {
     @Test
     public void sendTransactionTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.sendTransaction("test", "test");
             Assert.assertNull(result);

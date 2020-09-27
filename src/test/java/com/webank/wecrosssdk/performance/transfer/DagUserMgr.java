@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DagUserMgr {
-    private static Logger logger = LoggerFactory.getLogger(DagUserMgr.class);
+    private static final Logger logger = LoggerFactory.getLogger(DagUserMgr.class);
 
     public DagUserMgr(String file) {
         this.file = file;
     }
 
-    private List<DagTransferUser> userList = new ArrayList<DagTransferUser>();
+    private List<DagTransferUser> userList = new ArrayList<>();
 
     private String file = null;
 
@@ -75,7 +75,7 @@ public class DagUserMgr {
         for (int i = 0; i < userCount; i++) {
             DagTransferUser dagTransferUser = new DagTransferUser();
             String user = Long.toHexString(seconds) + Integer.toHexString(i);
-            BigInteger amount = new BigInteger("1000000000");
+            BigInteger amount = BigInteger.valueOf(Long.parseLong("1000000000"));
             dagTransferUser.setUser(user);
             dagTransferUser.setAmount(amount);
             this.getUserList().add(dagTransferUser);
@@ -88,20 +88,13 @@ public class DagUserMgr {
         }
         logger.info("file {}, begin load.", file);
 
-        BufferedWriter bw = null;
-        try {
-            bw = new BufferedWriter(new FileWriter(new File(file)));
-            for (int i = 0; i < userList.size(); i++) {
-                bw.write(userList.get(i).getUser() + "\n");
-                logger.trace(" write user , user is {}", userList.get(i).getUser());
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file)))) {
+            for (DagTransferUser dagTransferUser : userList) {
+                bw.write(dagTransferUser.getUser() + "\n");
+                logger.trace(" write user , user is {}", dagTransferUser.getUser());
             }
 
             bw.flush();
-
-        } finally {
-            if (bw != null) {
-                bw.close();
-            }
         }
 
         logger.info("file {}, load end, count is {}.", file, userList.size());
@@ -113,9 +106,7 @@ public class DagUserMgr {
         if (file == null) {
             return;
         }
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(new File(file)));
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(file)))) {
 
             String line = null;
             while ((line = br.readLine()) != null) {
@@ -124,17 +115,12 @@ public class DagUserMgr {
                     DagTransferUser user = new DagTransferUser();
                     user.setUser(line);
                     addUser(user);
-                    // System.out.println("load DagTransferUser ==>> " + line);
                 }
             }
 
         } catch (Exception e) {
             System.out.println(" load user failed, " + e);
             System.exit(0);
-        } finally {
-            if (br != null) {
-                br.close();
-            }
         }
 
         logger.info("file {}, load end, count is {}.", file, userList.size());

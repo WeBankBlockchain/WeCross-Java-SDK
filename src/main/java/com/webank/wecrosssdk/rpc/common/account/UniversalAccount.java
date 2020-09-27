@@ -87,6 +87,11 @@ public class UniversalAccount {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hashCode(username, pubKey, uaID);
+    }
+
+    @Override
     public String toString() {
         StringBuilder result =
                 new StringBuilder(
@@ -102,7 +107,7 @@ public class UniversalAccount {
                                 + "\"");
 
         result.append(", \"chainAccounts\": [");
-        if (chainAccounts != null && chainAccounts.size() != 0) {
+        if (chainAccounts != null && !chainAccounts.isEmpty()) {
             for (ChainAccount chainAccount : chainAccounts) {
                 result.append(chainAccount.toString()).append(",");
             }
@@ -118,7 +123,7 @@ public class UniversalAccount {
         result.append("username: ").append(username).append("\n");
         result.append("pubKey  : ").append(pubKey).append("\n");
         result.append("uaID    : ").append(uaID).append("\n");
-        if (chainAccounts != null && chainAccounts.size() != 0) {
+        if (chainAccounts != null && !chainAccounts.isEmpty()) {
             result.append("chainAccounts: [");
             result.append("\n");
             for (ChainAccount chainAccount : chainAccounts) {

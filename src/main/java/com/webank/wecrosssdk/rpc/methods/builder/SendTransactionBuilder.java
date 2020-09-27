@@ -15,7 +15,7 @@ public class SendTransactionBuilder {
 
     public SendTransactionBuilder() {}
 
-    public SendTransactionBuilder(String path, String account, String method, String[] args) {
+    public SendTransactionBuilder(String path, String method, String[] args) {
         this.path = path;
         this.method = method;
         this.args = args;

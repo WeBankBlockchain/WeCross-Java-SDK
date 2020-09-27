@@ -27,8 +27,8 @@ public class WeCrossRPCServiceTest {
 
     @Test
     public void sendTest() {
-        Request request = new Request();
-        request.setVersion(Version.CurrentVersion);
+        Request request = new Request<>();
+        request.setVersion(Version.CURRENT_VERSION);
         request.setPath("a.b.c");
         request.setMethod("call");
         WeCrossRPCService weCrossService = new WeCrossRPCService();

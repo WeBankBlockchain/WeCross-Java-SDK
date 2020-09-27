@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Callback<T> {
     private static Timer timer = new HashedWheelTimer();
-    private static final long callbackTimeout = 30000; // ms
+    private static final long CALLBACK_TIMEOUT = 30000; // ms
     private Timeout timeoutWorker;
     private AtomicBoolean isFinish = new AtomicBoolean(false);
 
@@ -25,7 +25,7 @@ public abstract class Callback<T> {
                                                 ErrorCode.REMOTECALL_ERROR, "Timeout"));
                             }
                         },
-                        callbackTimeout,
+                        CALLBACK_TIMEOUT,
                         TimeUnit.MILLISECONDS);
     }
 

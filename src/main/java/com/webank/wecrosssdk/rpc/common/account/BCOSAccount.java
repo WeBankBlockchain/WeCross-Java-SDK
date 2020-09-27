@@ -85,6 +85,7 @@ public class BCOSAccount extends ChainAccount {
                 + "\"}";
     }
 
+    @Override
     public String toFormatString() {
         return type
                 + " Account:\n"

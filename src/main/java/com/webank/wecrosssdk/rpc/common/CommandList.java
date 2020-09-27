@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CommandList {
     /** doCommand Require JWT */
-    public static final List<String> authRequiredCommands =
+    public static final List<String> AUTH_REQUIRED_COMMANDS =
             Arrays.asList(
                     "call",
                     "sendTransaction",
