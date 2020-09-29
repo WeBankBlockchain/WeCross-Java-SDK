@@ -8,7 +8,7 @@ public class FabricAccount extends ChainAccount {
 
     private String pubKey;
     private String secKey;
-    private String mspID;
+    private String ext;
 
     public FabricAccount() {
         super();
@@ -20,19 +20,18 @@ public class FabricAccount extends ChainAccount {
             boolean isDefault,
             String pubKey,
             String secKey,
-            String mspID) {
+            String ext) {
         super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.mspID = mspID;
+        this.ext = ext;
     }
 
-    public FabricAccount(
-            String type, String pubKey, String secKey, String mspID, boolean isDefault) {
+    public FabricAccount(String type, String pubKey, String secKey, String ext, boolean isDefault) {
         super(type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.mspID = mspID;
+        this.ext = ext;
     }
 
     public FabricAccount(Integer keyID, String type, boolean isDefault) {
@@ -43,7 +42,7 @@ public class FabricAccount extends ChainAccount {
         super(chainAccount.keyID, chainAccount.type, chainAccount.isDefault);
     }
 
-    @JsonSetter("cert")
+    @JsonSetter("pubKey")
     public void setPubKey(String pubKey) {
         this.pubKey = pubKey;
     }
@@ -58,14 +57,19 @@ public class FabricAccount extends ChainAccount {
         return secKey;
     }
 
-    @JsonGetter("mspID")
-    public String getMspID() {
-        return mspID;
+    @JsonSetter("secKey")
+    public void setSecKey(String secKey) {
+        this.secKey = secKey;
     }
 
-    @JsonSetter("mspID")
-    public void setMspID(String mspID) {
-        this.mspID = mspID;
+    @JsonGetter("ext")
+    public String getExt() {
+        return ext;
+    }
+
+    @JsonSetter("ext")
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class FabricAccount extends ChainAccount {
                 + pubKey
                 + '\"'
                 + ", \"MembershipID\":\""
-                + mspID
+                + ext
                 + '\"'
                 + ", \"isDefault\":\""
                 + isDefault
@@ -115,7 +119,7 @@ public class FabricAccount extends ChainAccount {
                 + pubKey
                 + "\n"
                 + "\tMembershipID : "
-                + mspID
+                + ext
                 + "\n"
                 + "\tisDefault: "
                 + isDefault

@@ -1,12 +1,14 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.base.Objects;
 
 public class BCOSAccount extends ChainAccount {
 
     private String pubKey;
     private String secKey;
-    private String address;
+    private String ext;
 
     public BCOSAccount() {
         super();
@@ -17,20 +19,19 @@ public class BCOSAccount extends ChainAccount {
             String type,
             String pubKey,
             String secKey,
-            String address,
+            String ext,
             boolean isDefault) {
         super(keyID, type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.address = address;
+        this.ext = ext;
     }
 
-    public BCOSAccount(
-            String type, String pubKey, String secKey, String address, boolean isDefault) {
+    public BCOSAccount(String type, String pubKey, String secKey, String ext, boolean isDefault) {
         super(type, isDefault);
         this.pubKey = pubKey;
         this.secKey = secKey;
-        this.address = address;
+        this.ext = ext;
     }
 
     public BCOSAccount(Integer keyID, String type, boolean isDefault) {
@@ -41,16 +42,34 @@ public class BCOSAccount extends ChainAccount {
         super(chainAccount.keyID, chainAccount.type, chainAccount.isDefault);
     }
 
+    @JsonGetter("pubKey")
     public String getPubKey() {
         return pubKey;
     }
 
+    @JsonGetter("secKey")
     public String getSecKey() {
         return secKey;
     }
 
-    public String getAddress() {
-        return address;
+    @JsonGetter("ext")
+    public String getExt() {
+        return ext;
+    }
+
+    @JsonSetter("pubKey")
+    public void setPubKey(String pubKey) {
+        this.pubKey = pubKey;
+    }
+
+    @JsonSetter("secKey")
+    public void setSecKey(String secKey) {
+        this.secKey = secKey;
+    }
+
+    @JsonSetter("ext")
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 
     @Override
@@ -58,12 +77,12 @@ public class BCOSAccount extends ChainAccount {
         if (this == o) return true;
         if (!(o instanceof BCOSAccount)) return false;
         BCOSAccount that = (BCOSAccount) o;
-        return Objects.equal(pubKey, that.pubKey) && Objects.equal(address, that.address);
+        return Objects.equal(pubKey, that.pubKey) && Objects.equal(ext, that.ext);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(type, pubKey, address);
+        return Objects.hashCode(type, pubKey, ext);
     }
 
     @Override
@@ -79,7 +98,7 @@ public class BCOSAccount extends ChainAccount {
                 + pubKey
                 + "\""
                 + ", \"address\":\""
-                + address
+                + ext
                 + "\""
                 + ", \"isDefault\":\""
                 + isDefault
@@ -100,7 +119,7 @@ public class BCOSAccount extends ChainAccount {
                 + pubKey
                 + "\n"
                 + "\taddress  : "
-                + address
+                + ext
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
