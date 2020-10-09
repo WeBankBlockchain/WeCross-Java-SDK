@@ -128,9 +128,9 @@ public class WeCrossRPCService implements WeCrossService {
 
             logger.info("CurrentUser: {}", uaRequest.getUsername());
             if (credential == null) {
-                logger.error("Credential in UAResponse is null!");
+                logger.error("Login fail, credential in UAResponse is null");
                 throw new WeCrossSDKException(
-                        ErrorCode.RPC_ERROR, "Login error: Credential in UAResponse is null!");
+                        ErrorCode.RPC_ERROR, "Login fail, credential in UAResponse is null!");
             }
             int firstIndexOfSpace = credential.trim().indexOf(' ');
 
@@ -161,14 +161,19 @@ public class WeCrossRPCService implements WeCrossService {
 
             checkRequest(request);
             BoundRequestBuilder builder = httpClient.preparePost(url);
-            String currentToken = AuthenticationManager.getCurrentUserCredential();
-            if (CommandList.AUTH_REQUIRED_COMMANDS.contains(request.getMethod())
-                    && currentToken != null) {
+            String currentUserCredential = AuthenticationManager.getCurrentUserCredential();
+            if (CommandList.AUTH_REQUIRED_COMMANDS.contains(request.getMethod())) {
+                if (currentUserCredential == null) {
+                    logger.error("Request's method required AUTH, but current credential is null.");
+                    throw new WeCrossSDKException(
+                            ErrorCode.LACK_AUTHENTICATION,
+                            "Command " + request.getMethod() + " needs Auth, please login.");
+                }
                 String runtimeAuthType = AuthenticationManager.runtimeAuthType.get();
                 if (runtimeAuthType != null) {
-                    currentToken = runtimeAuthType + " " + currentToken;
+                    currentUserCredential = runtimeAuthType + " " + currentUserCredential;
                 }
-                builder.setHeader(HttpHeaders.AUTHORIZATION, currentToken);
+                builder.setHeader(HttpHeaders.AUTHORIZATION, currentUserCredential);
             }
             builder.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
