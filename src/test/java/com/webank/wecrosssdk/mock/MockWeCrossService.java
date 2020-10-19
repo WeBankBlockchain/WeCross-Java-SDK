@@ -4,6 +4,7 @@ import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.*;
 import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
+import com.webank.wecrosssdk.rpc.common.account.FabricAccount;
 import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
@@ -97,8 +98,11 @@ public class MockWeCrossService implements WeCrossService {
         AccountResponse response = new AccountResponse();
         UniversalAccount account = new UniversalAccount("hello", "world");
         List<ChainAccount> list = new ArrayList<>();
-        ChainAccount chainAccount = new BCOSAccount(1, "BCOS2.0", "XXX", "XXX", "XXX", true);
-        list.add(chainAccount);
+        ChainAccount bcosAccount = new BCOSAccount(1, "BCOS2.0", "XXX", "XXX", "address", true);
+        list.add(bcosAccount);
+        ChainAccount fabricAccount =
+                new FabricAccount(2, "Fabric1.4", true, "xxx", "xxx", "membershipID");
+        list.add(fabricAccount);
         account.setChainAccounts(list);
         response.setErrorCode(0);
         response.setAccount(account);

@@ -86,4 +86,17 @@ public class ChainAccount {
                 + isDefault
                 + "\n";
     }
+
+    public String toDetailString() {
+        return "ChainAccount\n"
+                + "\tkeyID: "
+                + keyID
+                + "\n"
+                + "\ttype: "
+                + type
+                + "\n"
+                + "\tisDefault: "
+                + isDefault
+                + "\n";
+    }
 }

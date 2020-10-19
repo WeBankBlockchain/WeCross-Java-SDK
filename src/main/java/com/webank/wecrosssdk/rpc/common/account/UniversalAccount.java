@@ -1,7 +1,9 @@
 package com.webank.wecrosssdk.rpc.common.account;
 
-import com.google.common.base.Objects;
+import static com.webank.wecrosssdk.utils.RPCUtils.printHexDecently;
+
 import java.util.List;
+import java.util.Objects;
 
 public class UniversalAccount {
 
@@ -81,14 +83,14 @@ public class UniversalAccount {
         if (this == o) return true;
         if (!(o instanceof UniversalAccount)) return false;
         UniversalAccount that = (UniversalAccount) o;
-        return Objects.equal(username, that.username)
-                && Objects.equal(pubKey, that.pubKey)
-                && Objects.equal(uaID, that.uaID);
+        return Objects.equals(username, that.username)
+                && Objects.equals(pubKey, that.pubKey)
+                && Objects.equals(uaID, that.uaID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(username, pubKey, uaID);
+        return Objects.hashCode(this);
     }
 
     @Override
@@ -121,14 +123,44 @@ public class UniversalAccount {
     public String toFormatString() {
         StringBuilder result = new StringBuilder("Universal Account:\n");
         result.append("username: ").append(username).append("\n");
+        result.append("pubKey  : ").append(printHexDecently(pubKey)).append("\n");
+        result.append("uaID    : ").append(printHexDecently(uaID)).append("\n");
+        if (chainAccounts != null && !chainAccounts.isEmpty()) {
+            result.append("chainAccounts: [");
+            result.append("\n");
+            StringBuilder defaultAccountString = new StringBuilder();
+            StringBuilder normalAccountString = new StringBuilder();
+            for (ChainAccount chainAccount : chainAccounts) {
+                if (chainAccount.isDefault) {
+                    defaultAccountString.append(chainAccount.toFormatString());
+                } else {
+                    normalAccountString.append(chainAccount.toFormatString());
+                }
+            }
+            result.append(defaultAccountString).append(normalAccountString);
+            result.append("]");
+        }
+        return result.toString();
+    }
+
+    public String toDetailString() {
+        StringBuilder result = new StringBuilder("Universal Account:\n");
+        result.append("username: ").append(username).append("\n");
         result.append("pubKey  : ").append(pubKey).append("\n");
         result.append("uaID    : ").append(uaID).append("\n");
         if (chainAccounts != null && !chainAccounts.isEmpty()) {
             result.append("chainAccounts: [");
             result.append("\n");
+            StringBuilder defaultAccountString = new StringBuilder();
+            StringBuilder normalAccountString = new StringBuilder();
             for (ChainAccount chainAccount : chainAccounts) {
-                result.append(chainAccount.toFormatString());
+                if (chainAccount.isDefault) {
+                    defaultAccountString.append(chainAccount.toDetailString());
+                } else {
+                    normalAccountString.append(chainAccount.toDetailString());
+                }
             }
+            result.append(defaultAccountString).append(normalAccountString);
             result.append("]");
         }
         return result.toString();

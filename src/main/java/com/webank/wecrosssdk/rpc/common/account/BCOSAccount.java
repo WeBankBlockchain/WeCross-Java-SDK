@@ -107,7 +107,8 @@ public class BCOSAccount extends ChainAccount {
 
     @Override
     public String toFormatString() {
-        return type
+        return "\t"
+                + type
                 + " Account:\n"
                 + "\tkeyID    : "
                 + keyID
@@ -115,7 +116,26 @@ public class BCOSAccount extends ChainAccount {
                 + "\ttype     : "
                 + type
                 + "\n"
-                + "\tpubKey   :\n"
+                + "\taddress  : "
+                + ext
+                + "\n"
+                + "\tisDefault: "
+                + isDefault
+                + "\n\t----------\n";
+    }
+
+    @Override
+    public String toDetailString() {
+        return "\t"
+                + type
+                + " Account:\n"
+                + "\tkeyID    : "
+                + keyID
+                + "\n"
+                + "\ttype     : "
+                + type
+                + "\n"
+                + "\tpubKey   : "
                 + pubKey
                 + "\n"
                 + "\taddress  : "
@@ -123,6 +143,6 @@ public class BCOSAccount extends ChainAccount {
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
-                + "\n";
+                + "\n\t----------\n";
     }
 }

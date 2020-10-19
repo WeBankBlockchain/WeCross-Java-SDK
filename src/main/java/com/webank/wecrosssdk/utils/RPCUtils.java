@@ -27,4 +27,10 @@ public class RPCUtils {
         }
         return protocol + "://" + prefix + "/" + path.replace('.', '/');
     }
+
+    public static String printHexDecently(String hexString) {
+        if (hexString != null && hexString.length() > 10) {
+            return hexString.substring(0, 10) + "...";
+        } else return hexString;
+    }
 }
