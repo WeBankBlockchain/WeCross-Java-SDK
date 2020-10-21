@@ -50,7 +50,7 @@ public interface WeCrossRPC {
 
     RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option);
 
-    RemoteCall<UAResponse> register(String name, String password);
+    RemoteCall<UAResponse> register(String name, String password) throws WeCrossSDKException;
 
     RemoteCall<UAResponse> login(String name, String password);
 

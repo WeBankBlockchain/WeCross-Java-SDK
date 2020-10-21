@@ -16,6 +16,7 @@ import com.webank.wecrosssdk.utils.ConfigUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,9 +207,15 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<UAResponse> register(String name, String password) {
+    public RemoteCall<UAResponse> register(String name, String password)
+            throws WeCrossSDKException {
         UARequest uaRequest = new UARequest(name, password);
-
+        if (!Pattern.matches(Constant.USERNAME_PATTERN, name)
+                || !Pattern.matches(Constant.PASSWORD_PATTERN, password)) {
+            throw new WeCrossSDKException(
+                    ErrorCode.ILLEGAL_SYMBOL,
+                    "Invalid username/password, please check your username/password matches the pattern.");
+        }
         Request<UARequest> request = new Request<>("auth", "register", uaRequest);
 
         return new RemoteCall<>(weCrossService, UAResponse.class, request);
@@ -229,8 +236,8 @@ public class WeCrossRPCRest implements WeCrossRPC {
         String username = toml.getString("login.username");
         String password = toml.getString("login.password");
         if (username == null || password == null) {
-            logger.error(
-                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login.");
+            logger.info(
+                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login, turn to loginWithArgs");
             return null;
         }
         return login(username, password).send();

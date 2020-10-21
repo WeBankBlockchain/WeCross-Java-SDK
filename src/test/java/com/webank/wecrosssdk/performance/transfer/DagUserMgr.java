@@ -67,7 +67,7 @@ public class DagUserMgr {
     /**
      * Create the specified number of users
      *
-     * @param userCount
+     * @param userCount user number
      */
     public void createUser(int userCount) {
         userCount = (userCount > 0 ? userCount : 1);

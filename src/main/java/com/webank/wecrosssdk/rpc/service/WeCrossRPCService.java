@@ -188,7 +188,9 @@ public class WeCrossRPCService implements WeCrossService {
                                             callback.callOnFailed(
                                                     new WeCrossSDKException(
                                                             ErrorCode.LACK_AUTHENTICATION,
-                                                            "HTTP status code: 401-Unauthorized, have you logged in?"));
+                                                            "HTTP status code: 401-Unauthorized, have you logged in?\n"
+                                                                    + "If you have logged-in already, maybe you should re-login "
+                                                                    + "because your account login status has expired."));
                                             return null;
                                         }
                                         if (httpResponse.getStatusCode() != 200) {

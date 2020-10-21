@@ -130,6 +130,21 @@ public class CallRPCTest {
     }
 
     @Test
+    public void registerUsernameTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.register("hello-_123", "world").send();
+        UAResponse uaResponse1 = weCrossRPC.register("1234567890123456", "world").send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
+    public void registerPasswordTest() throws Exception {
+        UAResponse uaResponse = weCrossRPC.register("hello", "@+!%*#?world123").send();
+        UAResponse uaResponse1 = weCrossRPC.register("hello", "1234567890123456").send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+        Assert.assertEquals(uaResponse1.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
     public void loginTest() throws Exception {
         UAResponse uaResponse = weCrossRPC.login("hello", "world").send();
         Assert.assertEquals(uaResponse.getUAReceipt().getCredential(), "token");
