@@ -36,7 +36,7 @@ public interface WeCrossRPC {
             String transactionID, String path, String method, String... args);
 
     RemoteCall<TransactionResponse> execTransaction(
-            String transactionID, String seq, String path, String method, String... args);
+            String transactionID, String path, String method, String... args);
 
     RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths);
 
@@ -63,4 +63,6 @@ public interface WeCrossRPC {
     RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount);
 
     RemoteCall<UAResponse> setDefaultAccount(String type, Integer keyID);
+
+    String getCurrentTransactionID();
 }

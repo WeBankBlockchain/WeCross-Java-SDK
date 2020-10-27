@@ -16,6 +16,7 @@ public class CommandList {
                     "commitTransaction",
                     "rollbackTransaction",
                     "getTransactionInfo",
+                    "getTransactionIDs",
                     "logout",
                     "listAccounts",
                     "customCommand",

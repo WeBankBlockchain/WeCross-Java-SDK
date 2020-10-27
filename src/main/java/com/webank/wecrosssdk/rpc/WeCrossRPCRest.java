@@ -13,6 +13,8 @@ import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import com.webank.wecrosssdk.utils.ConfigUtils;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,7 +135,11 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<TransactionResponse> execTransaction(
-            String transactionID, String seq, String path, String method, String... args) {
+            String transactionID, String path, String method, String... args) {
+        // Chinese Standard Time UTC+8
+        ZoneOffset zoneOffset = ZoneOffset.ofHours(8);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        String seq = String.valueOf(localDateTime.toEpochSecond(zoneOffset));
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
         transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
@@ -274,6 +280,16 @@ public class WeCrossRPCRest implements WeCrossRPC {
         Request<ChainAccount> request = new Request<>("auth", "setDefaultAccount", chainAccount);
 
         return new RemoteCall<>(weCrossService, UAResponse.class, request);
+    }
+
+    @Override
+    public String getCurrentTransactionID() {
+        String txID = TransactionContext.currentTXID();
+        if (txID == null) {
+            logger.warn("getCurrentTransactionID: Current TransactionID is null.");
+            return null;
+        }
+        return txID;
     }
 
     private RemoteCall<TransactionResponse> buildSendTransactionRequest(
