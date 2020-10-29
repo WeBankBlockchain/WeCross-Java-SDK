@@ -12,14 +12,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BCOSXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
     private AtomicLong id;
-    private String[] accounts;
 
-    public BCOSXASuite(WeCrossRPC weCrossRPC, String account, String path) {
-        this.account = account;
+    public BCOSXASuite(WeCrossRPC weCrossRPC, String path) {
         this.path = path;
-        this.accounts = new String[] {account};
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }
@@ -37,7 +33,6 @@ public class BCOSXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            accounts,
                             new String[] {
                                 iPath,
                             })
@@ -53,7 +48,6 @@ public class BCOSXASuite implements PerformanceSuite {
                                                             sIndex,
                                                             "1",
                                                             iPath,
-                                                            account,
                                                             "newEvidence",
                                                             "a",
                                                             "a")
@@ -74,7 +68,6 @@ public class BCOSXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            accounts,
                                                                                             new String
                                                                                                     [] {
                                                                                                 iPath,

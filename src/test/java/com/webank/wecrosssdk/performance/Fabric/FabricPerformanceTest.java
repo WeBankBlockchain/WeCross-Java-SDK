@@ -13,19 +13,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FabricPerformanceTest {
-    private static Logger logger = LoggerFactory.getLogger(FabricPerformanceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(FabricPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] call [count] [qps] [poolSize]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest call [count] [qps] [poolSize]");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest [accountName] sendTransaction [count] [qps] [poolSize]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest sendTransaction [count] [qps] [poolSize]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 call 100 10 2000");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest call 100 10 2000");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest fabric_user1 sendTransaction 100 10 500");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.Fabric.FabricPerformanceTest sendTransaction 100 10 500");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
@@ -41,15 +41,14 @@ public class FabricPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5) {
+        if (args.length != 4) {
             usage();
         }
 
-        String accountName = args[0];
-        String command = args[1];
-        BigInteger count = new BigInteger(args[2]);
-        BigInteger qps = new BigInteger(args[3]);
-        int poolSize = Integer.parseInt(args[4]);
+        String command = args[0];
+        BigInteger count = new BigInteger(args[1]);
+        BigInteger qps = new BigInteger(args[2]);
+        int poolSize = Integer.parseInt(args[3]);
 
         System.out.println(
                 "FabricPerformanceTest: command is "
@@ -61,22 +60,23 @@ public class FabricPerformanceTest {
 
         switch (command) {
             case "call":
-                callTest(accountName, count, qps, poolSize);
+                callTest(count, qps, poolSize);
                 exit();
+                break;
             case "sendTransaction":
-                sendTransactionTest(accountName, count, qps, poolSize);
+                sendTransactionTest(count, qps, poolSize);
                 exit();
+                break;
             default:
                 usage();
         }
     }
 
-    public static void callTest(
-            String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.sacc", accountName);
+    public static void callTest(BigInteger count, BigInteger qps, int poolSize) {
+        Resource resource = loadResource("payment.fabric.sacc");
         if (resource == null) {
             logger.warn("Default to payment.fabric.sacc");
-            resource = loadResource("payment.fabric.sacc", accountName);
+            resource = loadResource("payment.fabric.sacc");
         }
 
         if (resource != null) {
@@ -92,12 +92,11 @@ public class FabricPerformanceTest {
         }
     }
 
-    public static void sendTransactionTest(
-            String accountName, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.fabric.sacc", accountName);
+    public static void sendTransactionTest(BigInteger count, BigInteger qps, int poolSize) {
+        Resource resource = loadResource("payment.fabric.sacc");
         if (resource == null) {
             logger.warn("Default to payment.fabric.sacc");
-            resource = loadResource("payment.fabric.sacc", accountName);
+            resource = loadResource("payment.fabric.sacc");
         }
 
         if (resource != null) {
@@ -113,12 +112,11 @@ public class FabricPerformanceTest {
         }
     }
 
-    private static Resource loadResource(String path, String accountName) {
+    private static Resource loadResource(String path) {
         WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
             WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
-            Resource resource = ResourceFactory.build(weCrossRPC, path, accountName);
-            return resource;
+            return ResourceFactory.build(weCrossRPC, path);
         } catch (WeCrossSDKException e) {
             System.out.println("Error: Init wecross service failed: {}" + e);
             return null;

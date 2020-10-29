@@ -12,14 +12,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class FabricXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
-    private String[] accounts;
     private AtomicLong id;
 
-    public FabricXASuite(WeCrossRPC weCrossRPC, String account, String path) {
-        this.account = account;
+    public FabricXASuite(WeCrossRPC weCrossRPC, String path) {
         this.path = path;
-        this.accounts = new String[] {account};
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }
@@ -36,7 +32,6 @@ public class FabricXASuite implements PerformanceSuite {
             weCrossRPC
                     .startTransaction(
                             sIndex,
-                            accounts,
                             new String[] {
                                 path,
                             })
@@ -52,7 +47,6 @@ public class FabricXASuite implements PerformanceSuite {
                                                             sIndex,
                                                             "1",
                                                             path,
-                                                            account,
                                                             "newEvidence",
                                                             "a",
                                                             "a")
@@ -73,7 +67,6 @@ public class FabricXASuite implements PerformanceSuite {
                                                                             weCrossRPC
                                                                                     .commitTransaction(
                                                                                             sIndex,
-                                                                                            accounts,
                                                                                             new String
                                                                                                     [] {
                                                                                                 path,

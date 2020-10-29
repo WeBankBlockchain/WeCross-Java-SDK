@@ -4,19 +4,18 @@ import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.util.Arrays;
 
 public class CallMethodBuilder {
     private String path;
-    private String account;
     private String method;
     private String[] args;
 
     public CallMethodBuilder() {}
 
-    public CallMethodBuilder(String path, String account, String method, String[] args) {
+    public CallMethodBuilder(String path, String method, String[] args) {
         this.path = path;
-        this.account = account;
         this.method = method;
         this.args = args;
     }
@@ -27,11 +26,6 @@ public class CallMethodBuilder {
 
     public CallMethodBuilder path(String path) {
         this.path = path;
-        return this;
-    }
-
-    public CallMethodBuilder account(String account) {
-        this.account = account;
         return this;
     }
 
@@ -51,11 +45,14 @@ public class CallMethodBuilder {
                     ErrorCode.REMOTECALL_ERROR,
                     "CalMethodBuilder: RPC in send(WeCrossRPC) is null");
         }
-        if (this.account == null || this.path == null || this.method == null || this.args == null) {
+        if (AuthenticationManager.getCurrentUser() == null
+                || this.path == null
+                || this.method == null
+                || this.args == null) {
             throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING, "Some field(s) in CallTransactionBuilder is null!");
+                    ErrorCode.FIELD_MISSING, "Some field(s) in CalMethodBuilder is null!");
         }
-        return weCrossRPC.call(this.path, this.account, this.method, this.args).send();
+        return weCrossRPC.call(this.path, this.method, this.args).send();
     }
 
     public String getPath() {
@@ -64,14 +61,6 @@ public class CallMethodBuilder {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public String getMethod() {
@@ -95,9 +84,6 @@ public class CallMethodBuilder {
         return "CallMethodBuilder{"
                 + "path='"
                 + path
-                + '\''
-                + ", account='"
-                + account
                 + '\''
                 + ", method='"
                 + method

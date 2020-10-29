@@ -9,16 +9,28 @@ import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ResourceTest {
 
+    private WeCrossRPC weCrossRPC;
+
+    @Before
+    public void init() {
+        WeCrossService service = new MockWeCrossService();
+        try {
+            weCrossRPC = WeCrossRPCFactory.build(service);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
     @Test
     public void statusTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
-            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String result = resource.status();
             Assert.assertEquals(result, "test");
         } catch (Exception e) {
@@ -29,9 +41,7 @@ public class ResourceTest {
     @Test
     public void infoTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
-            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             ResourceDetail result = resource.detail();
             Assert.assertNotEquals(result, null);
         } catch (Exception e) {
@@ -42,9 +52,7 @@ public class ResourceTest {
     @Test
     public void callTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
-            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.call("test");
             Assert.assertNull(result);
 
@@ -60,9 +68,7 @@ public class ResourceTest {
     @Test
     public void sendTransactionTest() {
         try {
-            WeCrossService service = new MockWeCrossService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(service);
-            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test", "test");
+            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.sendTransaction("test", "test");
             Assert.assertNull(result);
 

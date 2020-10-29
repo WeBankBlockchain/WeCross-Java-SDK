@@ -1,23 +1,20 @@
 package com.webank.wecrosssdk.mock;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
-import com.webank.wecrosssdk.rpc.common.Accounts;
-import com.webank.wecrosssdk.rpc.common.Receipt;
-import com.webank.wecrosssdk.rpc.common.ResourceDetail;
-import com.webank.wecrosssdk.rpc.common.Resources;
-import com.webank.wecrosssdk.rpc.common.Stubs;
+import com.webank.wecrosssdk.rpc.common.*;
+import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
+import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
+import com.webank.wecrosssdk.rpc.common.account.FabricAccount;
+import com.webank.wecrosssdk.rpc.common.account.UniversalAccount;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MockWeCrossService implements WeCrossService {
-    private Map<String, String> datas = new HashMap<>();
 
     @Override
     public void init() throws WeCrossSDKException {}
@@ -31,7 +28,7 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleDetail(request);
             case "supportedStubs":
                 return (T) handleSupportedStubs(request);
-            case "listAccounts":
+            case "listAccount":
                 return (T) handleListAccounts(request);
             case "listResources":
                 return (T) handleListResources(request);
@@ -41,6 +38,8 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleSendTransaction(request);
             case "startTransaction":
                 return (T) handleStartTransaction(request);
+            case "execTransaction":
+                return (T) handleExecTransaction(request);
             case "commitTransaction":
                 return (T) handleCommitTransaction(request);
             case "rollbackTransaction":
@@ -51,6 +50,16 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleCustomCommand(request);
             case "getTransactionIDs":
                 return (T) handleGetTransactionIDs(request);
+            case "register":
+                return (T) handleRegister(request);
+            case "login":
+                return (T) handleLogin(request);
+            case "addChainAccount":
+                return (T) handleAddChainAccount(request);
+            case "setDefaultAccount":
+                return (T) handleSetDefaultAccount(request);
+            case "logout":
+                return (T) handleLogout();
             default:
                 return handleMethodNotFound(request, responseType);
         }
@@ -87,12 +96,16 @@ public class MockWeCrossService implements WeCrossService {
 
     public AccountResponse handleListAccounts(Request request) {
         AccountResponse response = new AccountResponse();
-        Accounts accounts = new Accounts();
-        List<Map<String, String>> accountInfos = new ArrayList<>();
-        accountInfos.add((Map<String, String>) new HashMap<>().put("name", "bcos"));
-        accounts.setAccountInfos(accountInfos);
+        UniversalAccount account = new UniversalAccount("hello", "world");
+        List<ChainAccount> list = new ArrayList<>();
+        ChainAccount bcosAccount = new BCOSAccount(1, "BCOS2.0", "XXX", "XXX", "address", true);
+        list.add(bcosAccount);
+        ChainAccount fabricAccount =
+                new FabricAccount(2, "Fabric1.4", true, "xxx", "xxx", "membershipID");
+        list.add(fabricAccount);
+        account.setChainAccounts(list);
         response.setErrorCode(0);
-        response.setAccounts(accounts);
+        response.setAccount(account);
         return response;
     }
 
@@ -130,6 +143,15 @@ public class MockWeCrossService implements WeCrossService {
         return response;
     }
 
+    public TransactionResponse handleExecTransaction(Request request) {
+        TransactionResponse response = new TransactionResponse();
+        response.setErrorCode(0);
+        Receipt receipt = new Receipt();
+        receipt.setResult(new String[] {"true"});
+        response.setReceipt(receipt);
+        return response;
+    }
+
     public RoutineResponse handleCommitTransaction(Request request) {
         RoutineResponse response = new RoutineResponse();
         response.setErrorCode(0);
@@ -162,6 +184,46 @@ public class MockWeCrossService implements WeCrossService {
         RoutineIDResponse response = new RoutineIDResponse();
         response.setErrorCode(0);
         response.setIDs(new String[] {"001"});
+        return response;
+    }
+
+    public UAResponse handleRegister(Request request) {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
+        return response;
+    }
+
+    public UAResponse handleLogin(Request request) {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "", "token");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
+        return response;
+    }
+
+    public UAResponse handleLogout() {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
+        return response;
+    }
+
+    public UAResponse handleAddChainAccount(Request request) {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
+        return response;
+    }
+
+    public UAResponse handleSetDefaultAccount(Request request) {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
         return response;
     }
 

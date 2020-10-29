@@ -27,7 +27,7 @@ public class AsyncSendTest {
                         });
 
         weCrossRPC
-                .sendTransaction("payment.bcos.HelloWeCross", "bcos1", "set", "hello", "world")
+                .sendTransaction("payment.bcos.HelloWeCross", "set", "hello", "world")
                 .asyncSend(
                         new Callback<TransactionResponse>() {
                             @Override
@@ -42,7 +42,7 @@ public class AsyncSendTest {
                         });
 
         weCrossRPC
-                .call("payment.bcos.HelloWeCross", "bcos1", "get", "hello", "world")
+                .call("payment.bcos.HelloWeCross", "get", "hello", "world")
                 .asyncSend(
                         new Callback<TransactionResponse>() {
                             @Override

@@ -1,7 +1,5 @@
 package com.webank.wecrosssdk.performance.Fabric;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
@@ -11,9 +9,7 @@ import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 
 public class FabricCallSuite implements PerformanceSuite {
-    private Resource resource;
-    private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final Resource resource;
 
     public FabricCallSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
@@ -39,7 +35,7 @@ public class FabricCallSuite implements PerformanceSuite {
     public void call(PerformanceSuiteCallback callback, int index) {
         try {
             resource.getWeCrossRPC()
-                    .call(resource.getPath(), resource.getAccount(), "query", "a")
+                    .call(resource.getPath(), "query", "a")
                     .asyncSend(
                             new Callback<TransactionResponse>() {
                                 @Override

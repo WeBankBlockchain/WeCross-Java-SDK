@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class PerformanceManager {
-    private Logger logger = LoggerFactory.getLogger(PerformanceManager.class);
+    private final Logger logger = LoggerFactory.getLogger(PerformanceManager.class);
+    private BigInteger qps;
     private PerformanceSuite suite;
     private BigInteger count;
-    private BigInteger qps;
     private ThreadPoolTaskExecutor threadPool;
     private RateLimiter limiter;
     private Integer area;
 
-    private static int poolSize = 16;
+    private static final int POOL_SIZE = 16;
     private int maxConcurrentNumber = 800;
     private transient Semaphore concurrentLimiter = new Semaphore(maxConcurrentNumber, true);
 
@@ -48,8 +48,8 @@ public class PerformanceManager {
         this.qps = qps;
 
         this.threadPool = new ThreadPoolTaskExecutor();
-        this.threadPool.setCorePoolSize(poolSize);
-        this.threadPool.setMaxPoolSize(poolSize * 2);
+        this.threadPool.setCorePoolSize(POOL_SIZE);
+        this.threadPool.setMaxPoolSize(POOL_SIZE * 2);
         this.threadPool.setQueueCapacity(count.intValue());
         this.threadPool.initialize();
 
@@ -71,26 +71,23 @@ public class PerformanceManager {
             for (Integer i = 0; i < count.intValue(); ++i) {
                 Integer finalI = i;
                 threadPool.execute(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                PerformanceSuiteCallback callback = buildCallback(collector);
-                                limiter.acquire();
-                                suite.call(callback, finalI);
-                                int current = sended.incrementAndGet();
+                        () -> {
+                            PerformanceSuiteCallback callback = buildCallback(collector);
+                            limiter.acquire();
+                            suite.call(callback, finalI);
+                            int current = sended.incrementAndGet();
 
-                                if (current >= area && ((current % area) == 0)) {
-                                    long elapsed = System.currentTimeMillis() - startTime;
-                                    double sendSpeed = current / ((double) elapsed / 1000);
-                                    System.out.println(
-                                            "Already sended: "
-                                                    + current
-                                                    + "/"
-                                                    + count
-                                                    + " transactions"
-                                                    + ",QPS="
-                                                    + sendSpeed);
-                                }
+                            if (current >= area && ((current % area) == 0)) {
+                                long elapsed = System.currentTimeMillis() - startTime;
+                                double sendSpeed = current / ((double) elapsed / 1000);
+                                System.out.println(
+                                        "Already sended: "
+                                                + current
+                                                + "/"
+                                                + count
+                                                + " transactions"
+                                                + ",QPS="
+                                                + sendSpeed);
                             }
                         });
             }
@@ -108,7 +105,7 @@ public class PerformanceManager {
             collector.dumpSummary();
 
         } catch (Exception e) {
-            logger.error("Run exception: " + e);
+            logger.error("Run exception: ", e);
         }
     }
 

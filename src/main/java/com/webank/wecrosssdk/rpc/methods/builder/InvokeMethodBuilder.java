@@ -7,35 +7,34 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.util.Arrays;
 
-public class SendTransactionBuilder {
-
+public class InvokeMethodBuilder {
     private String path;
     private String method;
     private String[] args;
 
-    public SendTransactionBuilder() {}
+    public InvokeMethodBuilder() {}
 
-    public SendTransactionBuilder(String path, String method, String[] args) {
+    public InvokeMethodBuilder(String path, String method, String[] args) {
         this.path = path;
         this.method = method;
         this.args = args;
     }
 
-    public static SendTransactionBuilder build() {
-        return new SendTransactionBuilder();
+    public InvokeMethodBuilder build() {
+        return new InvokeMethodBuilder();
     }
 
-    public SendTransactionBuilder path(String path) {
+    public InvokeMethodBuilder path(String path) {
         this.path = path;
         return this;
     }
 
-    public SendTransactionBuilder method(String method) {
+    public InvokeMethodBuilder method(String method) {
         this.method = method;
         return this;
     }
 
-    public SendTransactionBuilder args(String[] args) {
+    public InvokeMethodBuilder args(String[] args) {
         this.args = args;
         return this;
     }
@@ -44,16 +43,16 @@ public class SendTransactionBuilder {
         if (weCrossRPC == null) {
             throw new WeCrossSDKException(
                     ErrorCode.REMOTECALL_ERROR,
-                    "SendTransactionBuilder: RPC in send(WeCrossRPC) is null");
+                    "InvokeMethodBuilder: RPC in send(WeCrossRPC) is null");
         }
         if (AuthenticationManager.getCurrentUser() == null
                 || this.path == null
                 || this.method == null
                 || this.args == null) {
             throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING, "Some field(s) in SendTransactionBuilder is null!");
+                    ErrorCode.FIELD_MISSING, "Some field(s) in InvokeMethodBuilder is null!");
         }
-        return weCrossRPC.sendTransaction(this.path, this.method, this.args).send();
+        return weCrossRPC.invoke(this.path, this.method, this.args).send();
     }
 
     public String getPath() {
@@ -82,8 +81,8 @@ public class SendTransactionBuilder {
 
     @Override
     public String toString() {
-        return "sendTransactionBuilder{"
-                + ", path='"
+        return "InvokeMethodBuilder{"
+                + "path='"
                 + path
                 + '\''
                 + ", method='"

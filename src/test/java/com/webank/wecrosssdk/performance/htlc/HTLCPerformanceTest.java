@@ -1,5 +1,6 @@
 package com.webank.wecrosssdk.performance.htlc;
 
+import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
@@ -84,12 +85,13 @@ public class HTLCPerformanceTest {
         exit();
     }
 
-    private static WeCrossRPC loadWeCrossRPC() throws Exception {
+    private static WeCrossRPC loadWeCrossRPC() throws WeCrossSDKException {
         WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
             return WeCrossRPCFactory.build(weCrossRPCService);
         } catch (WeCrossSDKException e) {
-            throw new Exception("Error: Init wecross service failed: {}" + e.getMessage());
+            throw new WeCrossSDKException(
+                    ErrorCode.RPC_ERROR, "Error: Init wecross service failed: " + e.getMessage());
         }
     }
 

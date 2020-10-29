@@ -18,8 +18,8 @@ public class Hash {
     private String bytesToHex(byte[] bytes) {
         StringBuilder stringBuffer = new StringBuilder();
         String temp;
-        for (int i = 0; i < bytes.length; i++) {
-            temp = Integer.toHexString(bytes[i] & 0xFF);
+        for (byte aByte : bytes) {
+            temp = Integer.toHexString(aByte & 0xFF);
             if (temp.length() == 1) {
                 stringBuffer.append("0");
             }
