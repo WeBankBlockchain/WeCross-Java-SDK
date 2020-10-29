@@ -21,7 +21,7 @@ public class RemoteCall<T extends Response> {
         return weCrossService.send(request, responseType);
     }
 
-    public void asyncSend(Callback<T> callback) throws Exception {
+    public void asyncSend(Callback<T> callback) {
         weCrossService.asyncSend(request, responseType, callback);
     }
 

@@ -1,7 +1,5 @@
 package com.webank.wecrosssdk.performance.Fabric;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
@@ -12,9 +10,7 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import java.security.SecureRandom;
 
 public class FabricSendTransactionSuite implements PerformanceSuite {
-    private Resource resource;
-    private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final Resource resource;
     static final int BOUND = Integer.MAX_VALUE - 1;
     SecureRandom rand = new SecureRandom();
 
@@ -48,7 +44,6 @@ public class FabricSendTransactionSuite implements PerformanceSuite {
             resource.getWeCrossRPC()
                     .sendTransaction(
                             resource.getPath(),
-                            resource.getAccount(),
                             "set",
                             String.valueOf(rand.nextInt(BOUND)),
                             String.valueOf(rand.nextInt(BOUND)))

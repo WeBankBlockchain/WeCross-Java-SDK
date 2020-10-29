@@ -5,19 +5,17 @@ import com.webank.wecrosssdk.rpc.common.Version;
 import com.webank.wecrosssdk.rpc.common.WeCrossCallback;
 
 public class Request<T> {
-    private String version = Version.CurrentVersion;
+    private String version = Version.CURRENT_VERSION;
     private String path;
     private String method;
-    private String account;
     private T data;
 
     @JsonIgnore private WeCrossCallback callback;
 
     public Request() {}
 
-    public Request(String path, String account, String method, T data) {
+    public Request(String path, String method, T data) {
         this.path = path;
-        this.account = account;
         this.method = method;
         this.data = data;
     }
@@ -46,14 +44,6 @@ public class Request<T> {
         this.method = method;
     }
 
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
     public T getData() {
         return data;
     }
@@ -72,21 +62,19 @@ public class Request<T> {
 
     @Override
     public String toString() {
-        return "Request{"
-                + "version='"
-                + version
-                + '\''
-                + ", path='"
-                + path
-                + '\''
-                + ", method='"
-                + method
-                + '\''
-                + ", accountName='"
-                + account
-                + '\''
-                + ", data="
-                + data
-                + '}';
+        String result =
+                "Request{"
+                        + "version='"
+                        + version
+                        + '\''
+                        + ", path='"
+                        + path
+                        + '\''
+                        + ", method='"
+                        + method
+                        + '\'';
+        result += (data == null) ? "" : ", data=" + data;
+        result += '}';
+        return result;
     }
 }

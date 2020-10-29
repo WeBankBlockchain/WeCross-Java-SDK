@@ -7,34 +7,30 @@ import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class XAPerformanceTest {
-    private static Logger logger = LoggerFactory.getLogger(XAPerformanceTest.class);
 
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest [type] [path] [account] [count] [qps] [poolSize]");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest [type] [path] [count] [qps] [poolSize]");
         System.out.println(
-                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest bcos payment.bcos.Evidence bcos_user1 1000 100 1000");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest bcos payment.bcos.Evidence 1000 100 1000");
         System.out.println(
-                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest fabric payment.fabric.Evidence fabric_user1 10 1 1");
+                " \t java -cp 'conf/:lib/*:apps/*' com.webank.wecrosssdk.performance.xa.XAPerformanceTest fabric payment.fabric.Evidence 10 1 1");
         exit();
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 6) {
+        if (args.length != 5) {
             usage();
         }
 
         String type = args[0];
         String path = args[1];
-        String account = args[2];
-        BigInteger count = new BigInteger(args[3]);
-        BigInteger qps = new BigInteger(args[4]);
-        int poolSize = Integer.parseInt(args[5]);
+        BigInteger count = new BigInteger(args[2]);
+        BigInteger qps = new BigInteger(args[3]);
+        int poolSize = Integer.parseInt(args[4]);
 
         try {
             WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
@@ -42,9 +38,9 @@ public class XAPerformanceTest {
 
             PerformanceSuite suite = null;
             if ("bcos".equals(type)) {
-                suite = new BCOSXASuite(weCrossRPC, account, path);
+                suite = new BCOSXASuite(weCrossRPC, path);
             } else if ("fabric".equals(type)) {
-                suite = new FabricXASuite(weCrossRPC, account, path);
+                suite = new FabricXASuite(weCrossRPC, path);
             } else {
                 exit();
             }

@@ -12,6 +12,7 @@
 .gradle
 build
 gradle.properties
+*.gpg
 
 ### output
 dist

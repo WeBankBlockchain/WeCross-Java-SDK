@@ -17,29 +17,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Resource {
-    private Logger logger = LoggerFactory.getLogger(Resource.class);
+    private final Logger logger = LoggerFactory.getLogger(Resource.class);
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
 
-    // Use given account to send transaction
-    Resource(WeCrossRPC weCrossRPC, String path, String account) {
+    Resource(WeCrossRPC weCrossRPC, String path) {
         this.weCrossRPC = weCrossRPC;
         this.path = path;
-        this.account = account;
     }
 
     public void check() throws WeCrossSDKException {
         checkWeCrossRPC(this.weCrossRPC);
         checkIPath(this.path);
-        checkAccountName(this.account);
     }
 
     public boolean isActive() {
         try {
             return status().equals("exists");
         } catch (Exception e) {
-            logger.error("Get status exception: " + e);
+            logger.error("Get status exception: ", e);
             return false;
         }
     }
@@ -63,16 +59,18 @@ public class Resource {
     }
 
     public String[] call(String method) throws WeCrossSDKException {
-        return call(method, null);
+        return call(method, (String) null);
     }
 
     public String[] call(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
-                (TransactionResponse) mustOkRequest(weCrossRPC.call(path, account, method, args));
+                (TransactionResponse) mustOkRequest(weCrossRPC.call(path, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
+            throw new WeCrossSDKException(
+                    ErrorCode.CALL_CONTRACT_ERROR,
+                    "Resource.call fail, receipt:" + receipt.toString());
         }
         return receipt.getResult();
     }
@@ -83,17 +81,18 @@ public class Resource {
     }
 
     public String[] sendTransaction(String method) throws WeCrossSDKException {
-        return sendTransaction(method, null);
+        return sendTransaction(method, (String) null);
     }
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
         TransactionResponse response =
-                (TransactionResponse)
-                        mustOkRequest(weCrossRPC.sendTransaction(path, account, method, args));
+                (TransactionResponse) mustOkRequest(weCrossRPC.sendTransaction(path, method, args));
         checkResponse(response);
         Receipt receipt = response.getReceipt();
         if (receipt.getErrorCode() != StatusCode.SUCCESS) {
-            throw new WeCrossSDKException(ErrorCode.CALL_CONTRACT_ERROR, receipt.toString());
+            throw new WeCrossSDKException(
+                    ErrorCode.CALL_CONTRACT_ERROR,
+                    "Resource.sendTransaction fail, receipt:" + receipt.toString());
         }
         return receipt.getResult();
     }
@@ -108,17 +107,11 @@ public class Resource {
         RPCUtils.checkPath(path);
     }
 
-    private void checkAccountName(String accountName) throws WeCrossSDKException {
-        if (accountName == null || accountName.equals("")) {
-            throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "AccountName not set");
-        }
-    }
-
     private Response<?> mustOkRequest(RemoteCall<?> call) throws WeCrossSDKException {
         try {
             return call.send();
         } catch (Exception e) {
-            logger.error("Error in RemoteCall: {}, exception: {}", e.getMessage(), e);
+            logger.error("Error in RemoteCall: {}", e.getMessage(), e);
             throw new WeCrossSDKException(ErrorCode.REMOTECALL_ERROR, e.getMessage());
         }
     }
@@ -145,13 +138,5 @@ public class Resource {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 }

@@ -1,5 +1,7 @@
 plugins {
     id 'com.github.sherter.google-java-format' version '0.8'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'maven-publish'
 }
 
 apply plugin: 'maven'
@@ -12,7 +14,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc4'
+version = '1.0.0-rc5-10271-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -69,6 +71,7 @@ dependencies {
     compile 'com.moandjiezana.toml:toml4j:0.7.2'
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.17.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-aop:2.1.17.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-security:2.1.17.RELEASE'
     compile 'org.springframework:spring-aspects:5.1.2.RELEASE'
     compile 'org.springframework:spring-aop:5.1.2.RELEASE'
     compile 'org.asynchttpclient:async-http-client:2.12.1'
@@ -79,7 +82,7 @@ dependencies {
     compile 'org.aspectj:aspectjrt:1.9.2'
     compile 'org.aspectj:aspectjweaver:1.9.2'
 }
-
+configurations.compile.exclude(group: 'ch.qos.logback')
 jar {
     destinationDir file('dist/apps')
     archiveName project.name + "-" + project.version + '.jar'

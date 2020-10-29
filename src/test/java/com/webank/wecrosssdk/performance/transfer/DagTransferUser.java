@@ -31,14 +31,14 @@ public class DagTransferUser {
     }
 
     public synchronized void increase(BigInteger amount) {
-        logger.debug("increase before amount is " + this.amount);
+        logger.debug("increase before amount is {}", this.amount);
         this.amount = this.amount.add(amount);
-        logger.debug("increase after amount is " + this.amount);
+        logger.debug("increase after amount is {}", this.amount);
     }
 
     public synchronized void decrease(BigInteger amount) {
-        logger.debug("decrease before amount is " + this.amount);
+        logger.debug("decrease before amount is {}", this.amount);
         this.amount = this.amount.subtract(amount);
-        logger.debug("decrease after amount is " + this.amount);
+        logger.debug("decrease after amount is {}", this.amount);
     }
 }

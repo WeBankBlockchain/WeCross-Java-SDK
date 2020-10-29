@@ -5,31 +5,27 @@ import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
-import io.netty.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Callback<T> {
     private static Timer timer = new HashedWheelTimer();
-    private static final long callbackTimeout = 30000; // ms
+    private static final long CALLBACK_TIMEOUT = 30000; // ms
     private Timeout timeoutWorker;
     private AtomicBoolean isFinish = new AtomicBoolean(false);
 
     public Callback() {
         timeoutWorker =
                 timer.newTimeout(
-                        new TimerTask() {
-                            @Override
-                            public void run(Timeout timeout) throws Exception {
-                                if (!isFinish.getAndSet(true)) {
-                                    timeoutWorker.cancel();
-                                    onFailed(
-                                            new WeCrossSDKException(
-                                                    ErrorCode.REMOTECALL_ERROR, "Timeout"));
-                                }
+                        timeout -> {
+                            if (!isFinish.getAndSet(true)) {
+                                timeoutWorker.cancel();
+                                onFailed(
+                                        new WeCrossSDKException(
+                                                ErrorCode.REMOTECALL_ERROR, "Timeout"));
                             }
                         },
-                        callbackTimeout,
+                        CALLBACK_TIMEOUT,
                         TimeUnit.MILLISECONDS);
     }
 

@@ -1,7 +1,5 @@
 package com.webank.wecrosssdk.performance.transfer;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
@@ -14,27 +12,11 @@ import java.math.BigInteger;
 public class BCOSSendTransactionSuite implements PerformanceSuite {
     private Resource resource;
     private DagUserMgr dagUserMgr = null;
-    private TypeReference<?> typeReference = new TypeReference<TransactionResponse>() {};
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     public BCOSSendTransactionSuite(Resource resource) throws WeCrossSDKException {
         if (!resource.isActive()) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_INACTIVE, "Resource inactive");
         }
-
-        /*
-        try {
-            resource.sendTransaction("transfer", data);
-        } catch (WeCrossSDKException e) {
-            System.out.println("Invalid contract or user or db: " + e.getMessage());
-            System.out.println(
-                    "\tRollback: Check the HelloWecross address configuration in stub.toml");
-            System.out.println("\tUser type: check the user type is BCOS2.0");
-            System.out.println(
-                    "\tBlocklimit failed: check the router is syncing or couldn't be the next block");
-            throw new WeCrossSDKException(ErrorCode.INVALID_CONTRACT, "Init contract failed");
-        }
-        */
 
         this.resource = resource;
     }
@@ -50,7 +32,6 @@ public class BCOSSendTransactionSuite implements PerformanceSuite {
             resource.getWeCrossRPC()
                     .sendTransaction(
                             resource.getPath(),
-                            resource.getAccount(),
                             "transfer",
                             dagUserMgr.getFrom(index).getUser(),
                             dagUserMgr.getTo(index).getUser(),

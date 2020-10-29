@@ -4,23 +4,13 @@ import java.util.Arrays;
 
 public class RoutineRequest {
     private String transactionID;
-    private String[] accounts;
     private String[] paths;
 
     public RoutineRequest() {}
 
-    public RoutineRequest(String transactionID, String[] accounts, String[] paths) {
+    public RoutineRequest(String transactionID, String[] paths) {
         this.transactionID = transactionID;
-        this.accounts = accounts;
         this.paths = paths;
-    }
-
-    public String[] getAccounts() {
-        return accounts;
-    }
-
-    public void setAccounts(String[] accounts) {
-        this.accounts = accounts;
     }
 
     public String[] getPaths() {
@@ -45,8 +35,6 @@ public class RoutineRequest {
                 + "transactionID='"
                 + transactionID
                 + '\''
-                + ", accounts="
-                + Arrays.toString(accounts)
                 + ", paths="
                 + Arrays.toString(paths)
                 + '}';

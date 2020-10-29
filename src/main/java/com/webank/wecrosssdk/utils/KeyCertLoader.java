@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KeyCertLoader {
-    private Logger logger = LoggerFactory.getLogger(KeyCertLoader.class);
+    private final Logger logger = LoggerFactory.getLogger(KeyCertLoader.class);
 
     private static final Pattern CERT_PATTERN =
             Pattern.compile(
@@ -107,7 +107,7 @@ public class KeyCertLoader {
         return getPrivateKeyFromByteBuffer(readPrivateKey(keyInputStream), keyPassword);
     }
 
-    ByteBuf readPrivateKey(InputStream in) throws KeyException {
+    private ByteBuf readPrivateKey(InputStream in) throws KeyException {
         String content;
         try {
             content = readContent(in);
@@ -129,8 +129,7 @@ public class KeyCertLoader {
     }
 
     public String readContent(InputStream in) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buf = new byte[8192];
             for (; ; ) {
                 int ret = in.read(buf);
@@ -140,8 +139,6 @@ public class KeyCertLoader {
                 out.write(buf, 0, ret);
             }
             return out.toString(CharsetUtil.US_ASCII.name());
-        } finally {
-            out.close();
         }
     }
 
@@ -156,10 +153,7 @@ public class KeyCertLoader {
         List<ByteBuf> certs = new ArrayList<ByteBuf>();
         Matcher m = CERT_PATTERN.matcher(content);
         int start = 0;
-        for (; ; ) {
-            if (!m.find(start)) {
-                break;
-            }
+        while (m.find(start)) {
 
             ByteBuf base64 = Unpooled.copiedBuffer(m.group(1), CharsetUtil.US_ASCII);
             ByteBuf der = Base64.decode(base64);
@@ -198,7 +192,7 @@ public class KeyCertLoader {
                         is.close();
                     } catch (IOException e) {
                         // This is not expected to happen, but re-throw in case it does.
-                        logger.warn("failed to close InputStream: {}", e.getMessage());
+                        logger.warn("failed to close InputStream: ", e);
                     }
                 }
             }
