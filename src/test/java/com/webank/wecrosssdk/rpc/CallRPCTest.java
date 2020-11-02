@@ -68,45 +68,45 @@ public class CallRPCTest {
     }
 
     @Test
-    public void callTransactionTest() throws Exception {
+    public void callXATest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC.callTransaction("001", "test.test.test", "test", "test").send();
+                weCrossRPC.callXA("001", "test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
     @Test
-    public void execTransactionTest() throws Exception {
+    public void sendXATransactionTest() throws Exception {
         TransactionResponse transactionResponse =
-                weCrossRPC.execTransaction("001", "0", "test.test.test", "test", "test").send();
+                weCrossRPC.sendXATransaction("001", "0", "test.test.test", "test", "test").send();
         Assert.assertEquals(transactionResponse.getErrorCode(), 0);
     }
 
     @Test
-    public void startTransactionTest() throws Exception {
-        RoutineResponse routineResponse =
-                weCrossRPC.startTransaction("001", new String[] {"test.test.test"}).send();
-        Assert.assertEquals(routineResponse.getErrorCode(), 0);
+    public void startXATransactionTest() throws Exception {
+        XAResponse XAResponse =
+                weCrossRPC.startXATransaction("001", new String[] {"test.test.test"}).send();
+        Assert.assertEquals(XAResponse.getErrorCode(), 0);
     }
 
     @Test
-    public void commitTransactionTest() throws Exception {
-        RoutineResponse routineResponse =
-                weCrossRPC.commitTransaction("001", new String[] {"test.test.test"}).send();
-        Assert.assertEquals(routineResponse.getErrorCode(), 0);
+    public void commitXATransactionTest() throws Exception {
+        XAResponse XAResponse =
+                weCrossRPC.commitXATransaction("001", new String[] {"test.test.test"}).send();
+        Assert.assertEquals(XAResponse.getErrorCode(), 0);
     }
 
     @Test
-    public void rollbackTransactionTest() throws Exception {
-        RoutineResponse routineResponse =
-                weCrossRPC.rollbackTransaction("001", new String[] {"test.test.test"}).send();
-        Assert.assertEquals(routineResponse.getErrorCode(), 0);
+    public void rollbackXATransactionTest() throws Exception {
+        XAResponse XAResponse =
+                weCrossRPC.rollbackXATransaction("001", new String[] {"test.test.test"}).send();
+        Assert.assertEquals(XAResponse.getErrorCode(), 0);
     }
 
     @Test
-    public void getTransactionInfoTest() throws Exception {
-        RoutineInfoResponse routineInfoResponse =
-                weCrossRPC.getTransactionInfo("001", new String[] {"test.test.test"}).send();
-        Assert.assertEquals(routineInfoResponse.getErrorCode(), 0);
+    public void getXATransactionTest() throws Exception {
+        XATransactionResponse XATransactionResponse =
+                weCrossRPC.getXATransaction("001", new String[] {"test.test.test"}).send();
+        Assert.assertNotNull(XATransactionResponse.getRawXATransactionResponse());
     }
 
     @Test
@@ -117,10 +117,10 @@ public class CallRPCTest {
     }
 
     @Test
-    public void getTransactionIDsTest() throws Exception {
-        RoutineIDResponse routineIDResponse =
-                weCrossRPC.getTransactionIDs("test.test.test", 0).send();
-        Assert.assertEquals("001", routineIDResponse.getIDs()[0]);
+    public void listXATransactionsTest() throws Exception {
+        XATransactionListResponse xaTransactionListResponse =
+                weCrossRPC.listXATransactions(0).send();
+        Assert.assertNotNull(xaTransactionListResponse.getRawXATransactionListResponse());
     }
 
     @Test

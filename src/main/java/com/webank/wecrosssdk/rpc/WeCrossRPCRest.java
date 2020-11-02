@@ -13,8 +13,6 @@ import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import com.webank.wecrosssdk.utils.ConfigUtils;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,62 +32,53 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<Response> status(String path) {
-        Request<String> request = new Request<>(path, "status", null);
-        return new RemoteCall<>(weCrossService, Response.class, request);
+        String uri = "/resource/" + path.replace('.', '/') + "/status";
+        return new RemoteCall<>(weCrossService, uri, Response.class, new Request<>());
     }
 
     @Override
     public RemoteCall<ResourceDetailResponse> detail(String path) {
-        Request<?> request = new Request<>(path, "detail", null);
-        return new RemoteCall<>(weCrossService, ResourceDetailResponse.class, request);
+        String uri = "/resource/" + path.replace('.', '/') + "/detail";
+        return new RemoteCall<>(weCrossService, uri, ResourceDetailResponse.class, new Request<>());
     }
 
     @Override
     public RemoteCall<Response> test() {
-        Request<String> request = new Request<>("", "test", null);
-        return new RemoteCall<>(weCrossService, Response.class, request);
+        return new RemoteCall<>(weCrossService, "/sys/test", Response.class, new Request<>());
     }
 
     @Override
     public RemoteCall<StubResponse> supportedStubs() {
-        Request<?> request = new Request<>("", "supportedStubs", null);
-        return new RemoteCall<>(weCrossService, StubResponse.class, request);
+        return new RemoteCall<>(
+                weCrossService, "/sys/supportedStubs", StubResponse.class, new Request<>());
     }
 
     @Override
     public RemoteCall<AccountResponse> listAccount() {
-        Request<?> request = new Request<>("auth", "listAccount", null);
-        return new RemoteCall<>(weCrossService, AccountResponse.class, request);
+        return new RemoteCall<>(
+                weCrossService, "/auth/listAccount", AccountResponse.class, new Request<>());
     }
 
     @Override
     public RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote) {
         ResourceRequest resourceRequest = new ResourceRequest(ignoreRemote);
-        Request<ResourceRequest> request = new Request<>("", "listResources", resourceRequest);
-        return new RemoteCall<>(weCrossService, ResourceResponse.class, request);
-    }
-
-    @Override
-    public RemoteCall<TransactionResponse> call(Request<TransactionRequest> request) {
-        return new RemoteCall<>(weCrossService, TransactionResponse.class, request);
+        Request<ResourceRequest> request = new Request<>(resourceRequest);
+        return new RemoteCall<>(
+                weCrossService, "/sys/listResources", ResourceResponse.class, request);
     }
 
     @Override
     public RemoteCall<TransactionResponse> call(String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-        String txID = TransactionContext.currentTXID();
+        String txID = TransactionContext.currentXATransactionID();
         if (txID != null) {
-            transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
+            transactionRequest.addOption(Constant.XA_TRANSACTION_ID_KEY, txID);
             logger.info(
                     "call: TransactionID exist, turn to callTransaction, TransactionID is{}", txID);
         }
-        Request<TransactionRequest> request = new Request<>(path, "call", transactionRequest);
-        return new RemoteCall<>(weCrossService, TransactionResponse.class, request);
-    }
-
-    @Override
-    public RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request) {
-        return new RemoteCall<>(weCrossService, TransactionResponse.class, request);
+        String uri = "/resource/" + path.replace('.', '/') + "/call";
+        Request<TransactionRequest> request = new Request<>(transactionRequest);
+        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
     }
 
     @Override
@@ -103,113 +92,100 @@ public class WeCrossRPCRest implements WeCrossRPC {
     public RemoteCall<TransactionResponse> invoke(String path, String method, String... args)
             throws WeCrossSDKException {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-        String txID = TransactionContext.currentTXID();
-        if (txID != null && TransactionContext.isPathInTransaction(path)) {
-            try {
-                transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
-                String seq = TransactionContext.currentSeq();
-                transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
-                logger.info(
-                        "invoke: TransactionID exist, turn to execTransaction, TransactionID is {}, Seq is{}",
-                        txID,
-                        seq);
-            } catch (WeCrossSDKException e) {
-                throw new WeCrossSDKException(
-                        ErrorCode.RPC_ERROR,
-                        "RPC.invoke: Exception happened in getting transaction context: "
-                                + e.getMessage());
-            }
+        String xaTransactionID = TransactionContext.currentXATransactionID();
+        if (xaTransactionID != null && TransactionContext.isPathInTransaction(path)) {
+            transactionRequest.addOption(Constant.XA_TRANSACTION_ID_KEY, xaTransactionID);
+            long xaTransactionSeq = TransactionContext.currentXATransactionSeq();
+            transactionRequest.addOption(Constant.XA_TRANSACTION_SEQ_KEY, xaTransactionSeq);
+            logger.info(
+                    "invoke: TransactionID exist, turn to execTransaction, TransactionID is {}, Seq is{}",
+                    xaTransactionID,
+                    xaTransactionSeq);
         }
         return buildSendTransactionRequest(path, transactionRequest);
     }
 
     @Override
-    public RemoteCall<TransactionResponse> callTransaction(
+    public RemoteCall<TransactionResponse> callXA(
             String transactionID, String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-        transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
+        transactionRequest.addOption(Constant.XA_TRANSACTION_ID_KEY, transactionID);
 
-        Request<TransactionRequest> request = new Request<>(path, "call", transactionRequest);
-        return new RemoteCall<>(weCrossService, TransactionResponse.class, request);
+        String uri = "/resource/" + path.replace('.', '/') + "/call";
+        Request<TransactionRequest> request = new Request<>(transactionRequest);
+        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
     }
 
     @Override
-    public RemoteCall<TransactionResponse> execTransaction(
+    public RemoteCall<TransactionResponse> sendXATransaction(
             String transactionID, String path, String method, String... args) {
-        // Chinese Standard Time UTC+8
-        ZoneOffset zoneOffset = ZoneOffset.ofHours(8);
-        LocalDateTime localDateTime = LocalDateTime.now();
-        String seq = String.valueOf(localDateTime.toEpochSecond(zoneOffset));
+        long xaTransactionSeq = TransactionContext.currentXATransactionSeq();
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
-        transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, transactionID);
-        transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
+        transactionRequest.addOption(Constant.XA_TRANSACTION_ID_KEY, transactionID);
+        transactionRequest.addOption(Constant.XA_TRANSACTION_SEQ_KEY, xaTransactionSeq);
 
         return buildSendTransactionRequest(path, transactionRequest);
     }
 
     @Override
-    public RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
+    public RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths) {
+        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
         TransactionContext.txThreadLocal.set(transactionID);
         TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
         List<String> pathInTransaction = Arrays.asList(paths);
         TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
-        Request<RoutineRequest> request = new Request<>("", "startTransaction", routineRequest);
-        return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
+        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        return new RemoteCall<>(
+                weCrossService, "/xa/startXATransaction", XAResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineResponse> commitTransaction(String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
+    public RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths) {
+        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
 
-        Request<RoutineRequest> request = new Request<>("", "commitTransaction", routineRequest);
-
-        return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
+        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        return new RemoteCall<>(
+                weCrossService, "/xa/commitXATransaction", XAResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineResponse> rollbackTransaction(String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
+    public RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths) {
+        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
         TransactionContext.txThreadLocal.remove();
         TransactionContext.seqThreadLocal.remove();
         TransactionContext.pathInTransactionThreadLocal.remove();
-
-        Request<RoutineRequest> request = new Request<>("", "rollbackTransaction", routineRequest);
-
-        return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
+        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        return new RemoteCall<>(
+                weCrossService, "/xa/rollbackXATransaction", XAResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineInfoResponse> getTransactionInfo(
+    public RemoteCall<XATransactionResponse> getXATransaction(
             String transactionID, String[] paths) {
-        RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
-
-        Request<RoutineRequest> request = new Request<>("", "getTransactionInfo", routineRequest);
-
-        return new RemoteCall<>(weCrossService, RoutineInfoResponse.class, request);
+        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
+        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        return new RemoteCall<>(
+                weCrossService, "/xa/getXATransaction", XATransactionResponse.class, request);
     }
 
     @Override
     public RemoteCall<CommandResponse> customCommand(String command, String path, Object... args) {
         CommandRequest commandRequest = new CommandRequest(command, args);
-
-        Request<CommandRequest> request = new Request<>(path, "customCommand", commandRequest);
-
-        return new RemoteCall<>(weCrossService, CommandResponse.class, request);
+        Request<CommandRequest> request = new Request<>(commandRequest);
+        String uri = "/resource/" + path.replace('.', '/') + "/customCommand";
+        return new RemoteCall<>(weCrossService, uri, CommandResponse.class, request);
     }
 
     @Override
-    public RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option) {
-        RoutineIDRequest routineIDRequest = new RoutineIDRequest(path, option);
-
-        Request<RoutineIDRequest> request =
-                new Request<>("", "getTransactionIDs", routineIDRequest);
-
-        return new RemoteCall<>(weCrossService, RoutineIDResponse.class, request);
+    public RemoteCall<XATransactionListResponse> listXATransactions(int size) {
+        ListXATransactionsRequest listXATransactionsRequest = new ListXATransactionsRequest(size);
+        Request<ListXATransactionsRequest> request = new Request<>(listXATransactionsRequest);
+        return new RemoteCall<>(
+                weCrossService, "/xa/listXATransactions", XATransactionListResponse.class, request);
     }
 
     @Override
@@ -222,18 +198,15 @@ public class WeCrossRPCRest implements WeCrossRPC {
                     ErrorCode.ILLEGAL_SYMBOL,
                     "Invalid username/password, please check your username/password matches the pattern.");
         }
-        Request<UARequest> request = new Request<>("auth", "register", uaRequest);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<UARequest> request = new Request<>(uaRequest);
+        return new RemoteCall<>(weCrossService, "/auth/register", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> login(String name, String password) {
         UARequest uaRequest = new UARequest(name, password);
-
-        Request<UARequest> request = new Request<>("auth", "login", uaRequest);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<UARequest> request = new Request<>(uaRequest);
+        return new RemoteCall<>(weCrossService, "/auth/login", UAResponse.class, request);
     }
 
     @Override
@@ -252,39 +225,34 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<UAResponse> logout() {
         UARequest uaRequest = new UARequest();
-
-        Request<UARequest> request = new Request<>("auth", "logout", uaRequest);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<UARequest> request = new Request<>(uaRequest);
+        return new RemoteCall<>(weCrossService, "/auth/logout", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount) {
-
-        Request<ChainAccount> request = new Request<>("auth", "addChainAccount", chainAccount);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(weCrossService, "/auth/addChainAccount", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount) {
-
-        Request<ChainAccount> request = new Request<>("auth", "setDefaultAccount", chainAccount);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "/auth/setDefaultAccount", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> setDefaultAccount(String type, Integer keyID) {
         ChainAccount chainAccount = new ChainAccount(keyID, type, true);
-        Request<ChainAccount> request = new Request<>("auth", "setDefaultAccount", chainAccount);
-
-        return new RemoteCall<>(weCrossService, UAResponse.class, request);
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "/auth/setDefaultAccount", UAResponse.class, request);
     }
 
     @Override
     public String getCurrentTransactionID() {
-        String txID = TransactionContext.currentTXID();
+        String txID = TransactionContext.currentXATransactionID();
         if (txID == null) {
             logger.warn("getCurrentTransactionID: Current TransactionID is null.");
             return null;
@@ -294,9 +262,9 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     private RemoteCall<TransactionResponse> buildSendTransactionRequest(
             String path, TransactionRequest transactionRequest) {
-        Request<TransactionRequest> request =
-                new Request<>(path, "sendTransaction", transactionRequest);
-        return new RemoteCall<>(weCrossService, TransactionResponse.class, request);
+        String uri = "/resource/" + path.replace('.', '/') + "/sendTransaction";
+        Request<TransactionRequest> request = new Request<>(transactionRequest);
+        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
     }
 
     public WeCrossService getWeCrossService() {

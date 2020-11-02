@@ -9,12 +9,9 @@ public interface WeCrossService {
 
     void init() throws WeCrossSDKException;
 
-    <T extends Response> T send(Request request, Class<T> responseType) throws Exception;
+    <T extends Response> T send(String uri, Request request, Class<T> responseType)
+            throws Exception;
 
     <T extends Response> void asyncSend(
-            Request<?> request, Class<T> responseType, Callback<T> callback);
-    //    void sendOnly(Request request);
-    //
-    //    <T extends Response> CompletableFuture<T> sendAsync(Request request, Class<T>
-    // responseType);
+            String uri, Request<?> request, Class<T> responseType, Callback<T> callback);
 }

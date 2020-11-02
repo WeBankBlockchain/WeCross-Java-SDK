@@ -7,9 +7,7 @@ import com.webank.wecrosssdk.rpc.RemoteCall;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
-import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.utils.RPCUtils;
@@ -53,11 +51,6 @@ public class Resource {
         return response.getData();
     }
 
-    public TransactionResponse call(Request<TransactionRequest> request)
-            throws WeCrossSDKException {
-        return (TransactionResponse) mustOkRequest(weCrossRPC.call(request));
-    }
-
     public String[] call(String method) throws WeCrossSDKException {
         return call(method, (String) null);
     }
@@ -73,11 +66,6 @@ public class Resource {
                     "Resource.call fail, receipt:" + receipt.toString());
         }
         return receipt.getResult();
-    }
-
-    public TransactionResponse sendTransaction(Request<TransactionRequest> request)
-            throws WeCrossSDKException {
-        return (TransactionResponse) mustOkRequest(weCrossRPC.sendTransaction(request));
     }
 
     public String[] sendTransaction(String method) throws WeCrossSDKException {

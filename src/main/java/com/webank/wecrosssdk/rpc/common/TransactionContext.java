@@ -15,21 +15,18 @@ public class TransactionContext implements AutoCloseable {
         txThreadLocal.set(txID);
     }
 
-    public static String currentTXID() {
+    public static String currentXATransactionID() {
         return txThreadLocal.get();
     }
 
-    public static String currentSeq() throws WeCrossSDKException {
-        if (seqThreadLocal.get() == null) {
-            throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING, "Transaction Seq is null, please check again.");
-        }
-        return String.valueOf(seqThreadLocal.get().getAndIncrement());
+    public static long currentXATransactionSeq() {
+        return System.currentTimeMillis();
     }
 
     public static boolean isPathInTransaction(String path) throws WeCrossSDKException {
-        if (txThreadLocal.get() == null) return false;
-        else {
+        if (txThreadLocal.get() == null) {
+            return false;
+        } else {
             List<String> paths = pathInTransactionThreadLocal.get();
             if (paths == null) {
                 throw new WeCrossSDKException(

@@ -29,11 +29,9 @@ public class WeCrossRPCServiceTest {
     public void sendTest() {
         Request request = new Request<>();
         request.setVersion(Version.CURRENT_VERSION);
-        request.setPath("a.b.c");
-        request.setMethod("call");
         WeCrossRPCService weCrossService = new WeCrossRPCService();
         try {
-            weCrossService.send(request, TransactionResponse.class);
+            weCrossService.send("/test/test/", request, TransactionResponse.class);
         } catch (Exception e) {
             Assert.assertNotNull(e);
         }

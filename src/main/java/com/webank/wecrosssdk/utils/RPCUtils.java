@@ -22,7 +22,7 @@ public class RPCUtils {
         }
     }
 
-    public static String pathToUrl(String protocol, String prefix, String path) {
+    public static String uriToUrl(String protocol, String prefix, String path) {
         if (path.isEmpty()) {
             return protocol + "://" + prefix;
         }
@@ -32,7 +32,9 @@ public class RPCUtils {
     public static String printHexDecently(String hexString) {
         if (hexString != null && hexString.length() > 10) {
             return hexString.substring(0, 10) + "...";
-        } else return hexString;
+        } else {
+            return hexString;
+        }
     }
 
     public static String genTransactionID() {
