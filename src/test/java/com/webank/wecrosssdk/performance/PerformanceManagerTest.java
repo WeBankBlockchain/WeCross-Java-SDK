@@ -31,7 +31,7 @@ public class PerformanceManagerTest {
     public void test() {
         try {
             PerformanceSuite suite = new MockPerformanceSuite();
-            PerformanceManager manager = new PerformanceManager(suite, 10000, 1000);
+            PerformanceManager manager = new PerformanceManager(suite, 1000, 1000);
             manager.run();
         } catch (Exception e) {
             System.out.println("Exception:" + e);

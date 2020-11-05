@@ -9,6 +9,7 @@ import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.UriDecoder;
 import com.webank.wecrosssdk.rpc.common.CommandList;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
@@ -16,7 +17,6 @@ import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
-import com.webank.wecrosssdk.utils.RPCUtils;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -59,25 +59,17 @@ public class WeCrossRPCService implements WeCrossService {
         if (request.getVersion().isEmpty()) {
             throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "Request version is empty");
         }
-        if (request.getMethod().isEmpty()) {
-            throw new WeCrossSDKException(ErrorCode.RPC_ERROR, "Request method is empty");
-        }
     }
 
     @Override
-    public <T extends Response> T send(Request request, Class<T> responseType)
+    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
             throws WeCrossSDKException {
-        String url =
-                RPCUtils.pathToUrl("https", server, request.getPath()) + "/" + request.getMethod();
-        if (logger.isDebugEnabled()) {
-            logger.debug("send-request: {}; url: {}", request, url);
-        }
-
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
         CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
         asyncSend(
+                uri,
                 request,
                 responseType,
                 new Callback<T>() {
@@ -108,7 +100,7 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             if (response instanceof UAResponse) {
-                getUAResponseInfo(request, (UAResponse) response);
+                getUAResponseInfo(uri, request, (UAResponse) response);
             }
             return response;
         } catch (TimeoutException e) {
@@ -121,8 +113,10 @@ public class WeCrossRPCService implements WeCrossService {
         }
     }
 
-    public void getUAResponseInfo(Request request, UAResponse response) throws WeCrossSDKException {
-        if (request.getMethod().equals("login")) {
+    public void getUAResponseInfo(String uri, Request request, UAResponse response)
+            throws WeCrossSDKException {
+        String query = uri.substring(1).split("/")[1];
+        if ("login".equals(query)) {
             UARequest uaRequest = (UARequest) request.getData();
             String credential = response.getUAReceipt().getCredential();
 
@@ -141,7 +135,7 @@ public class WeCrossRPCService implements WeCrossService {
             }
             AuthenticationManager.setCurrentUser(uaRequest.getUsername(), credential);
         }
-        if (request.getMethod().equals("logout")) {
+        if ("logout".equals(query)) {
             logger.info("CurrentUser: {} logout.", AuthenticationManager.getCurrentUser());
             AuthenticationManager.clearCurrentUser();
         }
@@ -149,25 +143,30 @@ public class WeCrossRPCService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
         try {
-            String url =
-                    RPCUtils.pathToUrl("https", server, request.getPath())
-                            + "/"
-                            + request.getMethod();
+            String url = "https://" + server + uri;
             if (logger.isDebugEnabled()) {
-                logger.debug("asyncSend-request: {}; url: {}", request, url);
+                logger.debug("request: {}; url: {}", request, url);
             }
 
             checkRequest(request);
             BoundRequestBuilder builder = httpClient.preparePost(url);
             String currentUserCredential = AuthenticationManager.getCurrentUserCredential();
-            if (CommandList.AUTH_REQUIRED_COMMANDS.contains(request.getMethod())) {
+
+            UriDecoder uriDecoder = new UriDecoder(uri);
+            String method = uriDecoder.getMethod();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("uri path: {}", method);
+            }
+
+            if (CommandList.AUTH_REQUIRED_COMMANDS.contains(method)) {
                 if (currentUserCredential == null) {
                     logger.error("Request's method required AUTH, but current credential is null.");
                     throw new WeCrossSDKException(
                             ErrorCode.LACK_AUTHENTICATION,
-                            "Command " + request.getMethod() + " needs Auth, please login.");
+                            "Command " + method + " needs Auth, please login.");
                 }
                 String runtimeAuthType = AuthenticationManager.runtimeAuthType.get();
                 if (runtimeAuthType != null) {
@@ -175,6 +174,7 @@ public class WeCrossRPCService implements WeCrossService {
                 }
                 builder.setHeader(HttpHeaders.AUTHORIZATION, currentUserCredential);
             }
+
             builder.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .setBody(objectMapper.writeValueAsString(request))

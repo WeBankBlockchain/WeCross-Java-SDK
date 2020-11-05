@@ -3,10 +3,11 @@ package com.webank.wecrosssdk.rpc.annotation;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
+import com.webank.wecrosssdk.rpc.methods.response.XAResponse;
 import com.webank.wecrosssdk.rpc.service.AuthenticationManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.UUID;
 import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
@@ -26,16 +27,16 @@ public class TransactionalAopHandler {
     @Resource private WeCrossRPC weCrossRPC;
     private Class<? extends Throwable>[] es;
 
-    private String transactionID;
+    private String xaTransactionID;
     private String[] paths;
 
     @Around("@annotation(com.webank.wecrosssdk.rpc.annotation.Transactional)")
     public Object transactionProceed(ProceedingJoinPoint pjp) throws Throwable {
         Object result;
 
-        transactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
+        xaTransactionID = UUID.randomUUID().toString().replace("-", "").toLowerCase();
 
-        logger.info("TransactionProceed transactionID: {}", transactionID);
+        logger.info("TransactionProceed transactionID: {}", xaTransactionID);
 
         setPathsFromAnnotation(pjp);
         if (paths.length == 0) {
@@ -50,16 +51,26 @@ public class TransactionalAopHandler {
         }
         setTransactionalRollbackFor(pjp);
 
-        RoutineResponse response = weCrossRPC.startTransaction(transactionID, paths).send();
+        XAResponse response = weCrossRPC.startXATransaction(xaTransactionID, paths).send();
         if (response.getErrorCode() != 0) {
             logger.error(
-                    "Transactional.startTransaction fail, errorCode:{}, errorMessage:{}",
+                    "Transactional.startTransaction fail, errorCode:{}, message:{}",
                     response.getErrorCode(),
                     response.getMessage());
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR,
                     "Transactional.startTransaction fail, response message: "
                             + response.getMessage());
+        }
+        if (response.getXARawResponse().getStatus() != 0) {
+            logger.error(
+                    "Transactional.startTransaction fail, message:{}",
+                    Arrays.toString(response.getXARawResponse().getChainErrorMessages().toArray()));
+            throw new WeCrossSDKException(
+                    ErrorCode.RPC_ERROR,
+                    "Transactional.startTransaction fail, response message: "
+                            + Arrays.toString(
+                                    response.getXARawResponse().getChainErrorMessages().toArray()));
         }
         try {
             result = pjp.proceed();
@@ -73,10 +84,10 @@ public class TransactionalAopHandler {
 
     private void doRollback() throws WeCrossSDKException {
         try {
-            RoutineResponse response = weCrossRPC.rollbackTransaction(transactionID, paths).send();
+            XAResponse response = weCrossRPC.rollbackXATransaction(xaTransactionID, paths).send();
             logger.info(
                     "Transactional rollback, transactionID is {},response: {}",
-                    transactionID,
+                    xaTransactionID,
                     response);
         } catch (WeCrossSDKException e) {
             logger.error(
@@ -96,10 +107,10 @@ public class TransactionalAopHandler {
 
     private void doCommit() throws WeCrossSDKException {
         try {
-            RoutineResponse response = weCrossRPC.commitTransaction(transactionID, paths).send();
+            XAResponse response = weCrossRPC.commitXATransaction(xaTransactionID, paths).send();
             logger.info(
                     "Transactions committed, transactionID is {}, response: {}",
-                    transactionID,
+                    xaTransactionID,
                     response);
         } catch (WeCrossSDKException e) {
             logger.error(

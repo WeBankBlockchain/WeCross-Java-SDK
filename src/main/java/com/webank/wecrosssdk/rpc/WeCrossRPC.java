@@ -2,9 +2,7 @@ package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
-import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
-import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 
 public interface WeCrossRPC {
@@ -21,34 +19,30 @@ public interface WeCrossRPC {
 
     RemoteCall<ResourceDetailResponse> detail(String path);
 
-    RemoteCall<TransactionResponse> call(Request<TransactionRequest> request);
-
     RemoteCall<TransactionResponse> call(String path, String method, String... args);
-
-    RemoteCall<TransactionResponse> sendTransaction(Request<TransactionRequest> request);
 
     RemoteCall<TransactionResponse> sendTransaction(String path, String method, String... args);
 
     RemoteCall<TransactionResponse> invoke(String path, String method, String... args)
             throws WeCrossSDKException;
 
-    RemoteCall<TransactionResponse> callTransaction(
+    RemoteCall<TransactionResponse> callXA(
             String transactionID, String path, String method, String... args);
 
-    RemoteCall<TransactionResponse> execTransaction(
+    RemoteCall<TransactionResponse> sendXATransaction(
             String transactionID, String path, String method, String... args);
 
-    RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths);
+    RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineResponse> commitTransaction(String transactionID, String[] paths);
+    RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineResponse> rollbackTransaction(String transactionID, String[] paths);
+    RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths);
 
-    RemoteCall<RoutineInfoResponse> getTransactionInfo(String transactionID, String[] paths);
+    RemoteCall<XATransactionResponse> getXATransaction(String transactionID, String[] paths);
 
     RemoteCall<CommandResponse> customCommand(String command, String path, Object... args);
 
-    RemoteCall<RoutineIDResponse> getTransactionIDs(String path, int option);
+    RemoteCall<XATransactionListResponse> listXATransactions(int size);
 
     RemoteCall<UAResponse> register(String name, String password) throws WeCrossSDKException;
 

@@ -118,7 +118,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
                         || receipt.getErrorCode() != StatusCode.SUCCESS) {
                     if (receipt != null) {
                         throw new Exception(
-                                "new transfer contract failed: " + receipt.getErrorMessage());
+                                "new transfer contract failed: " + receipt.getMessage());
                     } else {
                         throw new Exception(
                                 "new transfer contract failed: " + response.getMessage());
@@ -168,8 +168,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
                         || receipt.getErrorCode() != StatusCode.SUCCESS) {
                     if (receipt != null) {
                         throw new Exception(
-                                "failed to set transfer contract tx-info: "
-                                        + receipt.getErrorMessage());
+                                "failed to set transfer contract tx-info: " + receipt.getMessage());
                     } else {
                         throw new Exception(
                                 "failed to set transfer contract tx-info: "
@@ -200,7 +199,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
                 if (response.getErrorCode() != StatusCode.SUCCESS
                         || receipt.getErrorCode() != StatusCode.SUCCESS) {
                     if (receipt != null) {
-                        throw new Exception("failed to set secret: " + receipt.getErrorMessage());
+                        throw new Exception("failed to set secret: " + receipt.getMessage());
                     } else {
                         throw new Exception("failed to set secret: " + response.getMessage());
                     }
@@ -240,7 +239,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
                 if (response.getErrorCode() != StatusCode.SUCCESS
                         || receipt.getErrorCode() != StatusCode.SUCCESS) {
                     if (receipt != null) {
-                        throw new Exception("failed to get balance: " + receipt.getErrorMessage());
+                        throw new Exception("failed to get balance: " + receipt.getMessage());
                     } else {
                         throw new Exception("failed to get balance: " + response.getMessage());
                     }

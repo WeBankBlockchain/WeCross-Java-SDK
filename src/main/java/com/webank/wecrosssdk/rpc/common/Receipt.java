@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Receipt {
     private int errorCode = -1;
-    private String errorMessage;
+    private String message;
     private String hash;
     private List<String> extraHashes;
     private long blockNumber;
@@ -19,12 +19,12 @@ public class Receipt {
         this.errorCode = errorCode;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getHash() {
@@ -65,7 +65,7 @@ public class Receipt {
                 + "errorCode="
                 + errorCode
                 + ", errorMessage='"
-                + errorMessage
+                + message
                 + '\''
                 + ", hash='"
                 + hash

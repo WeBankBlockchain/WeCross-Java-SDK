@@ -20,8 +20,12 @@ public class MockWeCrossService implements WeCrossService {
     public void init() throws WeCrossSDKException {}
 
     @Override
-    public <T extends Response> T send(Request request, Class<T> responseType) throws Exception {
-        switch (request.getMethod()) {
+    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
+            throws Exception {
+        int end = uri.contains("?") ? uri.indexOf("?") : uri.length();
+        String[] splits = uri.substring(1, end).split("/");
+        String method = splits[splits.length - 1];
+        switch (method) {
             case "status":
                 return (T) handleStatus(request);
             case "detail":
@@ -36,19 +40,19 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleCall(request);
             case "sendTransaction":
                 return (T) handleSendTransaction(request);
-            case "startTransaction":
+            case "startXATransaction":
                 return (T) handleStartTransaction(request);
-            case "execTransaction":
-                return (T) handleExecTransaction(request);
-            case "commitTransaction":
+            case "sendXATransaction":
+                return (T) handleSendXATransaction(request);
+            case "commitXATransaction":
                 return (T) handleCommitTransaction(request);
-            case "rollbackTransaction":
+            case "rollbackXATransaction":
                 return (T) handleRollbackTransaction(request);
-            case "getTransactionInfo":
+            case "getXATransaction":
                 return (T) handleGetTransactionInfo(request);
             case "customCommand":
                 return (T) handleCustomCommand(request);
-            case "getTransactionIDs":
+            case "listXATransactions":
                 return (T) handleGetTransactionIDs(request);
             case "register":
                 return (T) handleRegister(request);
@@ -67,7 +71,7 @@ public class MockWeCrossService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
         return;
     }
 
@@ -136,14 +140,14 @@ public class MockWeCrossService implements WeCrossService {
         return response;
     }
 
-    public RoutineResponse handleStartTransaction(Request request) {
-        RoutineResponse response = new RoutineResponse();
+    public XAResponse handleStartTransaction(Request request) {
+        XAResponse response = new XAResponse();
         response.setErrorCode(0);
-        response.setResult(0);
+        response.setXARawResponse(new RawXAResponse());
         return response;
     }
 
-    public TransactionResponse handleExecTransaction(Request request) {
+    public TransactionResponse handleSendXATransaction(Request request) {
         TransactionResponse response = new TransactionResponse();
         response.setErrorCode(0);
         Receipt receipt = new Receipt();
@@ -152,24 +156,24 @@ public class MockWeCrossService implements WeCrossService {
         return response;
     }
 
-    public RoutineResponse handleCommitTransaction(Request request) {
-        RoutineResponse response = new RoutineResponse();
+    public XAResponse handleCommitTransaction(Request request) {
+        XAResponse response = new XAResponse();
         response.setErrorCode(0);
-        response.setResult(0);
+        response.setXARawResponse(new RawXAResponse());
         return response;
     }
 
-    public RoutineResponse handleRollbackTransaction(Request request) {
-        RoutineResponse response = new RoutineResponse();
+    public XAResponse handleRollbackTransaction(Request request) {
+        XAResponse response = new XAResponse();
         response.setErrorCode(0);
-        response.setResult(0);
+        response.setXARawResponse(new RawXAResponse());
         return response;
     }
 
-    public RoutineInfoResponse handleGetTransactionInfo(Request request) {
-        RoutineInfoResponse response = new RoutineInfoResponse();
+    public XATransactionResponse handleGetTransactionInfo(Request request) {
+        XATransactionResponse response = new XATransactionResponse();
         response.setErrorCode(0);
-        response.setInfo("success");
+        response.setRawXATransactionResponse(new XATransactionResponse.RawXATransactionResponse());
         return response;
     }
 
@@ -180,10 +184,11 @@ public class MockWeCrossService implements WeCrossService {
         return response;
     }
 
-    public RoutineIDResponse handleGetTransactionIDs(Request request) {
-        RoutineIDResponse response = new RoutineIDResponse();
+    public XATransactionListResponse handleGetTransactionIDs(Request request) {
+        XATransactionListResponse response = new XATransactionListResponse();
         response.setErrorCode(0);
-        response.setIDs(new String[] {"001"});
+        response.setRawXATransactionListResponse(
+                new XATransactionListResponse.RawXATransactionListResponse());
         return response;
     }
 

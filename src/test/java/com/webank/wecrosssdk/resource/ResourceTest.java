@@ -4,9 +4,6 @@ import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
-import com.webank.wecrosssdk.rpc.methods.Request;
-import com.webank.wecrosssdk.rpc.methods.request.TransactionRequest;
-import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,11 +52,6 @@ public class ResourceTest {
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.call("test");
             Assert.assertNull(result);
-
-            Request<TransactionRequest> request = new Request<>();
-            request.setMethod("call");
-            TransactionResponse response = resource.call(request);
-            Assert.assertEquals(response.getErrorCode(), 0);
         } catch (Exception e) {
             Assert.fail();
         }
@@ -71,11 +63,6 @@ public class ResourceTest {
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
             String[] result = resource.sendTransaction("test", "test");
             Assert.assertNull(result);
-
-            Request<TransactionRequest> request = new Request<>();
-            request.setMethod("sendTransaction");
-            TransactionResponse response = resource.sendTransaction(request);
-            Assert.assertEquals(response.getErrorCode(), 0);
         } catch (Exception e) {
             Assert.fail();
         }

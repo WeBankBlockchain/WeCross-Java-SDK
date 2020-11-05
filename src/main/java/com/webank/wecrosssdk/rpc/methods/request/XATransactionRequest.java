@@ -2,14 +2,14 @@ package com.webank.wecrosssdk.rpc.methods.request;
 
 import java.util.Arrays;
 
-public class RoutineRequest {
-    private String transactionID;
+public class XATransactionRequest {
+    private String xaTransactionID;
     private String[] paths;
 
-    public RoutineRequest() {}
+    public XATransactionRequest() {}
 
-    public RoutineRequest(String transactionID, String[] paths) {
-        this.transactionID = transactionID;
+    public XATransactionRequest(String xaTransactionID, String[] paths) {
+        this.xaTransactionID = xaTransactionID;
         this.paths = paths;
     }
 
@@ -21,19 +21,19 @@ public class RoutineRequest {
         this.paths = paths;
     }
 
-    public String getTransactionID() {
-        return transactionID;
+    public String getXaTransactionID() {
+        return xaTransactionID;
     }
 
-    public void setTransactionID(String transactionID) {
-        this.transactionID = transactionID;
+    public void setXaTransactionID(String xaTransactionID) {
+        this.xaTransactionID = xaTransactionID;
     }
 
     @Override
     public String toString() {
         return "RoutineRequest{"
                 + "transactionID='"
-                + transactionID
+                + xaTransactionID
                 + '\''
                 + ", paths="
                 + Arrays.toString(paths)
