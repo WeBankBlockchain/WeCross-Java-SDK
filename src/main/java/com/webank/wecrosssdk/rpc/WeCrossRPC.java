@@ -48,8 +48,6 @@ public interface WeCrossRPC {
 
     RemoteCall<UAResponse> login(String name, String password);
 
-    UAResponse login() throws Exception;
-
     RemoteCall<UAResponse> logout();
 
     RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount);

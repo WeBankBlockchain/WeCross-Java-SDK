@@ -199,6 +199,14 @@ public class WeCrossRPCService implements WeCrossService {
                                                                     + "because your account login status has expired."));
                                             return null;
                                         }
+                                        if (httpResponse.getStatusCode() == 404) {
+                                            callback.callOnFailed(
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.LACK_AUTHENTICATION,
+                                                            "HTTP status code: 404 Not Found\n"
+                                                                    + "Maybe your request's resource path is wrong."));
+                                            return null;
+                                        }
                                         if (httpResponse.getStatusCode() != 200) {
                                             callback.callOnFailed(
                                                     new WeCrossSDKException(

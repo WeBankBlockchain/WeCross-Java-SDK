@@ -210,19 +210,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public UAResponse login() throws Exception {
-        Toml toml = ConfigUtils.getToml(Constant.APPLICATION_CONFIG_FILE);
-        String username = toml.getString("login.username");
-        String password = toml.getString("login.password");
-        if (username == null || password == null) {
-            logger.info(
-                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login, turn to loginWithArgs");
-            return null;
-        }
-        return login(username, password).send();
-    }
-
-    @Override
     public RemoteCall<UAResponse> logout() {
         UARequest uaRequest = new UARequest();
         Request<UARequest> request = new Request<>(uaRequest);
