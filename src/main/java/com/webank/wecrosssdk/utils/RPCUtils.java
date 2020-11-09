@@ -10,7 +10,7 @@ public class RPCUtils {
 
     public static void checkPath(String path) throws WeCrossSDKException {
         String[] sp = path.split("\\.");
-        if (sp.length < 3) {
+        if (!path.matches("^[A-Za-z]*.[A-Za-z0-9_-]*.[A-Za-z0-9_-]*$") || sp.length != 3) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "Invalid iPath: " + path);
         }
         String templateUrl = Constant.TEMPLATE_URL + path.replace('.', '/');
