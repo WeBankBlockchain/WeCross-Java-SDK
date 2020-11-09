@@ -14,3 +14,5 @@ rm resources -rf
 ./gradlew build
 ./gradlew test
 ./gradlew jacocoTestReport
+
+bash <(curl -s https://codecov.io/bash)
