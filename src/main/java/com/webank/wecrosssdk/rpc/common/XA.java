@@ -1,10 +1,13 @@
 package com.webank.wecrosssdk.rpc.common;
 
+import java.util.Arrays;
+
 public class XA {
     private String xaTransactionID;
     private String username;
     private String status;
     private long timestamp;
+    private String[] paths;
 
     public String getXaTransactionID() {
         return xaTransactionID;
@@ -38,9 +41,17 @@ public class XA {
         this.timestamp = timestamp;
     }
 
+    public String[] getPaths() {
+        return paths;
+    }
+
+    public void setPaths(String[] paths) {
+        this.paths = paths;
+    }
+
     @Override
     public String toString() {
-        return "XATransactionInfo{"
+        return "XA{"
                 + "xaTransactionID='"
                 + xaTransactionID
                 + '\''
@@ -52,6 +63,8 @@ public class XA {
                 + '\''
                 + ", timestamp="
                 + timestamp
+                + ", paths="
+                + Arrays.toString(paths)
                 + '}';
     }
 }
