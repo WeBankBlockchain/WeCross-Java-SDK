@@ -10,10 +10,13 @@ import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.CommandList;
+import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
+import com.webank.wecrosssdk.rpc.methods.request.RoutineRequest;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
+import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
 import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import com.webank.wecrosssdk.utils.RPCUtils;
@@ -23,6 +26,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -110,6 +114,11 @@ public class WeCrossRPCService implements WeCrossService {
             if (response instanceof UAResponse) {
                 getUAResponseInfo(request, (UAResponse) response);
             }
+
+            if (response instanceof RoutineResponse) {
+                getXAResponseInfo(request, (RoutineResponse) response);
+            }
+
             return response;
         } catch (TimeoutException e) {
             logger.warn("http request timeout");
@@ -118,6 +127,20 @@ public class WeCrossRPCService implements WeCrossService {
         } catch (Exception e) {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
+        }
+    }
+
+    public void getXAResponseInfo(Request request, RoutineResponse response) {
+        if (request.getMethod().equals("startTransaction") && response.getErrorCode() == 0) {
+            RoutineRequest routineRequest = (RoutineRequest) request.getData();
+            TransactionContext.txThreadLocal.set(routineRequest.getTransactionID());
+            TransactionContext.pathInTransactionThreadLocal.set(
+                    Arrays.asList(routineRequest.getPaths()));
+        } else if ((request.getMethod().equals("commitTransaction")
+                        || request.getMethod().equals("rollbackTransaction"))
+                && response.getErrorCode() == 0) {
+            TransactionContext.txThreadLocal.remove();
+            TransactionContext.pathInTransactionThreadLocal.remove();
         }
     }
 

@@ -14,7 +14,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc5-10271-SNAPSHOT'
+version = '1.0.0-rc5-111003Stage-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -157,7 +157,7 @@ publishing {
             def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
-            //*
+            /*
             def NEXUS_USERNAME = ''
             def NEXUS_PASSWORD = ''
             //*/

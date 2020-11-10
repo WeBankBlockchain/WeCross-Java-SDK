@@ -13,9 +13,6 @@ import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,20 +100,15 @@ public class WeCrossRPCRest implements WeCrossRPC {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String txID = TransactionContext.currentTXID();
         if (txID != null && TransactionContext.isPathInTransaction(path)) {
-            try {
-                transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
-                String seq = TransactionContext.currentSeq();
-                transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
-                logger.info(
-                        "invoke: TransactionID exist, turn to execTransaction, TransactionID is {}, Seq is{}",
-                        txID,
-                        seq);
-            } catch (WeCrossSDKException e) {
-                throw new WeCrossSDKException(
-                        ErrorCode.RPC_ERROR,
-                        "RPC.invoke: Exception happened in getting transaction context: "
-                                + e.getMessage());
-            }
+            transactionRequest.addOption(Constant.TRANSACTION_ID_KEY, txID);
+            ZoneOffset zoneOffset = ZoneOffset.ofHours(8);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            String seq = String.valueOf(localDateTime.toEpochSecond(zoneOffset));
+            transactionRequest.addOption(Constant.TRANSACTION_SEQ_KEY, seq);
+            logger.info(
+                    "invoke: TransactionID exist, turn to execTransaction, TransactionID is {}, Seq is{}",
+                    txID,
+                    seq);
         }
         return buildSendTransactionRequest(path, transactionRequest);
     }
@@ -148,10 +140,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<RoutineResponse> startTransaction(String transactionID, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.set(transactionID);
-        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
-        List<String> pathInTransaction = Arrays.asList(paths);
-        TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         Request<RoutineRequest> request = new Request<>("", "startTransaction", routineRequest);
         return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
@@ -160,24 +148,16 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<RoutineResponse> commitTransaction(String transactionID, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
 
         Request<RoutineRequest> request = new Request<>("", "commitTransaction", routineRequest);
-
         return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
     }
 
     @Override
     public RemoteCall<RoutineResponse> rollbackTransaction(String transactionID, String[] paths) {
         RoutineRequest routineRequest = new RoutineRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
 
         Request<RoutineRequest> request = new Request<>("", "rollbackTransaction", routineRequest);
-
         return new RemoteCall<>(weCrossService, RoutineResponse.class, request);
     }
 
