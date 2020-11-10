@@ -1,5 +1,7 @@
 package com.webank.wecrosssdk.rpc.service;
 
+import static com.webank.wecrosssdk.common.Constant.SSL_OFF;
+import static com.webank.wecrosssdk.common.Constant.SSL_ON_CLIENT_AUTH;
 import static org.asynchttpclient.Dsl.asyncHttpClient;
 import static org.asynchttpclient.Dsl.config;
 
@@ -29,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.BoundRequestBuilder;
+import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -50,7 +53,10 @@ public class WeCrossRPCService implements WeCrossService {
         Connection connection = getConnection(Constant.APPLICATION_CONFIG_FILE);
         logger.info("RPCService init:{}", connection);
         System.setProperty("jdk.tls.namedGroups", "secp256k1");
-        server = connection.getServer();
+        server =
+                connection.getSslSwitch() == SSL_OFF
+                        ? "http://" + connection.getServer()
+                        : "https://" + connection.getServer();
         httpClient = getHttpAsyncClient(connection);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -145,7 +151,7 @@ public class WeCrossRPCService implements WeCrossService {
     public <T extends Response> void asyncSend(
             String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
         try {
-            String url = "https://" + server + uri;
+            String url = server + uri;
             if (logger.isDebugEnabled()) {
                 logger.debug("request: {}; url: {}", request, url);
             }
@@ -248,11 +254,10 @@ public class WeCrossRPCService implements WeCrossService {
         Toml toml = ConfigUtils.getToml(config);
         Connection connection = new Connection();
         connection.setServer(getServer(toml));
-        connection.setMaxTotal(toml.getLong("connection.maxTotal", 200L).intValue());
-        connection.setMaxPerRoute(toml.getLong("connection.maxPerRoute", 8L).intValue());
-        connection.setSSLKey(getSSLKey(toml));
-        connection.setSSLCert(getSSLCert(toml));
-        connection.setCaCert(getCACert(toml));
+        connection.setCaCert(toml.getString("connection.caCert"));
+        connection.setSslKey(toml.getString("connection.sslKey"));
+        connection.setSslCert(toml.getString("connection.sslCert"));
+        connection.setSslSwitch(toml.getLong("connection.sslSwitch", 0L).intValue());
         return connection;
     }
 
@@ -267,70 +272,45 @@ public class WeCrossRPCService implements WeCrossService {
         return server;
     }
 
-    private String getSSLKey(Toml toml) throws WeCrossSDKException {
-        String sslKey = toml.getString("connection.sslKey");
-        if (sslKey == null) {
-            throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING,
-                    "Something wrong with parsing [connection.keyStore], please check configuration");
-        }
-        return sslKey;
-    }
-
-    private String getSSLCert(Toml toml) throws WeCrossSDKException {
-        String sslCert = toml.getString("connection.sslCert");
-        if (sslCert == null) {
-            throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING,
-                    "Something wrong with parsing [connection.keyStore], please check configuration");
-        }
-        return sslCert;
-    }
-
-    private String getCACert(Toml toml) throws WeCrossSDKException {
-        String caCert = toml.getString("connection.caCert");
-        if (caCert == null) {
-            throw new WeCrossSDKException(
-                    ErrorCode.FIELD_MISSING,
-                    "Something wrong with parsing [connection.trustStore], please check configuration");
-        }
-        return caCert;
-    }
-
     private SslContext getSslContext(Connection connection) throws IOException {
 
         PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver =
                 new PathMatchingResourcePatternResolver();
-        Resource sslKey = pathMatchingResourcePatternResolver.getResource(connection.getSSLKey());
-        Resource sslCert = pathMatchingResourcePatternResolver.getResource(connection.getSSLCert());
+        Resource sslKey = pathMatchingResourcePatternResolver.getResource(connection.getSslKey());
+        Resource sslCert = pathMatchingResourcePatternResolver.getResource(connection.getSslCert());
         Resource caCert = pathMatchingResourcePatternResolver.getResource(connection.getCaCert());
 
-        return SslContextBuilder.forClient()
-                .trustManager(caCert.getInputStream())
-                .keyManager(sslCert.getInputStream(), sslKey.getInputStream())
-                .sslProvider(SslProvider.JDK)
-                .clientAuth(ClientAuth.REQUIRE)
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                .build();
+        SslContextBuilder builder =
+                SslContextBuilder.forClient()
+                        .trustManager(caCert.getInputStream())
+                        .keyManager(sslCert.getInputStream(), sslKey.getInputStream())
+                        .sslProvider(SslProvider.JDK)
+                        .trustManager(InsecureTrustManagerFactory.INSTANCE);
+
+        if (connection.getSslSwitch() == SSL_ON_CLIENT_AUTH) {
+            builder.clientAuth(ClientAuth.REQUIRE);
+        }
+
+        return builder.build();
     }
 
     private AsyncHttpClient getHttpAsyncClient(Connection connection) throws WeCrossSDKException {
         try {
-            return asyncHttpClient(
-                    config().setSslContext(getSslContext(connection))
-                            .setConnectTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setRequestTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setReadTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setHandshakeTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setShutdownTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setSslSessionTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setPooledConnectionIdleTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setAcquireFreeChannelTimeout(HTTP_CLIENT_TIME_OUT)
-                            .setConnectionPoolCleanerPeriod(HTTP_CLIENT_TIME_OUT)
-                            // .setMaxConnections(connection.getMaxTotal())
-                            // .setMaxConnectionsPerHost(connection.getMaxPerRoute())
-                            .setKeepAlive(true));
-
+            DefaultAsyncHttpClientConfig.Builder builder = config();
+            builder.setConnectTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setRequestTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setReadTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setHandshakeTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setShutdownTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setPooledConnectionIdleTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setAcquireFreeChannelTimeout(HTTP_CLIENT_TIME_OUT)
+                    .setConnectionPoolCleanerPeriod(HTTP_CLIENT_TIME_OUT)
+                    .setKeepAlive(true);
+            if (connection.getSslSwitch() != SSL_OFF) {
+                builder.setSslContext(getSslContext(connection))
+                        .setSslSessionTimeout(HTTP_CLIENT_TIME_OUT);
+            }
+            return asyncHttpClient(builder);
         } catch (Exception e) {
             logger.error("Init http client error: ", e);
             throw new WeCrossSDKException(

@@ -1,12 +1,13 @@
 package com.webank.wecrosssdk.rpc.service;
 
+import static com.webank.wecrosssdk.common.Constant.SSL_ON_CLIENT_AUTH;
+
 public class Connection {
-    String server;
-    int maxTotal;
-    int maxPerRoute;
-    String sslKey;
-    String sslCert;
-    String caCert;
+    private String server;
+    private String sslKey;
+    private String sslCert;
+    private String caCert;
+    private int sslSwitch = SSL_ON_CLIENT_AUTH;
 
     public String getServer() {
         return server;
@@ -16,36 +17,20 @@ public class Connection {
         this.server = server;
     }
 
-    public int getMaxTotal() {
-        return maxTotal;
-    }
-
-    public void setMaxTotal(int maxTotal) {
-        this.maxTotal = maxTotal;
-    }
-
-    public int getMaxPerRoute() {
-        return maxPerRoute;
-    }
-
-    public void setMaxPerRoute(int maxPerRoute) {
-        this.maxPerRoute = maxPerRoute;
-    }
-
-    public String getSSLKey() {
+    public String getSslKey() {
         return sslKey;
     }
 
-    public void setSSLKey(String keyStore) {
-        this.sslKey = keyStore;
+    public void setSslKey(String sslKey) {
+        this.sslKey = sslKey;
     }
 
-    public String getSSLCert() {
+    public String getSslCert() {
         return sslCert;
     }
 
-    public void setSSLCert(String trustStore) {
-        this.sslCert = trustStore;
+    public void setSslCert(String sslCert) {
+        this.sslCert = sslCert;
     }
 
     public String getCaCert() {
@@ -56,16 +41,20 @@ public class Connection {
         this.caCert = caCert;
     }
 
+    public int getSslSwitch() {
+        return sslSwitch;
+    }
+
+    public void setSslSwitch(int sslSwitch) {
+        this.sslSwitch = sslSwitch;
+    }
+
     @Override
     public String toString() {
         return "Connection{"
                 + "server='"
                 + server
                 + '\''
-                + ", maxTotal="
-                + maxTotal
-                + ", maxPerRoute="
-                + maxPerRoute
                 + ", sslKey='"
                 + sslKey
                 + '\''
@@ -75,6 +64,8 @@ public class Connection {
                 + ", caCert='"
                 + caCert
                 + '\''
+                + ", sslSwitch="
+                + sslSwitch
                 + '}';
     }
 }

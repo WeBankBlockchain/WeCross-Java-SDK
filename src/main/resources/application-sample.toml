@@ -3,5 +3,4 @@
     sslKey = 'classpath:ssl.key'
     sslCert = 'classpath:ssl.crt'
     caCert = 'classpath:ca.crt'
-    maxTotal = 2000
-    maxPerRoute = 64
+    sslSwitch = 2  # SSL_OFF(2), SSL_ON(1), SSL_ON_CLIENT_AUTH(0)
