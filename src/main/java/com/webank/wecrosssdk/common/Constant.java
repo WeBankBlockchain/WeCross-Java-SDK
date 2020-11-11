@@ -10,4 +10,8 @@ public class Constant {
 
     /** alphabet(upper or lower case) + digit + character("@+!%*#?") ，length in (4,16) */
     public static final String PASSWORD_PATTERN = "^[A-Za-z0-9@+!%*#?]{1,16}$";
+
+    public static final int SSL_OFF = 2;
+    public static final int SSL_ON = 1;
+    public static final int SSL_ON_CLIENT_AUTH = 0;
 }

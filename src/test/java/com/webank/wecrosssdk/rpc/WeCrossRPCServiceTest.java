@@ -17,8 +17,8 @@ public class WeCrossRPCServiceTest {
             Connection connection = new Connection();
             connection.setServer("server");
             connection.setCaCert("caCrt");
-            connection.setSSLCert("sslCrt");
-            connection.setSSLKey("sslKey");
+            connection.setSslCert("sslCrt");
+            connection.setSslKey("sslKey");
             WeCrossRPCFactory.build(weCrossService);
         } catch (WeCrossSDKException e) {
             Assert.assertNotNull(e);
