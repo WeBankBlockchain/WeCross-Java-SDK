@@ -1,6 +1,5 @@
 package com.webank.wecrosssdk.rpc;
 
-import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
@@ -12,10 +11,6 @@ import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
-import com.webank.wecrosssdk.utils.ConfigUtils;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,10 +125,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.set(transactionID);
-        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
-        List<String> pathInTransaction = Arrays.asList(paths);
-        TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
@@ -143,9 +134,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
@@ -155,9 +143,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
                 weCrossService, "/xa/rollbackXATransaction", XAResponse.class, request);
@@ -207,19 +192,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
         UARequest uaRequest = new UARequest(name, password);
         Request<UARequest> request = new Request<>(uaRequest);
         return new RemoteCall<>(weCrossService, "/auth/login", UAResponse.class, request);
-    }
-
-    @Override
-    public UAResponse login() throws Exception {
-        Toml toml = ConfigUtils.getToml(Constant.APPLICATION_CONFIG_FILE);
-        String username = toml.getString("login.username");
-        String password = toml.getString("login.password");
-        if (username == null || password == null) {
-            logger.info(
-                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login, turn to loginWithArgs");
-            return null;
-        }
-        return login(username, password).send();
     }
 
     @Override

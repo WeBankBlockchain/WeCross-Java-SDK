@@ -13,11 +13,14 @@ import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.UriDecoder;
 import com.webank.wecrosssdk.rpc.common.CommandList;
+import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
+import com.webank.wecrosssdk.rpc.methods.request.XATransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
+import com.webank.wecrosssdk.rpc.methods.response.XAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
@@ -25,9 +28,11 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.BoundRequestBuilder;
@@ -108,6 +113,11 @@ public class WeCrossRPCService implements WeCrossService {
             if (response instanceof UAResponse) {
                 getUAResponseInfo(uri, request, (UAResponse) response);
             }
+
+            if (response instanceof XAResponse) {
+                getXAResponseInfo(uri, request, (XAResponse) response);
+            }
+
             return response;
         } catch (TimeoutException e) {
             logger.warn("http request timeout");
@@ -116,6 +126,22 @@ public class WeCrossRPCService implements WeCrossService {
         } catch (Exception e) {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
+        }
+    }
+
+    public void getXAResponseInfo(String uri, Request request, XAResponse response) {
+        String query = uri.substring(1).split("/")[1];
+        if ("startXATransaction".equals(query) && response.getErrorCode() == 0) {
+            XATransactionRequest xaTransactionRequest = (XATransactionRequest) request.getData();
+            TransactionContext.txThreadLocal.set(xaTransactionRequest.getXaTransactionID());
+            TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
+            TransactionContext.pathInTransactionThreadLocal.set(
+                    Arrays.asList(xaTransactionRequest.getPaths()));
+        } else if (("commitXATransaction".equals(query))
+                || "rollbackXATransaction".equals(query) && response.getErrorCode() == 0) {
+            TransactionContext.txThreadLocal.remove();
+            TransactionContext.seqThreadLocal.remove();
+            TransactionContext.pathInTransactionThreadLocal.remove();
         }
     }
 
@@ -153,7 +179,7 @@ public class WeCrossRPCService implements WeCrossService {
         try {
             String url = server + uri;
             if (logger.isDebugEnabled()) {
-                logger.debug("request: {}; url: {}", request, url);
+                logger.debug("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
             }
 
             checkRequest(request);
@@ -197,6 +223,14 @@ public class WeCrossRPCService implements WeCrossService {
                                                             "HTTP status code: 401-Unauthorized, have you logged in?\n"
                                                                     + "If you have logged-in already, maybe you should re-login "
                                                                     + "because your account login status has expired."));
+                                            return null;
+                                        }
+                                        if (httpResponse.getStatusCode() == 404) {
+                                            callback.callOnFailed(
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.LACK_AUTHENTICATION,
+                                                            "HTTP status code: 404 Not Found\n"
+                                                                    + "Maybe your request's resource path is wrong."));
                                             return null;
                                         }
                                         if (httpResponse.getStatusCode() != 200) {
