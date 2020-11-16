@@ -11,9 +11,6 @@ import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,10 +125,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.set(transactionID);
-        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
-        List<String> pathInTransaction = Arrays.asList(paths);
-        TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
@@ -141,9 +134,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
@@ -153,9 +143,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
                 weCrossService, "/xa/rollbackXATransaction", XAResponse.class, request);
