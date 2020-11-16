@@ -153,7 +153,7 @@ public class WeCrossRPCService implements WeCrossService {
         try {
             String url = server + uri;
             if (logger.isDebugEnabled()) {
-                logger.debug("request: {}; url: {}", request, url);
+                logger.debug("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
             }
 
             checkRequest(request);
