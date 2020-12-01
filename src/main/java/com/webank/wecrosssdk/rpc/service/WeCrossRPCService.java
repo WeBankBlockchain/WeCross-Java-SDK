@@ -73,13 +73,15 @@ public class WeCrossRPCService implements WeCrossService {
     }
 
     @Override
-    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
+    public <T extends Response> T send(
+            String httpMethod, String uri, Request request, Class<T> responseType)
             throws WeCrossSDKException {
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
         CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
         asyncSend(
+                httpMethod,
                 uri,
                 request,
                 responseType,
@@ -175,7 +177,11 @@ public class WeCrossRPCService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String httpMethod,
+            String uri,
+            Request<?> request,
+            Class<T> responseType,
+            Callback<T> callback) {
         try {
             String url = server + uri;
             if (logger.isDebugEnabled()) {
@@ -183,7 +189,7 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             checkRequest(request);
-            BoundRequestBuilder builder = httpClient.preparePost(url);
+            BoundRequestBuilder builder = httpClient.prepare(httpMethod.toUpperCase(), url);
             String currentUserCredential = AuthenticationManager.getCurrentUserCredential();
 
             UriDecoder uriDecoder = new UriDecoder(uri);

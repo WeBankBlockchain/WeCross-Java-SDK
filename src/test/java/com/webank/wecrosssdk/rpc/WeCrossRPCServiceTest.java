@@ -31,7 +31,7 @@ public class WeCrossRPCServiceTest {
         request.setVersion(Version.CURRENT_VERSION);
         WeCrossRPCService weCrossService = new WeCrossRPCService();
         try {
-            weCrossService.send("/test/test/", request, TransactionResponse.class);
+            weCrossService.send("POST", "/test/test/", request, TransactionResponse.class);
         } catch (Exception e) {
             Assert.assertNotNull(e);
         }
