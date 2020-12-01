@@ -51,6 +51,18 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<PubResponse> queryPub() {
+        return new RemoteCall<>(
+                weCrossService, "GET", "/auth/pub", PubResponse.class, new Request<>());
+    }
+
+    @Override
+    public RemoteCall<AuthCodeResponse> queryAuthCode() {
+        return new RemoteCall<>(
+                weCrossService, "GET", "/auth/authCode", AuthCodeResponse.class, new Request<>());
+    }
+
+    @Override
     public RemoteCall<AccountResponse> listAccount() {
         return new RemoteCall<>(
                 weCrossService,
@@ -202,9 +214,10 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<UAResponse> login(String name, String password) {
+    public RemoteCall<UAResponse> login(String name, String password, String encodesParams) {
         UARequest uaRequest = new UARequest(name, password);
-        Request<UARequest> request = new Request<>(uaRequest);
+        Request<String> request = new Request<>(encodesParams);
+        request.setExt(uaRequest);
         return new RemoteCall<>(weCrossService, "POST", "/auth/login", UAResponse.class, request);
     }
 

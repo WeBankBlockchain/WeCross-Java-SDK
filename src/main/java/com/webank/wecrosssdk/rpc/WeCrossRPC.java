@@ -11,6 +11,10 @@ public interface WeCrossRPC {
 
     RemoteCall<StubResponse> supportedStubs();
 
+    RemoteCall<PubResponse> queryPub();
+
+    RemoteCall<AuthCodeResponse> queryAuthCode();
+
     RemoteCall<AccountResponse> listAccount();
 
     RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote);
@@ -45,7 +49,7 @@ public interface WeCrossRPC {
 
     RemoteCall<UAResponse> register(String name, String password) throws WeCrossSDKException;
 
-    RemoteCall<UAResponse> login(String name, String password);
+    RemoteCall<UAResponse> login(String name, String password, String encodesParams);
 
     RemoteCall<UAResponse> logout();
 

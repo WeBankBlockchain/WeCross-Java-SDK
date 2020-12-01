@@ -113,7 +113,11 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             if (response instanceof UAResponse) {
-                getUAResponseInfo(uri, request, (UAResponse) response);
+                if (request.getData() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getData(), (UAResponse) response);
+                } else if (request.getExt() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getExt(), (UAResponse) response);
+                }
             }
 
             if (response instanceof XAResponse) {
@@ -126,6 +130,7 @@ public class WeCrossRPCService implements WeCrossService {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request timeout, caused by: " + e.getMessage());
         } catch (Exception e) {
+            logger.error("e: ", e);
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
         }
@@ -147,11 +152,10 @@ public class WeCrossRPCService implements WeCrossService {
         }
     }
 
-    public void getUAResponseInfo(String uri, Request request, UAResponse response)
+    public void getUAResponseInfo(String uri, UARequest uaRequest, UAResponse response)
             throws WeCrossSDKException {
         String query = uri.substring(1).split("/")[1];
         if ("login".equals(query)) {
-            UARequest uaRequest = (UARequest) request.getData();
             String credential = response.getUAReceipt().getCredential();
 
             logger.info("CurrentUser: {}", uaRequest.getUsername());
