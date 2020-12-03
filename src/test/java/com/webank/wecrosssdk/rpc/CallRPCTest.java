@@ -145,13 +145,6 @@ public class CallRPCTest {
     }
 
     @Test
-    public void loginTest() throws Exception {
-        UAResponse uaResponse = weCrossRPC.login("hello", "world").send();
-        Assert.assertEquals(uaResponse.getUAReceipt().getCredential(), "token");
-        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
-    }
-
-    @Test
     public void addChainAccountTest() throws Exception {
         BCOSAccount bcosAccount = new BCOSAccount();
         UAResponse uaResponse = weCrossRPC.addChainAccount("BCOS2.0", bcosAccount).send();

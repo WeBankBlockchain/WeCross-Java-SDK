@@ -1,11 +1,12 @@
 package com.webank.wecrosssdk.rpc.common;
 
-import com.webank.wecrosssdk.exception.ErrorCode;
-import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransactionContext implements AutoCloseable {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionContext.class);
     public static final ThreadLocal<String> txThreadLocal = new ThreadLocal<>();
     public static final ThreadLocal<AtomicInteger> seqThreadLocal = new ThreadLocal<>();
     public static final ThreadLocal<List<String>> pathInTransactionThreadLocal =
@@ -23,14 +24,13 @@ public class TransactionContext implements AutoCloseable {
         return System.currentTimeMillis();
     }
 
-    public static boolean isPathInTransaction(String path) throws WeCrossSDKException {
+    public static boolean isPathInTransaction(String path) {
         if (txThreadLocal.get() == null) return false;
         else {
             List<String> paths = pathInTransactionThreadLocal.get();
             if (paths == null) {
-                throw new WeCrossSDKException(
-                        ErrorCode.FIELD_MISSING,
-                        "isPathInTransaction: TransactionID exist, but pathList doesn't.");
+                logger.error("isPathInTransaction: TransactionID exist, but pathList doesn't.");
+                return false;
             }
             return paths.contains(path);
         }

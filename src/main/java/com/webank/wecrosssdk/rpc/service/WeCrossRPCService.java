@@ -73,13 +73,15 @@ public class WeCrossRPCService implements WeCrossService {
     }
 
     @Override
-    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
+    public <T extends Response> T send(
+            String httpMethod, String uri, Request request, Class<T> responseType)
             throws WeCrossSDKException {
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
         CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
         asyncSend(
+                httpMethod,
                 uri,
                 request,
                 responseType,
@@ -111,7 +113,11 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             if (response instanceof UAResponse) {
-                getUAResponseInfo(uri, request, (UAResponse) response);
+                if (request.getData() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getData(), (UAResponse) response);
+                } else if (request.getExt() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getExt(), (UAResponse) response);
+                }
             }
 
             if (response instanceof XAResponse) {
@@ -124,6 +130,7 @@ public class WeCrossRPCService implements WeCrossService {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request timeout, caused by: " + e.getMessage());
         } catch (Exception e) {
+            logger.error("e: ", e);
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
         }
@@ -145,11 +152,10 @@ public class WeCrossRPCService implements WeCrossService {
         }
     }
 
-    public void getUAResponseInfo(String uri, Request request, UAResponse response)
+    public void getUAResponseInfo(String uri, UARequest uaRequest, UAResponse response)
             throws WeCrossSDKException {
         String query = uri.substring(1).split("/")[1];
         if ("login".equals(query)) {
-            UARequest uaRequest = (UARequest) request.getData();
             String credential = response.getUAReceipt().getCredential();
 
             logger.info("CurrentUser: {}", uaRequest.getUsername());
@@ -175,7 +181,11 @@ public class WeCrossRPCService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String httpMethod,
+            String uri,
+            Request<?> request,
+            Class<T> responseType,
+            Callback<T> callback) {
         try {
             String url = server + uri;
             if (logger.isDebugEnabled()) {
@@ -183,7 +193,7 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             checkRequest(request);
-            BoundRequestBuilder builder = httpClient.preparePost(url);
+            BoundRequestBuilder builder = httpClient.prepare(httpMethod.toUpperCase(), url);
             String currentUserCredential = AuthenticationManager.getCurrentUserCredential();
 
             UriDecoder uriDecoder = new UriDecoder(uri);
