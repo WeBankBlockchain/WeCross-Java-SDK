@@ -214,6 +214,20 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<UAResponse> register(String name, String password, String encodeParams)
+            throws WeCrossSDKException {
+        if (!Pattern.matches(Constant.USERNAME_PATTERN, name)
+                || !Pattern.matches(Constant.PASSWORD_PATTERN, password)) {
+            throw new WeCrossSDKException(
+                    ErrorCode.ILLEGAL_SYMBOL,
+                    "Invalid username/password, please check your username/password matches the pattern.");
+        }
+        Request<String> request = new Request<>(encodeParams);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/register", UAResponse.class, request);
+    }
+
+    @Override
     public RemoteCall<UAResponse> login(String name, String password, String encodesParams) {
         UARequest uaRequest = new UARequest(name, password);
         Request<String> request = new Request<>(encodesParams);
