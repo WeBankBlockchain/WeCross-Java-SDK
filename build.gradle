@@ -78,6 +78,8 @@ dependencies {
     compile 'io.netty:netty-buffer:4.1.52.Final'
     compile 'io.netty:netty-handler:4.1.52.Final'
     compile 'com.google.guava:guava:28.1-jre'
+    compile 'commons-codec:commons-codec:1.14'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.60'
     compile 'junit:junit:4.12'
     compile 'org.aspectj:aspectjrt:1.9.2'
     compile 'org.aspectj:aspectjweaver:1.9.2'

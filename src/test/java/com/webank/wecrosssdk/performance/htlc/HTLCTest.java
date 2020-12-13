@@ -2,12 +2,12 @@ package com.webank.wecrosssdk.performance.htlc;
 
 import com.webank.wecrosssdk.common.StatusCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
 import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.util.concurrent.Semaphore;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -78,8 +78,7 @@ public class HTLCTest {
                             try {
                                 // use timelock as secret
                                 String secret = String.valueOf(now) + finalI;
-                                Hash myHash = new Hash();
-                                String hash = myHash.sha256(secret);
+                                String hash = DigestUtils.sha256Hex(secret);
                                 // generate timelock
                                 long t0 = now + 5000000;
                                 long t1 = now + 2500000;
@@ -203,9 +202,8 @@ public class HTLCTest {
     }
 
     private static WeCrossRPC loadWeCrossRPC() throws Exception {
-        WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
-            return WeCrossRPCFactory.build(weCrossRPCService);
+            return WeCrossPerfRPCFactory.build();
         } catch (WeCrossSDKException e) {
             throw new Exception("Error: Init wecross service failed: {}" + e.getMessage());
         }
