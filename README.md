@@ -1,4 +1,4 @@
-![](docs/images/menu_logo_wecross.svg)
+![](docs/images/menu_logo_wecross.png)
 
 # WeCross-Java-SDK
 
