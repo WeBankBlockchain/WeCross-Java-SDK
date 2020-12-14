@@ -7,7 +7,7 @@ public class ResourceDetail {
     private String path;
     private int distance;
     private String stubType;
-    private Map<Object, Object> properties = new HashMap<Object, Object>();
+    private Map<Object, Object> properties = new HashMap<>();
     private String checksum;
 
     public String getPath() {

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class HTLCTest {
-    private static Logger logger = LoggerFactory.getLogger(HTLCTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(HTLCTest.class);
 
     private static WeCrossRPC weCrossRPC;
     private static ThreadPoolTaskExecutor threadPool;
@@ -71,48 +71,44 @@ public class HTLCTest {
             }
             int before = getBalance(counterpartyPath, senderAccount1, receiver1);
 
-            for (Integer i = 0; i < count; ++i) {
-                Integer finalI = i;
+            for (int i = 0; i < count; ++i) {
+                int finalI = i;
                 threadPool.execute(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    // use timelock as secret
-                                    String secret = String.valueOf(now) + finalI;
-                                    Hash myHash = new Hash();
-                                    String hash = myHash.sha256(secret);
-                                    // generate timelock
-                                    long t0 = now + 5000000;
-                                    long t1 = now + 2500000;
+                        () -> {
+                            try {
+                                // use timelock as secret
+                                String secret = String.valueOf(now) + finalI;
+                                Hash myHash = new Hash();
+                                String hash = myHash.sha256(secret);
+                                // generate timelock
+                                long t0 = now + 5000000;
+                                long t1 = now + 2500000;
 
-                                    String[] proposalArgs =
-                                            new String[] {
-                                                hash,
-                                                "false",
-                                                sender0,
-                                                receiver0,
-                                                "1",
-                                                String.valueOf(t0),
-                                                sender1,
-                                                receiver1,
-                                                "1",
-                                                String.valueOf(t1)
-                                            };
+                                String[] proposalArgs =
+                                        new String[] {
+                                            hash,
+                                            "false",
+                                            sender0,
+                                            receiver0,
+                                            "1",
+                                            String.valueOf(t0),
+                                            sender1,
+                                            receiver1,
+                                            "1",
+                                            String.valueOf(t1)
+                                        };
 
-                                    // participant
-                                    newContract(
-                                            counterpartyPath, senderAccount1, "null", proposalArgs);
+                                // participant
+                                newContract(counterpartyPath, senderAccount1, "null", proposalArgs);
 
-                                    proposalArgs[1] = "true";
-                                    // initiator
-                                    newContract(selfPath, senderAccount0, secret, proposalArgs);
-                                    semaphore.release();
-                                    System.out.println("create proposal " + finalI + " done");
-                                } catch (Exception e) {
-                                    semaphore.release();
-                                    System.out.println("Error: " + e.getMessage());
-                                }
+                                proposalArgs[1] = "true";
+                                // initiator
+                                newContract(selfPath, senderAccount0, secret, proposalArgs);
+                                semaphore.release();
+                                System.out.println("create proposal " + finalI + " done");
+                            } catch (Exception e) {
+                                semaphore.release();
+                                System.out.println("Error: " + e.getMessage());
                             }
                         });
             }
@@ -144,13 +140,12 @@ public class HTLCTest {
     */
     private static void newContract(String path, String account, String secret, String[] args)
             throws Exception {
-        TransactionResponse response =
-                weCrossRPC.sendTransaction(path, account, "newProposal", args).send();
+        TransactionResponse response = weCrossRPC.sendTransaction(path, "newProposal", args).send();
         Receipt receipt = response.getReceipt();
         if (response.getErrorCode() != StatusCode.SUCCESS
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
             if (receipt != null) {
-                throw new Exception("new transfer contract failed: " + receipt.getErrorMessage());
+                throw new Exception("new transfer contract failed: " + receipt.getMessage());
             } else {
                 throw new Exception("new transfer contract failed: " + response.getMessage());
             }
@@ -173,7 +168,6 @@ public class HTLCTest {
                 weCrossRPC
                         .sendTransaction(
                                 path,
-                                account,
                                 "setNewProposalTxInfo",
                                 hash,
                                 txHash,
@@ -185,7 +179,7 @@ public class HTLCTest {
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
             if (receipt != null) {
                 throw new Exception(
-                        "failed to set transfer contract tx-info: " + receipt.getErrorMessage());
+                        "failed to set transfer contract tx-info: " + receipt.getMessage());
             } else {
                 throw new Exception(
                         "failed to set transfer contract tx-info: " + response.getMessage());
@@ -196,12 +190,12 @@ public class HTLCTest {
     private static void setSecret(String path, String account, String hash, String secret)
             throws Exception {
         TransactionResponse response =
-                weCrossRPC.sendTransaction(path, account, "setSecret", hash, secret).send();
+                weCrossRPC.sendTransaction(path, "setSecret", hash, secret).send();
         Receipt receipt = response.getReceipt();
         if (response.getErrorCode() != StatusCode.SUCCESS
                 || receipt.getErrorCode() != StatusCode.SUCCESS) {
             if (receipt != null) {
-                throw new Exception("failed to set secret: " + receipt.getErrorMessage());
+                throw new Exception("failed to set secret: " + receipt.getMessage());
             } else {
                 throw new Exception("failed to set secret: " + response.getMessage());
             }
@@ -219,8 +213,7 @@ public class HTLCTest {
 
     private static int getBalance(String path, String account, String address) {
         try {
-            TransactionResponse response =
-                    weCrossRPC.call(path, account, "balanceOf", address).send();
+            TransactionResponse response = weCrossRPC.call(path, "balanceOf", address).send();
             if (response.getErrorCode() != 0 || response.getReceipt().getErrorCode() != 0) {
                 return -1;
             } else {

@@ -17,8 +17,8 @@ public class WeCrossRPCServiceTest {
             Connection connection = new Connection();
             connection.setServer("server");
             connection.setCaCert("caCrt");
-            connection.setSSLCert("sslCrt");
-            connection.setSSLKey("sslKey");
+            connection.setSslCert("sslCrt");
+            connection.setSslKey("sslKey");
             WeCrossRPCFactory.build(weCrossService);
         } catch (WeCrossSDKException e) {
             Assert.assertNotNull(e);
@@ -27,14 +27,11 @@ public class WeCrossRPCServiceTest {
 
     @Test
     public void sendTest() {
-        Request request = new Request();
-        request.setAccount("");
-        request.setVersion(Version.CurrentVersion);
-        request.setPath("a.b.c");
-        request.setMethod("call");
+        Request request = new Request<>();
+        request.setVersion(Version.CURRENT_VERSION);
         WeCrossRPCService weCrossService = new WeCrossRPCService();
         try {
-            weCrossService.send(request, TransactionResponse.class);
+            weCrossService.send("POST", "/test/test/", request, TransactionResponse.class);
         } catch (Exception e) {
             Assert.assertNotNull(e);
         }

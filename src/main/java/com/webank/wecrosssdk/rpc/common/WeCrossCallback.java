@@ -8,12 +8,6 @@ public class WeCrossCallback<T> {
     private String message;
     protected T data;
 
-    public void execute() {
-        this.onResponse(status, message, data);
-    }
-
-    public void onResponse(int status, String message, T data) {}
-
     public void setStatus(int status) {
         this.status = status;
     }

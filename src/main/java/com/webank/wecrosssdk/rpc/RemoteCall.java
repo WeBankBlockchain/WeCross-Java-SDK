@@ -8,21 +8,30 @@ import com.webank.wecrosssdk.rpc.service.WeCrossService;
 public class RemoteCall<T extends Response> {
 
     private WeCrossService weCrossService;
+    private String httpMethod;
+    private String uri;
     private Class<T> responseType;
     private Request<?> request;
 
-    public RemoteCall(WeCrossService weCrossService, Class<T> responseType, Request<?> request) {
+    public RemoteCall(
+            WeCrossService weCrossService,
+            String httpMethod,
+            String uri,
+            Class<T> responseType,
+            Request<?> request) {
         this.weCrossService = weCrossService;
+        this.httpMethod = httpMethod;
+        this.uri = uri;
         this.responseType = responseType;
         this.request = request;
     }
 
     public T send() throws Exception {
-        return weCrossService.send(request, responseType);
+        return weCrossService.send(httpMethod, uri, request, responseType);
     }
 
-    public void asyncSend(Callback<T> callback) throws Exception {
-        weCrossService.asyncSend(request, responseType, callback);
+    public void asyncSend(Callback<T> callback) {
+        weCrossService.asyncSend(httpMethod, uri, request, responseType, callback);
     }
 
     public WeCrossService getWeCrossService() {

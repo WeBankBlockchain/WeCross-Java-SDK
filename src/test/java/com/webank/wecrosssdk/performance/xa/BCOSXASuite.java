@@ -5,21 +5,17 @@ import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.PerformanceSuiteCallback;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
 import com.webank.wecrosssdk.rpc.methods.Callback;
-import com.webank.wecrosssdk.rpc.methods.response.RoutineResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
+import com.webank.wecrosssdk.rpc.methods.response.XAResponse;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BCOSXASuite implements PerformanceSuite {
     private WeCrossRPC weCrossRPC;
     private String path;
-    private String account;
     private AtomicLong id;
-    private String[] accounts;
 
-    public BCOSXASuite(WeCrossRPC weCrossRPC, String account, String path) {
-        this.account = account;
+    public BCOSXASuite(WeCrossRPC weCrossRPC, String path) {
         this.path = path;
-        this.accounts = new String[] {account};
         this.weCrossRPC = weCrossRPC;
         this.id = new AtomicLong(System.currentTimeMillis());
     }
@@ -35,25 +31,24 @@ public class BCOSXASuite implements PerformanceSuite {
         String iPath = path + '_' + index;
         try {
             weCrossRPC
-                    .startTransaction(
+                    .startXATransaction(
                             sIndex,
-                            accounts,
                             new String[] {
                                 iPath,
                             })
                     .asyncSend(
-                            new Callback<RoutineResponse>() {
+                            new Callback<XAResponse>() {
                                 @Override
-                                public void onSuccess(RoutineResponse response) {
-                                    if (response.getErrorCode() == 0 && response.getResult() == 0) {
+                                public void onSuccess(XAResponse response) {
+                                    if (response.getErrorCode() == 0
+                                            && response.getXARawResponse().getStatus() == 0) {
                                         callback.releaseLimiter();
                                         try {
                                             weCrossRPC
-                                                    .execTransaction(
+                                                    .sendXATransaction(
                                                             sIndex,
                                                             "1",
                                                             iPath,
-                                                            account,
                                                             "newEvidence",
                                                             "a",
                                                             "a")
@@ -72,27 +67,26 @@ public class BCOSXASuite implements PerformanceSuite {
                                                                                                     0])) {
                                                                         try {
                                                                             weCrossRPC
-                                                                                    .commitTransaction(
+                                                                                    .commitXATransaction(
                                                                                             sIndex,
-                                                                                            accounts,
                                                                                             new String
                                                                                                     [] {
                                                                                                 iPath,
                                                                                             })
                                                                                     .asyncSend(
                                                                                             new Callback<
-                                                                                                    RoutineResponse>() {
+                                                                                                    XAResponse>() {
                                                                                                 @Override
                                                                                                 public
                                                                                                 void
                                                                                                         onSuccess(
-                                                                                                                RoutineResponse
+                                                                                                                XAResponse
                                                                                                                         response) {
                                                                                                     if (response
                                                                                                                             .getErrorCode()
                                                                                                                     == 0
-                                                                                                            && response
-                                                                                                                            .getResult()
+                                                                                                            && response.getXARawResponse()
+                                                                                                                            .getStatus()
                                                                                                                     == 0) {
                                                                                                         callback
                                                                                                                 .onSuccessWithoutRelease(

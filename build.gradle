@@ -1,5 +1,7 @@
 plugins {
     id 'com.github.sherter.google-java-format' version '0.8'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'maven-publish'
 }
 
 apply plugin: 'maven'
@@ -12,7 +14,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc4'
+version = '1.0.0-rc5-12017-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -67,14 +69,20 @@ sourceSets {
 
 dependencies {
     compile 'com.moandjiezana.toml:toml4j:0.7.2'
-    compile 'org.springframework.boot:spring-boot-starter-web:2.1.13.RELEASE'
-    compile 'org.asynchttpclient:async-http-client:2.12.0'
-    compile 'io.netty:netty-buffer:4.1.47.Final'
-    compile 'io.netty:netty-handler:4.1.47.Final'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.1.17.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-aop:2.1.17.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-security:2.1.17.RELEASE'
+    compile 'org.springframework:spring-aspects:5.1.2.RELEASE'
+    compile 'org.springframework:spring-aop:5.1.2.RELEASE'
+    compile 'org.asynchttpclient:async-http-client:2.12.1'
+    compile 'io.netty:netty-buffer:4.1.52.Final'
+    compile 'io.netty:netty-handler:4.1.52.Final'
     compile 'com.google.guava:guava:28.1-jre'
     compile 'junit:junit:4.12'
+    compile 'org.aspectj:aspectjrt:1.9.2'
+    compile 'org.aspectj:aspectjweaver:1.9.2'
 }
-
+configurations.compile.exclude(group: 'ch.qos.logback')
 jar {
     destinationDir file('dist/apps')
     archiveName project.name + "-" + project.version + '.jar'
@@ -108,6 +116,16 @@ jar {
     }
 }
 
+ext {
+    if (!project.hasProperty("NEXUS_USERNAME")) {
+        NEXUS_USERNAME="xxx"
+    }
+
+    if (!project.hasProperty("NEXUS_PASSWORD")) {
+        NEXUS_PASSWORD="xxx"
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -121,7 +139,7 @@ publishing {
             pom {
                 name = "WeCross-Java-SDK"
                 description = "Java SDK for WeCross"
-                url = "https://github.com/WeBankFinTech/WeCross-Java-SDK"
+                url = "https://github.com/WeBankBlockchain/WeCross-Java-SDK"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -136,9 +154,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/WeBankFinTech/WeCross-Java-SDK.git"
-                    developerConnection = "scm:git:ssh://github.com/WeBankFinTech/WeCross-Java-SDK.git"
-                    url = "https://github.com/WeBankFinTech/WeCross-Java-SDK"
+                    connection = "scm:git:git://github.com/WeBankBlockchain/WeCross-Java-SDK.git"
+                    developerConnection = "scm:git:ssh://github.com/WeBankBlockchain/WeCross-Java-SDK.git"
+                    url = "https://github.com/WeBankBlockchain/WeCross-Java-SDK"
                 }
             }
         }
@@ -149,21 +167,19 @@ publishing {
             def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
-            //*
-            def NEXUS_USERNAME = ''
-            def NEXUS_PASSWORD = ''
-            //*/
             credentials {
                 username = NEXUS_USERNAME
                 password = NEXUS_PASSWORD
             }
         }
     }
+
+    signing {
+        sign publishing.publications.mavenJava
+    }
 }
 
-signing {
-    sign publishing.publications.mavenJava
-}
+
 
 test {
     testLogging.showStandardStreams = true

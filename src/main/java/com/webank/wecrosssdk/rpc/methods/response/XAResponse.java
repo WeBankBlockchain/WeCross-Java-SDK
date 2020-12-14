@@ -2,16 +2,16 @@ package com.webank.wecrosssdk.rpc.methods.response;
 
 import com.webank.wecrosssdk.rpc.methods.Response;
 
-public class RoutineResponse extends Response<Integer> {
-    public RoutineResponse() {
+public class XAResponse extends Response<RawXAResponse> {
+    public XAResponse() {
         super();
     }
 
-    public int getResult() {
+    public RawXAResponse getXARawResponse() {
         return getData();
     }
 
-    public void setResult(int res) {
+    public void setXARawResponse(RawXAResponse res) {
         setData(res);
     }
 }

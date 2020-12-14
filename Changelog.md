@@ -1,3 +1,27 @@
+### v1.0.0
+
+(2020-12-17)
+
+**新增**
+
+* 配置新增SSL开关项
+* 新增事务注解：@Transactional、 @Path
+* 新增事务接口：invoke，根据上下文自动选择发交易的方式
+* 新增账户相关接口：register、login、logout、addChainAccount、setDefaultAccount、setDefaultAccount
+
+**更改**
+
+* 资源调用相关接口不再需要传入账户名
+* 压测程序适配v1.0.0的压测方式
+* 接口重命名: 
+    * getTransactionInfo => getXATransaction
+    * getTransactionIDs => listXATransactions
+    * startTransaction => startXATransaction
+    * commitTransaction => commitXATransaction
+    * rollbackTransaction => rollbackXATransaction
+    * execTransaction => sendXATransaction
+    * callTransaction => callXA
+
 ### v1.0.0-rc4
 
 (2020-08-18)
@@ -10,9 +34,9 @@
   * getTransactionInfo、getTransactionIDs
 * 新增2PC的压测程序
 
-**更新**
+**更改**
 
-* 压测程序适配 v1.0.0-rc4的压测方式
+* 压测程序适配v1.0.0-rc4的压测方式
 
 ### v1.0.0-rc3
 
@@ -23,7 +47,7 @@
 * 新增异步请求API
 * 新增多种场景的压测程序
 
-**更新**
+**更改**
 
 * 将spring-boot async client更换为基于netty的async-http-client
 
@@ -37,7 +61,7 @@
 * 资源接口：提供资源访问相关接口
 * 配置文件：新增配置文件，配置TLS证书信息
 
-**更新**
+**更改**
 
 * RPC接口调整
 - 合约调用需要指定签名的账户
