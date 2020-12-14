@@ -123,6 +123,7 @@ public class CallRPCTest {
         Assert.assertNotNull(xaTransactionListResponse.getRawXATransactionListResponse());
     }
 
+    /*
     @Test
     public void registerTest() throws Exception {
         UAResponse uaResponse = weCrossRPC.register("hello", "world").send();
@@ -142,7 +143,7 @@ public class CallRPCTest {
         UAResponse uaResponse1 = weCrossRPC.register("hello", "1234567890123456").send();
         Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
         Assert.assertEquals(uaResponse1.getUAReceipt().getErrorCode(), 0);
-    }
+    }*/
 
     @Test
     public void addChainAccountTest() throws Exception {

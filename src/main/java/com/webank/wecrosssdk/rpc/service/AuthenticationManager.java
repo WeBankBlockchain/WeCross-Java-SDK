@@ -8,7 +8,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AuthenticationManager {
     private AuthenticationManager() {}
 
-    public static final ThreadLocal<String> runtimeAuthType = new ThreadLocal<>();
+    // public static final ThreadLocal<String> runtimeAuthType = new ThreadLocal<>();
+
+    public static String runtimeAuthType = "Bearer";
+
+    public static final void setRuntimeAuthType(String authType) {
+        runtimeAuthType = authType;
+    }
+
+    public static String getRuntimeAuthType() {
+        return runtimeAuthType;
+    }
 
     public static String getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
