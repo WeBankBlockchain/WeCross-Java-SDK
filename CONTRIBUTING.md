@@ -15,7 +15,7 @@
 
 ### Issue
 
-可直接去[issues page](https://github.com/WeBankFinTech/WeCross-Java-SDK/issues)提issue。
+可直接去[issues page](https://github.com/WeBankBlockchain/WeCross-Java-SDK/issues)提issue。
 
 ### 修复bug
 
