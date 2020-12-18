@@ -1,6 +1,5 @@
 package com.webank.wecrosssdk.rpc;
 
-import com.moandjiezana.toml.Toml;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
@@ -12,10 +11,6 @@ import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
-import com.webank.wecrosssdk.utils.ConfigUtils;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,30 +28,48 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<Response> status(String path) {
         String uri = "/resource/" + path.replace('.', '/') + "/status";
-        return new RemoteCall<>(weCrossService, uri, Response.class, new Request<>());
+        return new RemoteCall<>(weCrossService, "POST", uri, Response.class, new Request<>());
     }
 
     @Override
     public RemoteCall<ResourceDetailResponse> detail(String path) {
         String uri = "/resource/" + path.replace('.', '/') + "/detail";
-        return new RemoteCall<>(weCrossService, uri, ResourceDetailResponse.class, new Request<>());
+        return new RemoteCall<>(
+                weCrossService, "POST", uri, ResourceDetailResponse.class, new Request<>());
     }
 
     @Override
     public RemoteCall<Response> test() {
-        return new RemoteCall<>(weCrossService, "/sys/test", Response.class, new Request<>());
+        return new RemoteCall<>(
+                weCrossService, "POST", "/sys/test", Response.class, new Request<>());
     }
 
     @Override
     public RemoteCall<StubResponse> supportedStubs() {
         return new RemoteCall<>(
-                weCrossService, "/sys/supportedStubs", StubResponse.class, new Request<>());
+                weCrossService, "GET", "/sys/supportedStubs", StubResponse.class, new Request<>());
+    }
+
+    @Override
+    public RemoteCall<PubResponse> queryPub() {
+        return new RemoteCall<>(
+                weCrossService, "GET", "/auth/pub", PubResponse.class, new Request<>());
+    }
+
+    @Override
+    public RemoteCall<AuthCodeResponse> queryAuthCode() {
+        return new RemoteCall<>(
+                weCrossService, "GET", "/auth/authCode", AuthCodeResponse.class, new Request<>());
     }
 
     @Override
     public RemoteCall<AccountResponse> listAccount() {
         return new RemoteCall<>(
-                weCrossService, "/auth/listAccount", AccountResponse.class, new Request<>());
+                weCrossService,
+                "POST",
+                "/auth/listAccount",
+                AccountResponse.class,
+                new Request<>());
     }
 
     @Override
@@ -64,21 +77,21 @@ public class WeCrossRPCRest implements WeCrossRPC {
         ResourceRequest resourceRequest = new ResourceRequest(ignoreRemote);
         Request<ResourceRequest> request = new Request<>(resourceRequest);
         return new RemoteCall<>(
-                weCrossService, "/sys/listResources", ResourceResponse.class, request);
+                weCrossService, "GET", "/sys/listResources", ResourceResponse.class, request);
     }
 
     @Override
     public RemoteCall<TransactionResponse> call(String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String txID = TransactionContext.currentXATransactionID();
-        if (txID != null) {
+        if (txID != null && TransactionContext.isPathInTransaction(path)) {
             transactionRequest.addOption(Constant.XA_TRANSACTION_ID_KEY, txID);
             logger.info(
                     "call: TransactionID exist, turn to callTransaction, TransactionID is{}", txID);
         }
         String uri = "/resource/" + path.replace('.', '/') + "/call";
         Request<TransactionRequest> request = new Request<>(transactionRequest);
-        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
+        return new RemoteCall<>(weCrossService, "POST", uri, TransactionResponse.class, request);
     }
 
     @Override
@@ -89,8 +102,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<TransactionResponse> invoke(String path, String method, String... args)
-            throws WeCrossSDKException {
+    public RemoteCall<TransactionResponse> invoke(String path, String method, String... args) {
         TransactionRequest transactionRequest = new TransactionRequest(method, args);
         String xaTransactionID = TransactionContext.currentXATransactionID();
         if (xaTransactionID != null && TransactionContext.isPathInTransaction(path)) {
@@ -113,7 +125,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
         String uri = "/resource/" + path.replace('.', '/') + "/call";
         Request<TransactionRequest> request = new Request<>(transactionRequest);
-        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
+        return new RemoteCall<>(weCrossService, "POST", uri, TransactionResponse.class, request);
     }
 
     @Override
@@ -130,37 +142,27 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.set(transactionID);
-        TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
-        List<String> pathInTransaction = Arrays.asList(paths);
-        TransactionContext.pathInTransactionThreadLocal.set(pathInTransaction);
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
-                weCrossService, "/xa/startXATransaction", XAResponse.class, request);
+                weCrossService, "POST", "/xa/startXATransaction", XAResponse.class, request);
     }
 
     @Override
     public RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
 
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
-                weCrossService, "/xa/commitXATransaction", XAResponse.class, request);
+                weCrossService, "POST", "/xa/commitXATransaction", XAResponse.class, request);
     }
 
     @Override
     public RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths) {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        TransactionContext.txThreadLocal.remove();
-        TransactionContext.seqThreadLocal.remove();
-        TransactionContext.pathInTransactionThreadLocal.remove();
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
-                weCrossService, "/xa/rollbackXATransaction", XAResponse.class, request);
+                weCrossService, "POST", "/xa/rollbackXATransaction", XAResponse.class, request);
     }
 
     @Override
@@ -169,7 +171,11 @@ public class WeCrossRPCRest implements WeCrossRPC {
         XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
         Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
         return new RemoteCall<>(
-                weCrossService, "/xa/getXATransaction", XATransactionResponse.class, request);
+                weCrossService,
+                "POST",
+                "/xa/getXATransaction",
+                XATransactionResponse.class,
+                request);
     }
 
     @Override
@@ -177,7 +183,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         CommandRequest commandRequest = new CommandRequest(command, args);
         Request<CommandRequest> request = new Request<>(commandRequest);
         String uri = "/resource/" + path.replace('.', '/') + "/customCommand";
-        return new RemoteCall<>(weCrossService, uri, CommandResponse.class, request);
+        return new RemoteCall<>(weCrossService, "POST", uri, CommandResponse.class, request);
     }
 
     @Override
@@ -185,7 +191,11 @@ public class WeCrossRPCRest implements WeCrossRPC {
         ListXATransactionsRequest listXATransactionsRequest = new ListXATransactionsRequest(size);
         Request<ListXATransactionsRequest> request = new Request<>(listXATransactionsRequest);
         return new RemoteCall<>(
-                weCrossService, "/xa/listXATransactions", XATransactionListResponse.class, request);
+                weCrossService,
+                "POST",
+                "/xa/listXATransactions",
+                XATransactionListResponse.class,
+                request);
     }
 
     @Override
@@ -199,47 +209,51 @@ public class WeCrossRPCRest implements WeCrossRPC {
                     "Invalid username/password, please check your username/password matches the pattern.");
         }
         Request<UARequest> request = new Request<>(uaRequest);
-        return new RemoteCall<>(weCrossService, "/auth/register", UAResponse.class, request);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/register", UAResponse.class, request);
     }
 
     @Override
-    public RemoteCall<UAResponse> login(String name, String password) {
-        UARequest uaRequest = new UARequest(name, password);
-        Request<UARequest> request = new Request<>(uaRequest);
-        return new RemoteCall<>(weCrossService, "/auth/login", UAResponse.class, request);
-    }
-
-    @Override
-    public UAResponse login() throws Exception {
-        Toml toml = ConfigUtils.getToml(Constant.APPLICATION_CONFIG_FILE);
-        String username = toml.getString("login.username");
-        String password = toml.getString("login.password");
-        if (username == null || password == null) {
-            logger.info(
-                    "loginWithoutArgs: TOML file did not config [login] message, can not auto-login, turn to loginWithArgs");
-            return null;
+    public RemoteCall<UAResponse> register(String name, String password, String encodeParams)
+            throws WeCrossSDKException {
+        if (!Pattern.matches(Constant.USERNAME_PATTERN, name)
+                || !Pattern.matches(Constant.PASSWORD_PATTERN, password)) {
+            throw new WeCrossSDKException(
+                    ErrorCode.ILLEGAL_SYMBOL,
+                    "Invalid username/password, please check your username/password matches the pattern.");
         }
-        return login(username, password).send();
+        Request<String> request = new Request<>(encodeParams);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/register", UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> login(String name, String password, String encodesParams) {
+        UARequest uaRequest = new UARequest(name, password);
+        Request<String> request = new Request<>(encodesParams);
+        request.setExt(uaRequest);
+        return new RemoteCall<>(weCrossService, "POST", "/auth/login", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> logout() {
         UARequest uaRequest = new UARequest();
         Request<UARequest> request = new Request<>(uaRequest);
-        return new RemoteCall<>(weCrossService, "/auth/logout", UAResponse.class, request);
+        return new RemoteCall<>(weCrossService, "POST", "/auth/logout", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> addChainAccount(String type, ChainAccount chainAccount) {
         Request<ChainAccount> request = new Request<>(chainAccount);
-        return new RemoteCall<>(weCrossService, "/auth/addChainAccount", UAResponse.class, request);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/addChainAccount", UAResponse.class, request);
     }
 
     @Override
     public RemoteCall<UAResponse> setDefaultAccount(String type, ChainAccount chainAccount) {
         Request<ChainAccount> request = new Request<>(chainAccount);
         return new RemoteCall<>(
-                weCrossService, "/auth/setDefaultAccount", UAResponse.class, request);
+                weCrossService, "POST", "/auth/setDefaultAccount", UAResponse.class, request);
     }
 
     @Override
@@ -247,7 +261,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
         ChainAccount chainAccount = new ChainAccount(keyID, type, true);
         Request<ChainAccount> request = new Request<>(chainAccount);
         return new RemoteCall<>(
-                weCrossService, "/auth/setDefaultAccount", UAResponse.class, request);
+                weCrossService, "POST", "/auth/setDefaultAccount", UAResponse.class, request);
     }
 
     @Override
@@ -264,7 +278,7 @@ public class WeCrossRPCRest implements WeCrossRPC {
             String path, TransactionRequest transactionRequest) {
         String uri = "/resource/" + path.replace('.', '/') + "/sendTransaction";
         Request<TransactionRequest> request = new Request<>(transactionRequest);
-        return new RemoteCall<>(weCrossService, uri, TransactionResponse.class, request);
+        return new RemoteCall<>(weCrossService, "POST", uri, TransactionResponse.class, request);
     }
 
     public WeCrossService getWeCrossService() {

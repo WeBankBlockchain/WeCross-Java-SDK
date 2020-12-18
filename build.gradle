@@ -14,7 +14,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0-rc5-1110-SNAPSHOT'
+version = '1.0.0'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -139,7 +139,7 @@ publishing {
             pom {
                 name = "WeCross-Java-SDK"
                 description = "Java SDK for WeCross"
-                url = "https://github.com/WeBankFinTech/WeCross-Java-SDK"
+                url = "https://github.com/WeBankBlockchain/WeCross-Java-SDK"
                 licenses {
                     license {
                         name = "The Apache License, Version 2.0"
@@ -154,9 +154,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/WeBankFinTech/WeCross-Java-SDK.git"
-                    developerConnection = "scm:git:ssh://github.com/WeBankFinTech/WeCross-Java-SDK.git"
-                    url = "https://github.com/WeBankFinTech/WeCross-Java-SDK"
+                    connection = "scm:git:git://github.com/WeBankBlockchain/WeCross-Java-SDK.git"
+                    developerConnection = "scm:git:ssh://github.com/WeBankBlockchain/WeCross-Java-SDK.git"
+                    url = "https://github.com/WeBankBlockchain/WeCross-Java-SDK"
                 }
             }
         }

@@ -20,7 +20,8 @@ public class MockWeCrossService implements WeCrossService {
     public void init() throws WeCrossSDKException {}
 
     @Override
-    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
+    public <T extends Response> T send(
+            String httpMethod, String uri, Request request, Class<T> responseType)
             throws Exception {
         int end = uri.contains("?") ? uri.indexOf("?") : uri.length();
         String[] splits = uri.substring(1, end).split("/");
@@ -71,7 +72,11 @@ public class MockWeCrossService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String httpMethod,
+            String uri,
+            Request<?> request,
+            Class<T> responseType,
+            Callback<T> callback) {
         return;
     }
 

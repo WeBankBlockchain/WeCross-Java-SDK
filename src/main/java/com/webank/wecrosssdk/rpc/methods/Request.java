@@ -7,6 +7,7 @@ import com.webank.wecrosssdk.rpc.common.WeCrossCallback;
 public class Request<T> {
     private String version = Version.CURRENT_VERSION;
     private T data;
+    @JsonIgnore private Object ext;
 
     @JsonIgnore private WeCrossCallback callback;
 
@@ -38,6 +39,14 @@ public class Request<T> {
 
     public void setCallback(WeCrossCallback callback) {
         this.callback = callback;
+    }
+
+    public Object getExt() {
+        return ext;
+    }
+
+    public void setExt(Object ext) {
+        this.ext = ext;
     }
 
     @Override

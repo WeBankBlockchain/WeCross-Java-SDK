@@ -13,11 +13,14 @@ import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.UriDecoder;
 import com.webank.wecrosssdk.rpc.common.CommandList;
+import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
+import com.webank.wecrosssdk.rpc.methods.request.XATransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
+import com.webank.wecrosssdk.rpc.methods.response.XAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
@@ -25,9 +28,11 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.asynchttpclient.AsyncCompletionHandler;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.BoundRequestBuilder;
@@ -68,13 +73,15 @@ public class WeCrossRPCService implements WeCrossService {
     }
 
     @Override
-    public <T extends Response> T send(String uri, Request request, Class<T> responseType)
+    public <T extends Response> T send(
+            String httpMethod, String uri, Request request, Class<T> responseType)
             throws WeCrossSDKException {
         checkRequest(request);
         CompletableFuture<T> responseFuture = new CompletableFuture<>();
         CompletableFuture<WeCrossSDKException> exceptionFuture = new CompletableFuture<>();
 
         asyncSend(
+                httpMethod,
                 uri,
                 request,
                 responseType,
@@ -106,24 +113,49 @@ public class WeCrossRPCService implements WeCrossService {
             }
 
             if (response instanceof UAResponse) {
-                getUAResponseInfo(uri, request, (UAResponse) response);
+                if (request.getData() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getData(), (UAResponse) response);
+                } else if (request.getExt() instanceof UARequest) {
+                    getUAResponseInfo(uri, (UARequest) request.getExt(), (UAResponse) response);
+                }
             }
+
+            if (response instanceof XAResponse) {
+                getXAResponseInfo(uri, request, (XAResponse) response);
+            }
+
             return response;
         } catch (TimeoutException e) {
             logger.warn("http request timeout");
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request timeout, caused by: " + e.getMessage());
         } catch (Exception e) {
+            logger.error("e: ", e);
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "http request failed, caused by: " + e.getMessage());
         }
     }
 
-    public void getUAResponseInfo(String uri, Request request, UAResponse response)
+    public void getXAResponseInfo(String uri, Request request, XAResponse response) {
+        String query = uri.substring(1).split("/")[1];
+        if ("startXATransaction".equals(query) && response.getErrorCode() == 0) {
+            XATransactionRequest xaTransactionRequest = (XATransactionRequest) request.getData();
+            TransactionContext.txThreadLocal.set(xaTransactionRequest.getXaTransactionID());
+            TransactionContext.seqThreadLocal.set(new AtomicInteger(1));
+            TransactionContext.pathInTransactionThreadLocal.set(
+                    Arrays.asList(xaTransactionRequest.getPaths()));
+        } else if (("commitXATransaction".equals(query))
+                || "rollbackXATransaction".equals(query) && response.getErrorCode() == 0) {
+            TransactionContext.txThreadLocal.remove();
+            TransactionContext.seqThreadLocal.remove();
+            TransactionContext.pathInTransactionThreadLocal.remove();
+        }
+    }
+
+    public void getUAResponseInfo(String uri, UARequest uaRequest, UAResponse response)
             throws WeCrossSDKException {
         String query = uri.substring(1).split("/")[1];
         if ("login".equals(query)) {
-            UARequest uaRequest = (UARequest) request.getData();
             String credential = response.getUAReceipt().getCredential();
 
             logger.info("CurrentUser: {}", uaRequest.getUsername());
@@ -149,15 +181,19 @@ public class WeCrossRPCService implements WeCrossService {
 
     @Override
     public <T extends Response> void asyncSend(
-            String uri, Request<?> request, Class<T> responseType, Callback<T> callback) {
+            String httpMethod,
+            String uri,
+            Request<?> request,
+            Class<T> responseType,
+            Callback<T> callback) {
         try {
             String url = server + uri;
             if (logger.isDebugEnabled()) {
-                logger.debug("request: {}; url: {}", request, url);
+                logger.debug("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
             }
 
             checkRequest(request);
-            BoundRequestBuilder builder = httpClient.preparePost(url);
+            BoundRequestBuilder builder = httpClient.prepare(httpMethod.toUpperCase(), url);
             String currentUserCredential = AuthenticationManager.getCurrentUserCredential();
 
             UriDecoder uriDecoder = new UriDecoder(uri);
@@ -197,6 +233,14 @@ public class WeCrossRPCService implements WeCrossService {
                                                             "HTTP status code: 401-Unauthorized, have you logged in?\n"
                                                                     + "If you have logged-in already, maybe you should re-login "
                                                                     + "because your account login status has expired."));
+                                            return null;
+                                        }
+                                        if (httpResponse.getStatusCode() == 404) {
+                                            callback.callOnFailed(
+                                                    new WeCrossSDKException(
+                                                            ErrorCode.LACK_AUTHENTICATION,
+                                                            "HTTP status code: 404 Not Found\n"
+                                                                    + "Maybe your request's resource path is wrong."));
                                             return null;
                                         }
                                         if (httpResponse.getStatusCode() != 200) {
