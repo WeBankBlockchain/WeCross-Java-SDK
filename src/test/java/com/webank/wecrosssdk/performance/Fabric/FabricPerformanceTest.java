@@ -1,13 +1,11 @@
 package com.webank.wecrosssdk.performance.Fabric;
 
-import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
+import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.resource.Resource;
 import com.webank.wecrosssdk.resource.ResourceFactory;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,11 +111,10 @@ public class FabricPerformanceTest {
     }
 
     private static Resource loadResource(String path) {
-        WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
+            WeCrossRPC weCrossRPC = WeCrossPerfRPCFactory.build();
             return ResourceFactory.build(weCrossRPC, path);
-        } catch (WeCrossSDKException e) {
+        } catch (Exception e) {
             System.out.println("Error: Init wecross service failed: {}" + e);
             return null;
         }

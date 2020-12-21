@@ -9,6 +9,7 @@ import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +60,7 @@ public class HTLCTransferSuite implements PerformanceSuite {
             long now = System.currentTimeMillis() / 1000;
             // use timelock as secret
             String secret = String.valueOf(now);
-            Hash myHash = new Hash();
-            String hash = myHash.sha256(secret);
+            String hash = DigestUtils.sha256Hex(secret);
             // generate timelock
             long t0 = now + 500;
             long t1 = now + 250;

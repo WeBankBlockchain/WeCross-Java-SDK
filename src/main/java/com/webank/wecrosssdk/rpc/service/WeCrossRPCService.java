@@ -168,7 +168,13 @@ public class WeCrossRPCService implements WeCrossService {
 
             if (firstIndexOfSpace != -1) {
                 String authenticationType = credential.substring(0, firstIndexOfSpace);
-                AuthenticationManager.runtimeAuthType.set(authenticationType);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "username: {}, authType: {}",
+                            uaRequest.getUsername(),
+                            authenticationType);
+                }
+                // AuthenticationManager.setRuntimeAuthType(authenticationType);
                 credential = credential.substring(firstIndexOfSpace);
             }
             AuthenticationManager.setCurrentUser(uaRequest.getUsername(), credential);
@@ -210,7 +216,7 @@ public class WeCrossRPCService implements WeCrossService {
                             ErrorCode.LACK_AUTHENTICATION,
                             "Command " + method + " needs Auth, please login.");
                 }
-                String runtimeAuthType = AuthenticationManager.runtimeAuthType.get();
+                String runtimeAuthType = AuthenticationManager.getRuntimeAuthType();
                 if (runtimeAuthType != null) {
                     currentUserCredential = runtimeAuthType + " " + currentUserCredential;
                 }
