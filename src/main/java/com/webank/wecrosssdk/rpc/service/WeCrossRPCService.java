@@ -164,19 +164,6 @@ public class WeCrossRPCService implements WeCrossService {
                 throw new WeCrossSDKException(
                         ErrorCode.RPC_ERROR, "Login fail, credential in UAResponse is null!");
             }
-            int firstIndexOfSpace = credential.trim().indexOf(' ');
-
-            if (firstIndexOfSpace != -1) {
-                String authenticationType = credential.substring(0, firstIndexOfSpace);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
-                            "username: {}, authType: {}",
-                            uaRequest.getUsername(),
-                            authenticationType);
-                }
-                // AuthenticationManager.setRuntimeAuthType(authenticationType);
-                credential = credential.substring(firstIndexOfSpace);
-            }
             AuthenticationManager.setCurrentUser(uaRequest.getUsername(), credential);
         }
         if ("logout".equals(query)) {
@@ -215,10 +202,6 @@ public class WeCrossRPCService implements WeCrossService {
                     throw new WeCrossSDKException(
                             ErrorCode.LACK_AUTHENTICATION,
                             "Command " + method + " needs Auth, please login.");
-                }
-                String runtimeAuthType = AuthenticationManager.getRuntimeAuthType();
-                if (runtimeAuthType != null) {
-                    currentUserCredential = runtimeAuthType + " " + currentUserCredential;
                 }
                 builder.setHeader(HttpHeaders.AUTHORIZATION, currentUserCredential);
             }

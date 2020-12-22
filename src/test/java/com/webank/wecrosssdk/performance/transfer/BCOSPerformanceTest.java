@@ -1,7 +1,6 @@
 package com.webank.wecrosssdk.performance.transfer;
 
 import com.webank.wecrosssdk.performance.PerformanceManager;
-import com.webank.wecrosssdk.performance.PerformanceSuite;
 import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.resource.Resource;
 import com.webank.wecrosssdk.resource.ResourceFactory;
@@ -56,10 +55,6 @@ public class BCOSPerformanceTest {
                 sendTransactionTest(count, qps, poolSize, file);
                 exit();
                 break;
-            case "status":
-                statusTest(count, qps, poolSize);
-                exit();
-                break;
             default:
                 usage();
         }
@@ -77,21 +72,6 @@ public class BCOSPerformanceTest {
                 bcosSendTransactionSuite.setDagUserMgr(dagUserMgr);
                 PerformanceManager performanceManager =
                         new PerformanceManager(bcosSendTransactionSuite, count, qps, poolSize);
-                performanceManager.run();
-
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
-            }
-        }
-    }
-
-    public static void statusTest(BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource("payment.bcos.transfer");
-        if (resource != null) {
-            try {
-                PerformanceSuite suite = new StatusSuite(resource);
-                PerformanceManager performanceManager =
-                        new PerformanceManager(suite, count, qps, poolSize);
                 performanceManager.run();
 
             } catch (Exception e) {

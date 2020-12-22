@@ -27,12 +27,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<Response> status(String path) {
-        String uri = "/resource/" + path.replace('.', '/') + "/status";
-        return new RemoteCall<>(weCrossService, "POST", uri, Response.class, new Request<>());
-    }
-
-    @Override
     public RemoteCall<ResourceDetailResponse> detail(String path) {
         String uri = "/resource/" + path.replace('.', '/') + "/detail";
         return new RemoteCall<>(
