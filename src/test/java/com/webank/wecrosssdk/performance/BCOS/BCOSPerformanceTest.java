@@ -55,10 +55,6 @@ public class BCOSPerformanceTest {
                 sendTransactionTest(path, count, qps, poolSize);
                 exit();
                 break;
-            case "status":
-                statusTest(path, count, qps, poolSize);
-                exit();
-                break;
             default:
                 usage();
         }
@@ -91,21 +87,6 @@ public class BCOSPerformanceTest {
 
             } catch (Exception e) {
                 System.out.println("sendTransactionTest Error: " + e.getMessage());
-            }
-        }
-    }
-
-    public static void statusTest(String path, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource(path);
-        if (resource != null) {
-            try {
-                PerformanceSuite suite = new StatusSuite(resource);
-                PerformanceManager performanceManager =
-                        new PerformanceManager(suite, count, qps, poolSize);
-                performanceManager.run();
-
-            } catch (Exception e) {
-                System.out.println("statusTest Error: " + e.getMessage());
             }
         }
     }
