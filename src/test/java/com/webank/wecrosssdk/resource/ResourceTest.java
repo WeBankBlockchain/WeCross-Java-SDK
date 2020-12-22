@@ -25,17 +25,6 @@ public class ResourceTest {
     }
 
     @Test
-    public void statusTest() {
-        try {
-            Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");
-            String result = resource.status();
-            Assert.assertEquals(result, "test");
-        } catch (Exception e) {
-            Assert.fail();
-        }
-    }
-
-    @Test
     public void infoTest() {
         try {
             Resource resource = ResourceFactory.build(weCrossRPC, "test.test.test");

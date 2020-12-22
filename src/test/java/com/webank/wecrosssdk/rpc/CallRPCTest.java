@@ -3,7 +3,6 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.mock.MockWeCrossService;
 import com.webank.wecrosssdk.rpc.common.account.BCOSAccount;
-import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
 import org.junit.Assert;
@@ -39,12 +38,6 @@ public class CallRPCTest {
         ResourceResponse resourceResponse = weCrossRPC.listResources(true).send();
         Assert.assertEquals(resourceResponse.getErrorCode(), 0);
         Assert.assertNotNull(resourceResponse.getResources());
-    }
-
-    @Test
-    public void statusTest() throws Exception {
-        Response response = weCrossRPC.status("test.test.test").send();
-        Assert.assertEquals(response.getErrorCode(), 0);
     }
 
     @Test
@@ -122,28 +115,6 @@ public class CallRPCTest {
                 weCrossRPC.listXATransactions(0).send();
         Assert.assertNotNull(xaTransactionListResponse.getRawXATransactionListResponse());
     }
-
-    /*
-    @Test
-    public void registerTest() throws Exception {
-        UAResponse uaResponse = weCrossRPC.register("hello", "world").send();
-        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
-    }
-
-    @Test
-    public void registerUsernameTest() throws Exception {
-        UAResponse uaResponse = weCrossRPC.register("hello-_123", "world").send();
-        UAResponse uaResponse1 = weCrossRPC.register("1234567890123456", "world").send();
-        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
-    }
-
-    @Test
-    public void registerPasswordTest() throws Exception {
-        UAResponse uaResponse = weCrossRPC.register("hello", "@+!%*#?world123").send();
-        UAResponse uaResponse1 = weCrossRPC.register("hello", "1234567890123456").send();
-        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
-        Assert.assertEquals(uaResponse1.getUAReceipt().getErrorCode(), 0);
-    }*/
 
     @Test
     public void addChainAccountTest() throws Exception {

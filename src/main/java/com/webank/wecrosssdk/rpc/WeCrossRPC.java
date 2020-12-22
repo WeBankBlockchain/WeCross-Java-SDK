@@ -18,8 +18,6 @@ public interface WeCrossRPC {
 
     RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote);
 
-    RemoteCall<Response> status(String path);
-
     RemoteCall<ResourceDetailResponse> detail(String path);
 
     RemoteCall<TransactionResponse> call(String path, String method, String... args);

@@ -9,6 +9,7 @@ import com.webank.wecrosssdk.rpc.common.Receipt;
 import com.webank.wecrosssdk.rpc.common.ResourceDetail;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.ResourceDetailResponse;
+import com.webank.wecrosssdk.rpc.methods.response.ResourceResponse;
 import com.webank.wecrosssdk.rpc.methods.response.TransactionResponse;
 import com.webank.wecrosssdk.utils.RPCUtils;
 import org.slf4j.Logger;
@@ -31,17 +32,22 @@ public class Resource {
 
     public boolean isActive() {
         try {
-            return status().equals("exists");
+            ResourceResponse resourceResponse =
+                    (ResourceResponse) mustOkRequest(weCrossRPC.listResources(false));
+            checkResponse(resourceResponse);
+            ResourceDetail[] resourceDetails = resourceResponse.getResources().getResourceDetails();
+            boolean isActiveFlag = false;
+            for (ResourceDetail resourceDetail : resourceDetails) {
+                if (resourceDetail.getPath().equals(path)) {
+                    isActiveFlag = true;
+                    break;
+                }
+            }
+            return isActiveFlag;
         } catch (Exception e) {
             logger.error("Get status exception: ", e);
             return false;
         }
-    }
-
-    public String status() throws WeCrossSDKException {
-        Response<String> response = (Response<String>) mustOkRequest(weCrossRPC.status(path));
-        checkResponse(response);
-        return response.getData();
     }
 
     public ResourceDetail detail() throws WeCrossSDKException {
@@ -52,7 +58,7 @@ public class Resource {
     }
 
     public String[] call(String method) throws WeCrossSDKException {
-        return call(method, (String) null);
+        return call(method, (String[]) null);
     }
 
     public String[] call(String method, String... args) throws WeCrossSDKException {
@@ -69,7 +75,7 @@ public class Resource {
     }
 
     public String[] sendTransaction(String method) throws WeCrossSDKException {
-        return sendTransaction(method, (String) null);
+        return sendTransaction(method, (String[]) null);
     }
 
     public String[] sendTransaction(String method, String... args) throws WeCrossSDKException {
