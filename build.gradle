@@ -2,6 +2,7 @@ plugins {
     id 'com.github.sherter.google-java-format' version '0.8'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'maven-publish'
+    id 'org.ajoberstar.grgit' version '4.0.1'
 }
 
 apply plugin: 'maven'
@@ -14,7 +15,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.0.0'
+version = '1.1.0-dev-02020-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -69,15 +70,17 @@ sourceSets {
 
 dependencies {
     compile 'com.moandjiezana.toml:toml4j:0.7.2'
-    compile 'org.springframework.boot:spring-boot-starter-web:2.1.17.RELEASE'
-    compile 'org.springframework.boot:spring-boot-starter-aop:2.1.17.RELEASE'
-    compile 'org.springframework.boot:spring-boot-starter-security:2.1.17.RELEASE'
-    compile 'org.springframework:spring-aspects:5.1.2.RELEASE'
-    compile 'org.springframework:spring-aop:5.1.2.RELEASE'
-    compile 'org.asynchttpclient:async-http-client:2.12.1'
+    compile 'org.springframework.boot:spring-boot-starter-web:2.3.8.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-aop:2.3.8.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-security:2.3.8.RELEASE'
+    compile 'org.springframework:spring-aspects:5.2.12.RELEASE'
+    compile 'org.springframework:spring-aop:5.2.12.RELEASE'
+    compile 'org.asynchttpclient:async-http-client:2.12.2'
     compile 'io.netty:netty-buffer:4.1.52.Final'
     compile 'io.netty:netty-handler:4.1.52.Final'
-    compile 'com.google.guava:guava:28.1-jre'
+    compile 'com.google.guava:guava:30.1-jre'
+    compile 'commons-codec:commons-codec:1.14'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.60'
     compile 'junit:junit:4.12'
     compile 'org.aspectj:aspectjrt:1.9.2'
     compile 'org.aspectj:aspectjweaver:1.9.2'
@@ -98,6 +101,27 @@ jar {
                 'Main-Class': 'com.webank.wecrosssdk.TestMain',
                 'version': project.version,
         )
+
+        try {
+            def repo = grgit.open(dir: file('.').canonicalPath)
+            if (repo != null) {
+                def date = new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                def branch = repo.branch.getCurrent().getName()
+                def commit = repo.head().getAbbreviatedId(40)
+
+                attributes(["Implementation-Timestamp": date,
+                            "Git-Branch"              : branch,
+                            "Git-Commit"              : commit
+                ])
+
+                logger.info("  Commit : ")
+                logger.info("  => date: {}", date)
+                logger.info("  => branch: {}", branch)
+                logger.info("  => commit: {}", commit)
+            }
+        } catch (Exception e) {
+            // logger.warn(' .git not exist, cannot found commit info')
+        }
     }
 
     doLast {

@@ -1,13 +1,11 @@
 package com.webank.wecrosssdk.performance.BCOS;
 
-import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
+import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.resource.Resource;
 import com.webank.wecrosssdk.resource.ResourceFactory;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
 
 public class BCOSPerformanceTest {
@@ -57,10 +55,6 @@ public class BCOSPerformanceTest {
                 sendTransactionTest(path, count, qps, poolSize);
                 exit();
                 break;
-            case "status":
-                statusTest(path, count, qps, poolSize);
-                exit();
-                break;
             default:
                 usage();
         }
@@ -97,27 +91,11 @@ public class BCOSPerformanceTest {
         }
     }
 
-    public static void statusTest(String path, BigInteger count, BigInteger qps, int poolSize) {
-        Resource resource = loadResource(path);
-        if (resource != null) {
-            try {
-                PerformanceSuite suite = new StatusSuite(resource);
-                PerformanceManager performanceManager =
-                        new PerformanceManager(suite, count, qps, poolSize);
-                performanceManager.run();
-
-            } catch (Exception e) {
-                System.out.println("statusTest Error: " + e.getMessage());
-            }
-        }
-    }
-
     private static Resource loadResource(String path) {
-        WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
+            WeCrossRPC weCrossRPC = WeCrossPerfRPCFactory.build();
             return ResourceFactory.build(weCrossRPC, path);
-        } catch (WeCrossSDKException e) {
+        } catch (Exception e) {
             System.out.println("Error: Init wecross service failed: {}" + e);
             return null;
         }

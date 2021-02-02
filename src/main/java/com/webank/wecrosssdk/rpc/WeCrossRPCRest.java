@@ -3,6 +3,7 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
+import com.webank.wecrosssdk.rpc.common.RequestUtility;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Request;
@@ -23,12 +24,6 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     public WeCrossRPCRest(WeCrossService weCrossService) {
         this.weCrossService = weCrossService;
-    }
-
-    @Override
-    public RemoteCall<Response> status(String path) {
-        String uri = "/resource/" + path.replace('.', '/') + "/status";
-        return new RemoteCall<>(weCrossService, "POST", uri, Response.class, new Request<>());
     }
 
     @Override
@@ -199,38 +194,25 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<UAResponse> register(String name, String password)
-            throws WeCrossSDKException {
-        UARequest uaRequest = new UARequest(name, password);
+    public RemoteCall<UAResponse> register(String name, String password) throws Exception {
         if (!Pattern.matches(Constant.USERNAME_PATTERN, name)
                 || !Pattern.matches(Constant.PASSWORD_PATTERN, password)) {
             throw new WeCrossSDKException(
                     ErrorCode.ILLEGAL_SYMBOL,
                     "Invalid username/password, please check your username/password matches the pattern.");
         }
-        Request<UARequest> request = new Request<>(uaRequest);
+
+        String registerParams = RequestUtility.buildRegisterParams(this, name, password);
+        Request<String> request = new Request<>(registerParams);
         return new RemoteCall<>(
                 weCrossService, "POST", "/auth/register", UAResponse.class, request);
     }
 
     @Override
-    public RemoteCall<UAResponse> register(String name, String password, String encodeParams)
-            throws WeCrossSDKException {
-        if (!Pattern.matches(Constant.USERNAME_PATTERN, name)
-                || !Pattern.matches(Constant.PASSWORD_PATTERN, password)) {
-            throw new WeCrossSDKException(
-                    ErrorCode.ILLEGAL_SYMBOL,
-                    "Invalid username/password, please check your username/password matches the pattern.");
-        }
-        Request<String> request = new Request<>(encodeParams);
-        return new RemoteCall<>(
-                weCrossService, "POST", "/auth/register", UAResponse.class, request);
-    }
-
-    @Override
-    public RemoteCall<UAResponse> login(String name, String password, String encodesParams) {
+    public RemoteCall<UAResponse> login(String name, String password) throws Exception {
         UARequest uaRequest = new UARequest(name, password);
-        Request<String> request = new Request<>(encodesParams);
+        String loginParams = RequestUtility.buildLoginParams(this, name, password);
+        Request<String> request = new Request<>(loginParams);
         request.setExt(uaRequest);
         return new RemoteCall<>(weCrossService, "POST", "/auth/login", UAResponse.class, request);
     }

@@ -1,6 +1,5 @@
 package com.webank.wecrosssdk.rpc;
 
-import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
@@ -18,8 +17,6 @@ public interface WeCrossRPC {
     RemoteCall<AccountResponse> listAccount();
 
     RemoteCall<ResourceResponse> listResources(Boolean ignoreRemote);
-
-    RemoteCall<Response> status(String path);
 
     RemoteCall<ResourceDetailResponse> detail(String path);
 
@@ -47,12 +44,9 @@ public interface WeCrossRPC {
 
     RemoteCall<XATransactionListResponse> listXATransactions(int size);
 
-    RemoteCall<UAResponse> register(String name, String password) throws WeCrossSDKException;
+    RemoteCall<UAResponse> register(String name, String password) throws Exception;
 
-    RemoteCall<UAResponse> register(String name, String password, String encodesParams)
-            throws WeCrossSDKException;
-
-    RemoteCall<UAResponse> login(String name, String password, String encodesParams);
+    RemoteCall<UAResponse> login(String name, String password) throws Exception;
 
     RemoteCall<UAResponse> logout();
 

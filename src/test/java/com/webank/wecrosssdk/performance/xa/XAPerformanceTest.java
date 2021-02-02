@@ -3,9 +3,8 @@ package com.webank.wecrosssdk.performance.xa;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
 import com.webank.wecrosssdk.performance.PerformanceSuite;
+import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
 
 public class XAPerformanceTest {
@@ -33,8 +32,7 @@ public class XAPerformanceTest {
         int poolSize = Integer.parseInt(args[4]);
 
         try {
-            WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
-            WeCrossRPC weCrossRPC = WeCrossRPCFactory.build(weCrossRPCService);
+            WeCrossRPC weCrossRPC = WeCrossPerfRPCFactory.build();
 
             PerformanceSuite suite = null;
             if ("bcos".equals(type)) {

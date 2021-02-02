@@ -8,8 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AuthenticationManager {
     private AuthenticationManager() {}
 
-    public static final ThreadLocal<String> runtimeAuthType = new ThreadLocal<>();
-
     public static String getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

@@ -3,9 +3,8 @@ package com.webank.wecrosssdk.performance.htlc;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.performance.PerformanceManager;
+import com.webank.wecrosssdk.performance.WeCrossPerfRPCFactory;
 import com.webank.wecrosssdk.rpc.WeCrossRPC;
-import com.webank.wecrosssdk.rpc.WeCrossRPCFactory;
-import com.webank.wecrosssdk.rpc.service.WeCrossRPCService;
 import java.math.BigInteger;
 
 public class HTLCPerformanceTest {
@@ -86,10 +85,9 @@ public class HTLCPerformanceTest {
     }
 
     private static WeCrossRPC loadWeCrossRPC() throws WeCrossSDKException {
-        WeCrossRPCService weCrossRPCService = new WeCrossRPCService();
         try {
-            return WeCrossRPCFactory.build(weCrossRPCService);
-        } catch (WeCrossSDKException e) {
+            return WeCrossPerfRPCFactory.build();
+        } catch (Exception e) {
             throw new WeCrossSDKException(
                     ErrorCode.RPC_ERROR, "Error: Init wecross service failed: " + e.getMessage());
         }
