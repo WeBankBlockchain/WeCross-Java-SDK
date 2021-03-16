@@ -8,6 +8,7 @@ public class Connection {
     private String sslCert;
     private String caCert;
     private int sslSwitch = SSL_ON_CLIENT_AUTH;
+    private String urlPrefix;
 
     public String getServer() {
         return server;
@@ -49,6 +50,14 @@ public class Connection {
         this.sslSwitch = sslSwitch;
     }
 
+    public String getUrlPrefix() {
+        return urlPrefix;
+    }
+
+    public void setUrlPrefix(String urlPrefix) {
+        this.urlPrefix = urlPrefix;
+    }
+
     @Override
     public String toString() {
         return "Connection{"
@@ -66,6 +75,9 @@ public class Connection {
                 + '\''
                 + ", sslSwitch="
                 + sslSwitch
+                + ", urlPrefix='"
+                + urlPrefix
+                + '\''
                 + '}';
     }
 }

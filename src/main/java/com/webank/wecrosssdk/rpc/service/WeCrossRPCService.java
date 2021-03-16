@@ -22,6 +22,7 @@ import com.webank.wecrosssdk.rpc.methods.request.XATransactionRequest;
 import com.webank.wecrosssdk.rpc.methods.response.UAResponse;
 import com.webank.wecrosssdk.rpc.methods.response.XAResponse;
 import com.webank.wecrosssdk.utils.ConfigUtils;
+import com.webank.wecrosssdk.utils.RPCUtils;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -49,6 +50,7 @@ public class WeCrossRPCService implements WeCrossService {
 
     private String server;
     private AsyncHttpClient httpClient;
+    private String urlPrefix = null;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final int HTTP_CLIENT_TIME_OUT = 100000; // ms
@@ -62,6 +64,9 @@ public class WeCrossRPCService implements WeCrossService {
                 connection.getSslSwitch() == SSL_OFF
                         ? "http://" + connection.getServer()
                         : "https://" + connection.getServer();
+        if (connection.getUrlPrefix() != null) {
+            urlPrefix = connection.getUrlPrefix();
+        }
         httpClient = getHttpAsyncClient(connection);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -180,7 +185,12 @@ public class WeCrossRPCService implements WeCrossService {
             Class<T> responseType,
             Callback<T> callback) {
         try {
-            String url = server + uri;
+            String url;
+            if (urlPrefix != null) {
+                url = server + urlPrefix + uri;
+            } else {
+                url = server + uri;
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
             }
@@ -291,6 +301,7 @@ public class WeCrossRPCService implements WeCrossService {
         connection.setSslKey(toml.getString("connection.sslKey"));
         connection.setSslCert(toml.getString("connection.sslCert"));
         connection.setSslSwitch(toml.getLong("connection.sslSwitch", 0L).intValue());
+        connection.setUrlPrefix(RPCUtils.formatUrlPrefix(toml.getString("connection.urlPrefix")));
         return connection;
     }
 
