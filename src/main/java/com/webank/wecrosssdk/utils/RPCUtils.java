@@ -42,7 +42,7 @@ public class RPCUtils {
         }
     }
 
-    public static String formatUrlPrefix(String urlPrefix) {
+    public static String formatUrlPrefix(String urlPrefix) throws WeCrossSDKException {
         String pattern = "^/(?!_)(?!-)(?!.*?_$)(?!.*?-$)[\\w-]{1,18}$";
         String prefix = urlPrefix;
         if (prefix == null) {
@@ -60,11 +60,9 @@ public class RPCUtils {
         if (Pattern.matches(pattern, prefix)) {
             return prefix;
         } else {
-            LOGGER.error(
-                    "URL prefix: '{}' is wrong, does not match pattern: '{}', use default: null.",
-                    prefix,
-                    pattern);
-            return null;
+            throw new WeCrossSDKException(
+                    ErrorCode.FIELD_MISSING,
+                    "Error 'urlPrefix' in config, it should matches pattern: " + pattern);
         }
     }
 
