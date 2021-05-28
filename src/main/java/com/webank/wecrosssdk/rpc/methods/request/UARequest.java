@@ -37,6 +37,7 @@ public class UARequest {
                     break;
                 }
             case "Fabric1.4":
+            case "Fabric2.0":
                 {
                     this.chainAccount = new FabricAccount(chainAccount);
                     logger.debug("this.chainAccount is {}", this.chainAccount);
