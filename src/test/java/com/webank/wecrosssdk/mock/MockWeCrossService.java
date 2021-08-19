@@ -111,7 +111,10 @@ public class MockWeCrossService implements WeCrossService {
         list.add(bcosAccount);
         ChainAccount fabricAccount =
                 new FabricAccount(2, "Fabric1.4", true, "xxx", "xxx", "membershipID");
+        ChainAccount fabricAccount2 =
+                new FabricAccount(3, "Fabric2.0", true, "xxx", "xxx", "membershipID");
         list.add(fabricAccount);
+        list.add(fabricAccount2);
         account.setChainAccounts(list);
         response.setErrorCode(0);
         response.setAccount(account);
