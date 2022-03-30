@@ -12,10 +12,14 @@ public class BCOSPerformanceTest {
     public static void usage() {
         System.out.println("Usage:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction [count] [qps] [poolSize] [userFile]");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction [count] [qps] [poolSize] [transfer] [userFile]");
+        System.out.println(
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest userAdd [count] [qps] [poolSize] [transfer] [userFile]");
         System.out.println("Example:");
         System.out.println(
-                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction 100 10 500 ./user");
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest sendTransaction 100 ./user 10 500 payment.bcos.transfer");
+        System.out.println(
+                " \t java -cp conf/:lib/*:apps/* com.webank.wecrosssdk.performance.transfer.BCOSPerformanceTest userAdd 100 ./user");
         System.out.println("===================================================================");
         System.out.println(
                 "Performance test resource info: \n"
@@ -30,7 +34,7 @@ public class BCOSPerformanceTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5) {
+        if (args.length < 5) {
             usage();
         }
 
@@ -38,11 +42,14 @@ public class BCOSPerformanceTest {
         BigInteger count = new BigInteger(args[1]);
         BigInteger qps = new BigInteger(args[2]);
         int poolSize = Integer.parseInt(args[3]);
-        String file = args[4];
+        String transferResource = args[4];
+        String file = args[5];
 
         System.out.println(
                 "BCOSPerformanceTest: command is "
                         + command
+                        + ", transferResource is "
+                        + transferResource
                         + ", count is "
                         + count
                         + ", qps is "
@@ -51,8 +58,12 @@ public class BCOSPerformanceTest {
                         + file);
 
         switch (command) {
+            case "userAdd":
+                createUser(count, qps, poolSize, file, transferResource);
+                exit();
+                break;
             case "sendTransaction":
-                sendTransactionTest(count, qps, poolSize, file);
+                sendTransactionTest(count, qps, poolSize, file, transferResource);
                 exit();
                 break;
             default:
@@ -60,9 +71,26 @@ public class BCOSPerformanceTest {
         }
     }
 
+    public static void createUser(
+            BigInteger count, BigInteger qps, int poolSize, String file, String resourceName) {
+        Resource resource = loadResource(resourceName);
+        try {
+            DagUserMgr dagUserMgr = new DagUserMgr(file);
+            dagUserMgr.createUser(count.intValue());
+            BCOSUserAddSuite bcosUserAddSuite = new BCOSUserAddSuite(resource);
+            bcosUserAddSuite.setDagUserMgr(dagUserMgr);
+            PerformanceManager performanceManager =
+                    new PerformanceManager(bcosUserAddSuite, count, qps, poolSize);
+            performanceManager.run();
+            dagUserMgr.writeDagTransferUser();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
     public static void sendTransactionTest(
-            BigInteger count, BigInteger qps, int poolSize, String file) {
-        Resource resource = loadResource("payment.bcos.transfer");
+            BigInteger count, BigInteger qps, int poolSize, String file, String resourceName) {
+        Resource resource = loadResource(resourceName);
         if (resource != null) {
             try {
                 DagUserMgr dagUserMgr = new DagUserMgr(file);
