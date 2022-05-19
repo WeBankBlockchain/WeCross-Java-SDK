@@ -40,6 +40,9 @@ public interface WeCrossRPC {
 
     RemoteCall<XATransactionResponse> getXATransaction(String transactionID, String[] paths);
 
+    RemoteCall<XAResponse> autoCommitXATransaction(
+            String transactionID, String[] paths, String method, String... args) throws Exception;
+
     RemoteCall<CommandResponse> customCommand(String command, String path, Object... args);
 
     RemoteCall<XATransactionListResponse> listXATransactions(int size);
