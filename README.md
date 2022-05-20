@@ -17,7 +17,7 @@ WeCross Java SDK提供操作跨链资源的Java API，开发者通过SDK可以�
 gradle
 
 ```
-compile ('com.webank:wecross-java-sdk:1.2.0')
+compile ('com.webank:wecross-java-sdk:1.2.1')
 ```
 
 maven
@@ -26,7 +26,7 @@ maven
 <dependency>
     <groupId>com.webank</groupId>
     <artifactId>wecross-java-sdk</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
 </dependency>
 ```
 
