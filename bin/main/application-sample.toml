@@ -1,0 +1,6 @@
+[connection]
+    server =  '127.0.0.1:8250'
+    sslKey = 'classpath:ssl.key'
+    sslCert = 'classpath:ssl.crt'
+    caCert = 'classpath:ca.crt'
+    sslSwitch = 2  # disable ssl:2, SSL without client auth:1 , SSL with client and server auth: 0

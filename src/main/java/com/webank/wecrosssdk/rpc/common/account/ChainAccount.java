@@ -21,6 +21,7 @@ public class ChainAccount {
     public Integer keyID;
     public String type;
     public boolean isDefault = false;
+    public String fabricDefault = "";
 
     public ChainAccount() {}
 
@@ -28,6 +29,11 @@ public class ChainAccount {
         this.keyID = keyID;
         this.type = type;
         this.isDefault = isDefault;
+    }
+
+    public ChainAccount(Integer keyID,String chainName){
+        this.keyID = keyID;
+        this.fabricDefault = chainName;
     }
 
     public ChainAccount(String type, boolean isDefault) {
@@ -59,6 +65,16 @@ public class ChainAccount {
     @JsonSetter("isDefault")
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    @JsonGetter("fabricDefault")
+    public String getFabricDefault(){
+        return fabricDefault;
+    }
+
+    @JsonSetter("fabricDefault")
+    public void setFabricDefault(String chainName){
+        fabricDefault = chainName;
     }
 
     @Override
