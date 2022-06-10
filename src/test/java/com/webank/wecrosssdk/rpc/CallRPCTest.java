@@ -130,8 +130,8 @@ public class CallRPCTest {
     }
 
     @Test
-    public void setDefaultFabricAccountTest() throws Exception{
-        UAResponse uaResponse = weCrossRPC.setDefaultFabricAccount("payment.fabric-mychannel", 0).send();
+    public void setDefaultChainAccountTest() throws Exception{
+        UAResponse uaResponse = weCrossRPC.setDefaultChainAccount("payment.fabric-mychannel", 0).send();
         Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
     }
 
