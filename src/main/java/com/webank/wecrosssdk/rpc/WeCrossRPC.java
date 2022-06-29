@@ -59,5 +59,9 @@ public interface WeCrossRPC {
 
     RemoteCall<UAResponse> setDefaultAccount(String type, Integer keyID);
 
+    RemoteCall<UAResponse> setDefaultChainAccount(String chainName, ChainAccount chainAccount);
+
+    RemoteCall<UAResponse> setDefaultChainAccount(String chainName, Integer keyID);
+
     String getCurrentTransactionID();
 }

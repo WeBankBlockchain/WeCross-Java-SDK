@@ -143,6 +143,9 @@ public class BCOSAccount extends ChainAccount {
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
+                + "\n"
+                + "\tchainDefault: "
+                + chainDefault
                 + "\n\t----------\n";
     }
 }

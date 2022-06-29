@@ -310,6 +310,21 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
+    public RemoteCall<UAResponse> setDefaultChainAccount(String chainName, ChainAccount chainAccount) {
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/setDefaultChainAccount", UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> setDefaultChainAccount(String chainName, Integer keyID) {
+        ChainAccount chainAccount = new ChainAccount(keyID,chainName);
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/setDefaultChainAccount", UAResponse.class, request);
+    }
+
+    @Override
     public String getCurrentTransactionID() {
         String txID = TransactionContext.currentXATransactionID();
         if (txID == null) {
