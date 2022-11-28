@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes(
         value = {
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3.0"),
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS3.0"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
             @JsonSubTypes.Type(value = FabricAccount.class, name = "Fabric1.4"),
