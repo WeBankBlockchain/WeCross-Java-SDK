@@ -15,7 +15,7 @@ apply plugin: 'jacoco'
 
 group = 'com.webank'
 sourceCompatibility = '1.8'
-version = '1.2.1-SNAPSHOT'
+version = '1.3.0-SNAPSHOT'
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
     classifier = 'sources'
@@ -71,7 +71,7 @@ sourceSets {
     }
 }
 
-def log4j_version="2.17.2"
+def log4j_version="2.19.0"
 List logger = [
         "org.apache.logging.log4j:log4j-api:$log4j_version",
         //"org.apache.logging.log4j:log4j-core:$log4j_version",
