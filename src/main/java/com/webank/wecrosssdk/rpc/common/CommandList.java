@@ -22,6 +22,7 @@ public class CommandList {
                     "customCommand",
                     "addChainAccount",
                     "setDefaultAccount",
+                    "setDefaultChainAccount",
                     "listAccount",
                     "supportedStubs",
                     "listResources",
