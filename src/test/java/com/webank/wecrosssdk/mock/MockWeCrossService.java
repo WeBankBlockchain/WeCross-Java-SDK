@@ -63,6 +63,8 @@ public class MockWeCrossService implements WeCrossService {
                 return (T) handleAddChainAccount(request);
             case "setDefaultAccount":
                 return (T) handleSetDefaultAccount(request);
+            case "setDefaultChainAccount":
+                return (T) handleSetDefaultChainAccount(request);
             case "logout":
                 return (T) handleLogout();
             default:
@@ -233,6 +235,14 @@ public class MockWeCrossService implements WeCrossService {
     }
 
     public UAResponse handleSetDefaultAccount(Request request) {
+        UAResponse response = new UAResponse();
+        UAReceipt uaReceipt = new UAReceipt(0, "");
+        response.setUAReceipt(uaReceipt);
+        response.setErrorCode(0);
+        return response;
+    }
+
+    public UAResponse handleSetDefaultChainAccount(Request request) {
         UAResponse response = new UAResponse();
         UAReceipt uaReceipt = new UAReceipt(0, "");
         response.setUAReceipt(uaReceipt);

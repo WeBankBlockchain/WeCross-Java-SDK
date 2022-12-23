@@ -1,17 +1,22 @@
 package com.webank.wecrosssdk.rpc;
 
 import com.webank.wecrosssdk.common.Constant;
+import com.webank.wecrosssdk.common.StatusCode;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
 import com.webank.wecrosssdk.rpc.common.RequestUtility;
 import com.webank.wecrosssdk.rpc.common.TransactionContext;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
+import com.webank.wecrosssdk.rpc.methods.Callback;
 import com.webank.wecrosssdk.rpc.methods.Request;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,26 +141,26 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<XAResponse> startXATransaction(String transactionID, String[] paths) {
-        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
+        XATransactionRequest xaTransactionRequest = new XATransactionRequest(transactionID, paths);
 
-        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        Request<XATransactionRequest> request = new Request<>(xaTransactionRequest);
         return new RemoteCall<>(
                 weCrossService, "POST", "/xa/startXATransaction", XAResponse.class, request);
     }
 
     @Override
     public RemoteCall<XAResponse> commitXATransaction(String transactionID, String[] paths) {
-        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
+        XATransactionRequest xaTransactionRequest = new XATransactionRequest(transactionID, paths);
 
-        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        Request<XATransactionRequest> request = new Request<>(xaTransactionRequest);
         return new RemoteCall<>(
                 weCrossService, "POST", "/xa/commitXATransaction", XAResponse.class, request);
     }
 
     @Override
     public RemoteCall<XAResponse> rollbackXATransaction(String transactionID, String[] paths) {
-        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        XATransactionRequest xaTransactionRequest = new XATransactionRequest(transactionID, paths);
+        Request<XATransactionRequest> request = new Request<>(xaTransactionRequest);
         return new RemoteCall<>(
                 weCrossService, "POST", "/xa/rollbackXATransaction", XAResponse.class, request);
     }
@@ -163,14 +168,72 @@ public class WeCrossRPCRest implements WeCrossRPC {
     @Override
     public RemoteCall<XATransactionResponse> getXATransaction(
             String transactionID, String[] paths) {
-        XATransactionRequest XATransactionRequest = new XATransactionRequest(transactionID, paths);
-        Request<XATransactionRequest> request = new Request<>(XATransactionRequest);
+        XATransactionRequest xaTransactionRequest = new XATransactionRequest(transactionID, paths);
+        Request<XATransactionRequest> request = new Request<>(xaTransactionRequest);
         return new RemoteCall<>(
                 weCrossService,
                 "POST",
                 "/xa/getXATransaction",
                 XATransactionResponse.class,
                 request);
+    }
+
+    @Override
+    public RemoteCall<XAResponse> autoCommitXATransaction(
+            String transactionID, String[] paths, String method, String... args) {
+        try {
+            XAResponse xaResponse = startXATransaction(transactionID, paths).send();
+            if (xaResponse.getErrorCode() != StatusCode.SUCCESS
+                    || xaResponse.getXARawResponse().getStatus() != StatusCode.SUCCESS) {
+                throw new WeCrossSDKException(
+                        xaResponse.getXARawResponse().getStatus(),
+                        xaResponse.getXARawResponse().toString());
+            }
+            CompletableFuture<RemoteCall<XAResponse>> remoteCallCompletableFuture =
+                    new CompletableFuture<>();
+            AtomicInteger totalCount = new AtomicInteger(paths.length);
+            AtomicInteger failedCount = new AtomicInteger(0);
+            Runnable counter =
+                    () -> {
+                        int decrementAndGet = totalCount.decrementAndGet();
+                        if (decrementAndGet == 0) {
+                            if (failedCount.get() > 0) {
+                                remoteCallCompletableFuture.complete(
+                                        rollbackXATransaction(transactionID, paths));
+                            } else {
+                                remoteCallCompletableFuture.complete(
+                                        commitXATransaction(transactionID, paths));
+                            }
+                        }
+                    };
+            for (String path : paths) {
+                sendXATransaction(transactionID, path, method, args)
+                        .asyncSend(
+                                new Callback<TransactionResponse>() {
+                                    @Override
+                                    public void onSuccess(TransactionResponse response) {
+                                        counter.run();
+                                    }
+
+                                    @Override
+                                    public void onFailed(WeCrossSDKException e) {
+                                        failedCount.incrementAndGet();
+                                        counter.run();
+                                    }
+                                });
+            }
+            return remoteCallCompletableFuture.get(20, TimeUnit.SECONDS);
+        } catch (WeCrossSDKException e) {
+            logger.error(
+                    "error in autoCommitXATransaction, errorCode:{}, msg:{}",
+                    e.getErrorCode(),
+                    e.getMessage(),
+                    e);
+            return rollbackXATransaction(transactionID, paths);
+        } catch (Exception e) {
+            logger.error("error in autoCommitXATransaction, msg:{}", e.getMessage(), e);
+            return rollbackXATransaction(transactionID, paths);
+        }
     }
 
     @Override
@@ -244,6 +307,21 @@ public class WeCrossRPCRest implements WeCrossRPC {
         Request<ChainAccount> request = new Request<>(chainAccount);
         return new RemoteCall<>(
                 weCrossService, "POST", "/auth/setDefaultAccount", UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> setDefaultChainAccount(String chainName, ChainAccount chainAccount) {
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/setDefaultChainAccount", UAResponse.class, request);
+    }
+
+    @Override
+    public RemoteCall<UAResponse> setDefaultChainAccount(String chainName, Integer keyID) {
+        ChainAccount chainAccount = new ChainAccount(keyID,chainName);
+        Request<ChainAccount> request = new Request<>(chainAccount);
+        return new RemoteCall<>(
+                weCrossService, "POST", "/auth/setDefaultChainAccount", UAResponse.class, request);
     }
 
     @Override

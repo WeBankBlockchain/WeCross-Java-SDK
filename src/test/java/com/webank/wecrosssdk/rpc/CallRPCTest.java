@@ -130,6 +130,12 @@ public class CallRPCTest {
     }
 
     @Test
+    public void setDefaultChainAccountTest() throws Exception{
+        UAResponse uaResponse = weCrossRPC.setDefaultChainAccount("payment.fabric-mychannel", 0).send();
+        Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
+    }
+
+    @Test
     public void logoutTest() throws Exception {
         UAResponse uaResponse = weCrossRPC.logout().send();
         Assert.assertEquals(uaResponse.getUAReceipt().getErrorCode(), 0);
