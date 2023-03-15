@@ -121,6 +121,9 @@ public class FabricAccount extends ChainAccount {
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
+                + "\n"
+                + "\tchainDefault: "
+                + chainDefault
                 + "\n\t----------\n";
     }
 
@@ -143,6 +146,9 @@ public class FabricAccount extends ChainAccount {
                 + "\n"
                 + "\tisDefault: "
                 + isDefault
+                + "\n"
+                + "\tchainDefault: "
+                + chainDefault
                 + "\n\t----------\n";
     }
 }
