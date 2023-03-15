@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         include = JsonTypeInfo.As.EXISTING_PROPERTY)
 @JsonSubTypes(
         value = {
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_ECDSA_EVM"),
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_GM_EVM"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
             @JsonSubTypes.Type(value = FabricAccount.class, name = "Fabric1.4"),
@@ -21,6 +23,7 @@ public class ChainAccount {
     public Integer keyID;
     public String type;
     public boolean isDefault = false;
+    public String chainDefault = "";
 
     public ChainAccount() {}
 
@@ -28,6 +31,11 @@ public class ChainAccount {
         this.keyID = keyID;
         this.type = type;
         this.isDefault = isDefault;
+    }
+
+    public ChainAccount(Integer keyID, String chainName) {
+        this.keyID = keyID;
+        this.chainDefault = chainName;
     }
 
     public ChainAccount(String type, boolean isDefault) {
@@ -59,6 +67,16 @@ public class ChainAccount {
     @JsonSetter("isDefault")
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    @JsonGetter("chainDefault")
+    public String getChainDefault() {
+        return chainDefault;
+    }
+
+    @JsonSetter("chainDefault")
+    public void setChainDefault(String chainName) {
+        chainDefault = chainName;
     }
 
     @Override

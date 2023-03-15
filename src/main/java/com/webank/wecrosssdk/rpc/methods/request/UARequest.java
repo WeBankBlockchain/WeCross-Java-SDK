@@ -29,6 +29,8 @@ public class UARequest {
 
     public UARequest(String type, ChainAccount chainAccount) {
         switch (type) {
+            case "BCOS3.0":
+            case "GM_BCOS3.0":
             case "GM_BCOS2.0":
             case "BCOS2.0":
                 {
