@@ -4,14 +4,17 @@
 
 **新增**
 
-- 新增对FISCO BCOS 3.x的支持
-- 新增单次跨链事务写接口 `autoCommitXATransaction`
-- 新增有多个同类型链时指定该链的默认账户的接口 `setDefaultChainAccount` #134
+* 新增对FISCO BCOS 3.x的支持
+* 新增单次跨链事务写接口 `autoCommitXATransaction`
+* 新增有多个同类型链时指定该链的默认账户的接口 `setDefaultChainAccount` #134
 
 **修复**
 
-- 修复UA的密码长度检验与网页不一致的问题。#129
-- 修复log4j的漏洞，将其升级至2.15。
+* 修复UA的密码长度检验与网页不一致的问题。#129
+
+**更新**
+
+* 更新gson、bouncycastle、netty、spring-boot-starter、jackson-databind的版本号，以修复安全问题。
 
 ### v1.2.1
 
