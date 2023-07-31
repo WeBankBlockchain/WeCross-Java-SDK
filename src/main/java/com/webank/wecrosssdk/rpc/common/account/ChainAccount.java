@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         value = {
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_ECDSA_EVM"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_GM_EVM"),
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_ECDSA_WASM"),
+            @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS3_GM_WASM"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "BCOS2.0"),
             @JsonSubTypes.Type(value = BCOSAccount.class, name = "GM_BCOS2.0"),
             @JsonSubTypes.Type(value = FabricAccount.class, name = "Fabric1.4"),
