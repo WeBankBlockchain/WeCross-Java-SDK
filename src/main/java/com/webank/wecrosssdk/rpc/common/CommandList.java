@@ -27,7 +27,8 @@ public class CommandList {
                     "supportedStubs",
                     "listResources",
                     "status",
-                    "detail");
+                    "detail",
+                    "getBlock");
 
     public static final List<String> normalCommands = Arrays.asList("register", "login");
 }
