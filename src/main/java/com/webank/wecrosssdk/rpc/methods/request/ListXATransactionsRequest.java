@@ -9,8 +9,12 @@ public class ListXATransactionsRequest {
 
     private Map<String, Integer> offsets = new HashMap<>();
 
-    public ListXATransactionsRequest(int size) {
+    private String chainPath;
+
+    public ListXATransactionsRequest(int size, String chainPath) {
         this.size = size;
+        this.chainPath = chainPath;
+        ;
     }
 
     public int getSize() {
@@ -27,5 +31,13 @@ public class ListXATransactionsRequest {
 
     public void setOffsets(Map<String, Integer> offsets) {
         this.offsets = offsets;
+    }
+
+    public String getChainPath() {
+        return chainPath;
+    }
+
+    public void setChainPath(String chainPath) {
+        this.chainPath = chainPath;
     }
 }
