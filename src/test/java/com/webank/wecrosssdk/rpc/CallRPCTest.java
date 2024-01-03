@@ -112,7 +112,7 @@ public class CallRPCTest {
     @Test
     public void listXATransactionsTest() throws Exception {
         XATransactionListResponse xaTransactionListResponse =
-                weCrossRPC.listXATransactions(0).send();
+                weCrossRPC.listXATransactions(0, null).send();
         Assert.assertNotNull(xaTransactionListResponse.getRawXATransactionListResponse());
     }
 

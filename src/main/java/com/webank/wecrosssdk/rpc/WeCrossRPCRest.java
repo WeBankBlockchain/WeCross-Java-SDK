@@ -246,8 +246,9 @@ public class WeCrossRPCRest implements WeCrossRPC {
     }
 
     @Override
-    public RemoteCall<XATransactionListResponse> listXATransactions(int size) {
-        ListXATransactionsRequest listXATransactionsRequest = new ListXATransactionsRequest(size);
+    public RemoteCall<XATransactionListResponse> listXATransactions(int size, String chainPath) {
+        ListXATransactionsRequest listXATransactionsRequest =
+                new ListXATransactionsRequest(size, chainPath);
         Request<ListXATransactionsRequest> request = new Request<>(listXATransactionsRequest);
         return new RemoteCall<>(
                 weCrossService,
