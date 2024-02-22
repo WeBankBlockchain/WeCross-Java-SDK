@@ -11,10 +11,13 @@ public class ListXATransactionsRequest {
 
     private String chainPath;
 
+    public ListXATransactionsRequest(int size) {
+        this.size = size;
+    }
+
     public ListXATransactionsRequest(int size, String chainPath) {
         this.size = size;
         this.chainPath = chainPath;
-        ;
     }
 
     public int getSize() {
