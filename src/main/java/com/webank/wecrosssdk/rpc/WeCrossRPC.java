@@ -46,6 +46,8 @@ public interface WeCrossRPC {
 
     RemoteCall<CommandResponse> customCommand(String command, String path, Object... args);
 
+    RemoteCall<XATransactionListResponse> listXATransactions(int size);
+
     RemoteCall<XATransactionListResponse> listXATransactions(int size, String chainPath);
 
     RemoteCall<UAResponse> register(String name, String password) throws Exception;
