@@ -89,6 +89,9 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     compile ('org.springframework.boot:spring-boot-starter-web:2.7.18'){
         exclude group: 'org.springframework', module: 'spring-core'
+        exclude group: 'org.springframework', module: 'spring-web'
+        exclude group: 'org.springframework', module: 'spring-webmvc'
+        exclude group: 'org.yaml', module: 'snakeyaml'
     }
     compile 'org.springframework.boot:spring-boot-starter-aop:2.7.18'
     compile 'org.springframework.boot:spring-boot-starter-security:2.7.18'
@@ -100,8 +103,8 @@ dependencies {
     implementation ('org.asynchttpclient:async-http-client:2.12.3'){
         exclude group : 'io.netty'
     }
-    implementation 'io.netty:netty-all:4.1.101.Final'
-    implementation 'com.google.guava:guava:32.0.1-jre'
+    compile 'io.netty:netty-all:4.1.101.Final'
+    compile 'com.google.guava:guava:32.0.1-jre'
     compile 'commons-codec:commons-codec:1.14'
     compile 'org.bouncycastle:bcprov-jdk18on:1.77'
     compile 'junit:junit:4.13.1'

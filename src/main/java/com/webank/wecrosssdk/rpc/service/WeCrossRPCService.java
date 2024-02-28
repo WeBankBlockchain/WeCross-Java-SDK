@@ -191,8 +191,8 @@ public class WeCrossRPCService implements WeCrossService {
             } else {
                 url = server + uri;
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
+            if (logger.isTraceEnabled()) {
+                logger.trace("request: {}; url: {}", objectMapper.writeValueAsString(request), url);
             }
 
             checkRequest(request);
