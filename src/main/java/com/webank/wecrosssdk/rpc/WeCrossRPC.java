@@ -3,6 +3,7 @@ package com.webank.wecrosssdk.rpc;
 import com.webank.wecrosssdk.rpc.common.account.ChainAccount;
 import com.webank.wecrosssdk.rpc.methods.Response;
 import com.webank.wecrosssdk.rpc.methods.response.*;
+import java.math.BigInteger;
 
 public interface WeCrossRPC {
 
@@ -47,6 +48,8 @@ public interface WeCrossRPC {
 
     RemoteCall<XATransactionListResponse> listXATransactions(int size);
 
+    RemoteCall<XATransactionListResponse> listXATransactions(int size, String chainPath);
+
     RemoteCall<UAResponse> register(String name, String password) throws Exception;
 
     RemoteCall<UAResponse> login(String name, String password) throws Exception;
@@ -62,6 +65,8 @@ public interface WeCrossRPC {
     RemoteCall<UAResponse> setDefaultChainAccount(String chainName, ChainAccount chainAccount);
 
     RemoteCall<UAResponse> setDefaultChainAccount(String chainName, Integer keyID);
+
+    RemoteCall<CommandResponse> getBlock(String path, BigInteger blockNumber);
 
     String getCurrentTransactionID();
 }

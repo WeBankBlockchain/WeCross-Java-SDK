@@ -26,11 +26,9 @@ public class RequestUtility {
         String confusedPassword = DigestUtils.sha256Hex(LoginSalt.LoginSalt + password);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "login username: {}, pub: {}, randomToken: {}",
-                    username,
-                    pub,
-                    authCode.getRandomToken());
+            username = username.replace("\n", "");
+            username = username.replace("\r", "");
+            logger.debug("login username: {}", username);
         }
 
         LoginRequest loginRequest = new LoginRequest();
@@ -56,11 +54,9 @@ public class RequestUtility {
         String confusedPassword = DigestUtils.sha256Hex(LoginSalt.LoginSalt + password);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "register username: {}, pub: {}, randomToken: {}",
-                    username,
-                    pub,
-                    authCode.getRandomToken());
+            username = username.replace("\n", "");
+            username = username.replace("\r", "");
+            logger.debug("login username: {}", username);
         }
 
         RegisterRequest registerRequest = new RegisterRequest();

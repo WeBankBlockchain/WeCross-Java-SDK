@@ -14,6 +14,7 @@ import com.webank.wecrosssdk.rpc.methods.request.*;
 import com.webank.wecrosssdk.rpc.methods.request.UARequest;
 import com.webank.wecrosssdk.rpc.methods.response.*;
 import com.webank.wecrosssdk.rpc.service.WeCrossService;
+import java.math.BigInteger;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -246,7 +247,13 @@ public class WeCrossRPCRest implements WeCrossRPC {
 
     @Override
     public RemoteCall<XATransactionListResponse> listXATransactions(int size) {
-        ListXATransactionsRequest listXATransactionsRequest = new ListXATransactionsRequest(size);
+        return listXATransactions(size, null);
+    }
+
+    @Override
+    public RemoteCall<XATransactionListResponse> listXATransactions(int size, String chainPath) {
+        ListXATransactionsRequest listXATransactionsRequest =
+                new ListXATransactionsRequest(size, chainPath);
         Request<ListXATransactionsRequest> request = new Request<>(listXATransactionsRequest);
         return new RemoteCall<>(
                 weCrossService,
@@ -333,6 +340,14 @@ public class WeCrossRPCRest implements WeCrossRPC {
             return null;
         }
         return txID;
+    }
+
+    @Override
+    public RemoteCall<CommandResponse> getBlock(String path, BigInteger blockNumber) {
+        String uri = "/trans/getBlock";
+        BlockRequest blockRequest = new BlockRequest(blockNumber, path);
+        Request<BlockRequest> request = new Request<>(blockRequest);
+        return new RemoteCall<>(weCrossService, "GET", uri, CommandResponse.class, request);
     }
 
     private RemoteCall<TransactionResponse> buildSendTransactionRequest(
