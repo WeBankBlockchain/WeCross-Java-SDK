@@ -48,6 +48,8 @@ public interface WeCrossRPC {
 
     RemoteCall<XATransactionListResponse> listXATransactions(int size);
 
+    RemoteCall<XATransactionListResponse> listXATransactions(int size, String chainPath);
+
     RemoteCall<UAResponse> register(String name, String password) throws Exception;
 
     RemoteCall<UAResponse> login(String name, String password) throws Exception;

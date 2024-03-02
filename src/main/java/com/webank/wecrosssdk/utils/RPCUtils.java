@@ -1,9 +1,7 @@
 package com.webank.wecrosssdk.utils;
 
-import com.webank.wecrosssdk.common.Constant;
 import com.webank.wecrosssdk.exception.ErrorCode;
 import com.webank.wecrosssdk.exception.WeCrossSDKException;
-import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -17,13 +15,6 @@ public class RPCUtils {
         String[] sp = path.split("\\.");
         if (!path.matches("^[A-Za-z]*.[A-Za-z0-9_-]*.[A-Za-z0-9_-]*$") || sp.length != 3) {
             throw new WeCrossSDKException(ErrorCode.RESOURCE_ERROR, "Invalid iPath: " + path);
-        }
-        String templateUrl = Constant.TEMPLATE_URL + path.replace('.', '/');
-
-        try {
-            new URL(templateUrl);
-        } catch (Exception e) {
-            throw new WeCrossSDKException(ErrorCode.ILLEGAL_SYMBOL, "Invalid iPath: " + path);
         }
     }
 
