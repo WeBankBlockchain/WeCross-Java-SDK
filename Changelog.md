@@ -1,3 +1,16 @@
+### v1.4.0
+
+(2024-03-01)
+
+**新增**
+
+- 增加获取区块的PRC接口 https://github.com/WeBankBlockchain/WeCross-Java-SDK/pull/145
+- 增加获取跨链事务的接口，该接口可以优化获取事务的效率 https://github.com/WeBankBlockchain/WeCross-Java-SDK/pull/146
+
+**更改**
+
+- 更新版本依赖，修复安全问题 https://github.com/WeBankBlockchain/WeCross-Java-SDK/pull/148
+
 ### v1.3.1
 
 (2023-07-31)
